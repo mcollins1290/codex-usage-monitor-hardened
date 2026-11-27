@@ -34,6 +34,13 @@ pub struct Attempt {
     auth: Option<(CredentialWatchMode, CredentialWatchSnapshot)>,
 }
 impl Attempt {
+    pub fn from_result(result: Result<UsageData, PollError>) -> Self {
+        Self {
+            result: Some(result),
+            auth: None,
+        }
+    }
+
     pub fn cancelled() -> Self {
         Self {
             result: None,
