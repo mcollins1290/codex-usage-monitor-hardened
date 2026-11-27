@@ -13,10 +13,12 @@ use std::io::{BufRead, BufReader, Write};
 use std::os::windows::io::AsRawHandle;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::os::windows::process::CommandExt;
 use std::sync::mpsc::sync_channel;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 const MAX_JSON_LINE_BYTES: usize = 256 * 1024;
+const CREATE_NO_WINDOW: u32 = 0x0800_0000;
 const STARTUP_TIMEOUT: Duration = Duration::from_secs(3);
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(7);
 const CODEX_VERSION: &str = "0.166.0";
@@ -221,6 +223,7 @@ pub fn read_rate_limits(identity: &ApprovedExecutable) -> Result<UsageData, AppS
     command
         .arg("app-server")
         .arg("--stdio")
+        .creation_flags(CREATE_NO_WINDOW)
         .current_dir(std::env::temp_dir())
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
