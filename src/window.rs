@@ -805,21 +805,6 @@ fn collect_low_quota_alerts(state: &mut AppState, data: &AppUsageData) -> Vec<Qu
 
     let strings = state.language.strings();
     let mut alerts = Vec::new();
-    if state.show_claude_code {
-        if let Some(usage) = data.claude_code.as_ref() {
-            append_provider_alerts(
-                &mut alerts,
-                &mut state.notified_quota_windows,
-                threshold,
-                state.language,
-                tray_icon::TrayIconKind::Claude,
-                "claude",
-                strings.claude_code_model,
-                usage,
-                strings,
-            );
-        }
-    }
     if state.show_codex {
         if let Some(usage) = data.codex.as_ref() {
             append_provider_alerts(
@@ -830,21 +815,6 @@ fn collect_low_quota_alerts(state: &mut AppState, data: &AppUsageData) -> Vec<Qu
                 tray_icon::TrayIconKind::Codex,
                 "codex",
                 strings.codex_model,
-                usage,
-                strings,
-            );
-        }
-    }
-    if state.show_antigravity {
-        if let Some(usage) = data.antigravity.as_ref() {
-            append_provider_alerts(
-                &mut alerts,
-                &mut state.notified_quota_windows,
-                threshold,
-                state.language,
-                tray_icon::TrayIconKind::Antigravity,
-                "antigravity",
-                strings.antigravity_model,
                 usage,
                 strings,
             );
@@ -1289,35 +1259,17 @@ fn refresh_usage_texts(state: &mut AppState) -> bool {
     let local_today = (state.appearance.reset_time_display == ResetTimeDisplay::Clock)
         .then(|| native_interop::system_time_to_local(now))
         .flatten();
-    for (id, visible, usage, session, weekly) in [
-        (
-            0,
-            state.show_claude_code,
-            data.claude_code.as_ref(),
-            &mut state.session_text,
-            &mut state.weekly_text,
-        ),
-        (
-            1,
-            state.show_codex,
-            data.codex.as_ref(),
-            &mut state.codex_session_text,
-            &mut state.codex_weekly_text,
-        ),
-        (
-            2,
-            state.show_antigravity,
-            data.antigravity.as_ref(),
-            &mut state.antigravity_session_text,
-            &mut state.antigravity_weekly_text,
-        ),
-    ] {
+    for (visible, usage, session, weekly) in [(
+        state.show_codex,
+        data.codex.as_ref(),
+        &mut state.codex_session_text,
+        &mut state.codex_weekly_text,
+    )] {
         if !visible {
             continue;
         }
         let service = &state.monitor.service;
-        let antigravity = id == 2;
-        if let Some(usage) = usage.filter(|_| !antigravity || service.error.is_none()) {
+        if let Some(usage) = usage {
             let observed_at = service.history.last_success;
             let stale = service.stale(now);
             for (weekly, output, section) in [
@@ -1336,14 +1288,10 @@ fn refresh_usage_texts(state: &mut AppState) -> bool {
                 *output = text;
             }
         } else {
-            let label = if antigravity {
-                "--"
-            } else {
-                service
-                    .error
-                    .map(|error| poll_error_display_label(error, state.language))
-                    .unwrap_or("...")
-            };
+            let label = service
+                .error
+                .map(|error| poll_error_display_label(error, state.language))
+                .unwrap_or("...");
             changed |= session != label || weekly != label;
             *session = label.to_string();
             *weekly = label.to_string();
@@ -2901,43 +2849,22 @@ fn complete_provider_poll(
         }
         let mut fresh = AppUsageData::default();
         if completion.successful {
-            let data = s.monitor.service.data.clone();
-            match job.id {
-                0 => fresh.claude_code = data,
-                1 => fresh.codex = data,
-                _ => fresh.antigravity = data,
-            }
+            fresh.codex = s.monitor.service.data.clone();
         }
         let previous_keys = s.notified_quota_windows.clone();
         let mut alerts = collect_low_quota_alerts(s, &fresh);
         let mut settings_changed = previous_keys != s.notified_quota_windows;
-        let usage = match job.id {
-            0 => &fresh.claude_code,
-            1 => &fresh.codex,
-            _ => &fresh.antigravity,
-        };
+        let usage = &fresh.codex;
         if let Some(usage) = usage.as_ref() {
             settings_changed |=
                 collect_reset_alerts(s, job.id, usage, SystemTime::now(), &mut alerts);
         }
         let cached = s.monitor.cached();
-        for (usage, session, weekly) in [
-            (
-                cached.claude_code.as_ref(),
-                &mut s.session_percent,
-                &mut s.weekly_percent,
-            ),
-            (
-                cached.codex.as_ref(),
-                &mut s.codex_session_percent,
-                &mut s.codex_weekly_percent,
-            ),
-            (
-                cached.antigravity.as_ref(),
-                &mut s.antigravity_session_percent,
-                &mut s.antigravity_weekly_percent,
-            ),
-        ] {
+        for (usage, session, weekly) in [(
+            cached.codex.as_ref(),
+            &mut s.codex_session_percent,
+            &mut s.codex_weekly_percent,
+        )] {
             *session = usage.map_or(0.0, |u| u.session.percentage);
             *weekly = usage.map_or(0.0, |u| u.weekly.percentage);
         }
@@ -3000,22 +2927,10 @@ fn schedule_countdown_timer() {
         return;
     };
     let delays = [
-        data.claude_code
-            .as_ref()
-            .and_then(|usage| poller::time_until_display_change(usage.session.resets_at)),
-        data.claude_code
-            .as_ref()
-            .and_then(|usage| poller::time_until_display_change(usage.weekly.resets_at)),
         data.codex
             .as_ref()
             .and_then(|usage| poller::time_until_display_change(usage.session.resets_at)),
         data.codex
-            .as_ref()
-            .and_then(|usage| poller::time_until_display_change(usage.weekly.resets_at)),
-        data.antigravity
-            .as_ref()
-            .and_then(|usage| poller::time_until_display_change(usage.session.resets_at)),
-        data.antigravity
             .as_ref()
             .and_then(|usage| poller::time_until_display_change(usage.weekly.resets_at)),
     ];

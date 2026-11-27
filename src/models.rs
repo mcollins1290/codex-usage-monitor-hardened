@@ -29,9 +29,7 @@ pub struct UsageData {
 
 #[derive(Clone, Debug, Default)]
 pub struct AppUsageData {
-    pub claude_code: Option<UsageData>,
     pub codex: Option<UsageData>,
-    pub antigravity: Option<UsageData>,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
