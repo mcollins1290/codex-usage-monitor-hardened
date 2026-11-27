@@ -23,8 +23,8 @@ use crate::diagnose;
 use crate::localization::{self, LanguageId, Strings};
 use crate::models::{AppUsageData, QuotaDisplayMode};
 use crate::native_interop::{
-    self, Color, TIMER_COUNTDOWN, TIMER_FRESHNESS, TIMER_POLL, TIMER_TASKBAR_RETRY,
-    WM_APP_TRAY, WM_APP_USAGE_UPDATED,
+    self, Color, TIMER_COUNTDOWN, TIMER_FRESHNESS, TIMER_POLL, TIMER_TASKBAR_RETRY, WM_APP_TRAY,
+    WM_APP_USAGE_UPDATED,
 };
 use crate::poller;
 use crate::provider_icons::{self, Provider};
@@ -1405,7 +1405,9 @@ fn import_compatibility_evidence(hwnd: HWND) {
         OFN_PATHMUSTEXIST, OPENFILENAMEW,
     };
     let mut buffer = vec![0u16; 32768];
-    let filter: Vec<u16> = "JSON evidence (*.json)\0*.json\0\0".encode_utf16().collect();
+    let filter: Vec<u16> = "JSON evidence (*.json)\0*.json\0\0"
+        .encode_utf16()
+        .collect();
     let mut dialog = OPENFILENAMEW {
         lStructSize: std::mem::size_of::<OPENFILENAMEW>() as u32,
         hwndOwner: hwnd,
@@ -1433,8 +1435,12 @@ fn import_compatibility_evidence(hwnd: HWND) {
     );
     let message = native_interop::wide_str(&text);
     let accepted = unsafe {
-        MessageBoxW(hwnd, PCWSTR(message.as_ptr()), w!("Confirm compatibility evidence"),
-            MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2)
+        MessageBoxW(
+            hwnd,
+            PCWSTR(message.as_ptr()),
+            w!("Confirm compatibility evidence"),
+            MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2,
+        )
     } == IDYES;
     if !accepted {
         return;
@@ -1449,7 +1455,11 @@ fn import_compatibility_evidence(hwnd: HWND) {
                 state.codex_identity.replace(identity)
             };
             if save_state_settings() {
-                show_info_message(hwnd, "Compatibility evidence recorded", "Live polling is still disabled pending runtime security acceptance.");
+                show_info_message(
+                    hwnd,
+                    "Compatibility evidence recorded",
+                    "Live polling is still disabled pending runtime security acceptance.",
+                );
             } else {
                 if let Some(state) = lock_state().as_mut() {
                     state.codex_identity = previous;
@@ -1457,7 +1467,11 @@ fn import_compatibility_evidence(hwnd: HWND) {
                 show_error_message(hwnd, "Approval not saved", "Settings could not be saved. The previous in-memory approval was restored; live polling remains disabled.");
             }
         }
-        Err(_) => show_error_message(hwnd, "Evidence rejected", "The executable identity could not be revalidated. No approval was recorded."),
+        Err(_) => show_error_message(
+            hwnd,
+            "Evidence rejected",
+            "The executable identity could not be revalidated. No approval was recorded.",
+        ),
     }
 }
 
@@ -1466,7 +1480,11 @@ fn revoke_compatibility_evidence(hwnd: HWND) {
         state.codex_identity = None;
     }
     if save_state_settings() {
-        show_info_message(hwnd, "Approval revoked", "The recorded executable approval has been cleared. Live polling remains disabled.");
+        show_info_message(
+            hwnd,
+            "Approval revoked",
+            "The recorded executable approval has been cleared. Live polling remains disabled.",
+        );
     } else {
         // Never restore approval after an explicit revocation request.
         show_error_message(hwnd, "Revocation not saved", "Approval is cleared for this session, but the previous settings may remain on disk. Retry revocation before restarting. Live polling remains disabled.");

@@ -14,7 +14,7 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 - Last verified code commit: `6f58cbb97bb911e04cca79b8844301457bd027ac`
 - [Windows CI run 45932899764](https://github.com/mcollins1290/codex-usage-monitor-hardened/actions/runs/45932899764): success; formatting, locked dependency tests and optimized build passed.
 - Tests: 108 passed, 0 failed, 4 ignored (two child fixtures invoked by parent tests).
-- Release build: 41 compiler warnings; cleanup outstanding.
+- Release build: warning cleanup remains outstanding; the last local test build reported 16 dead-code warnings.
 - Native child containment, descendant rejection, forced shutdown, compatibility, isolated profile and negative version-probe tests passed. Schema 2 now binds evidence to the executable path as well as version/hash/policy; tests pending CI. No version probe or approval action is exposed to users yet.
 
 **Temporary CI policy (owner authorized):** Windows CI is manual-only on this development branch until final verification. Intermediate commits are unverified; restore push and pull-request triggers and require a successful full Windows CI run before acceptance, merging or installation. All checks remain intact.

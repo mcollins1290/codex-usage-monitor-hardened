@@ -15,7 +15,7 @@ start turns, invoke inference, or expose a generic JSON-RPC method interface.
 
 ## Executable identity
 
-The first approved integration target is Codex CLI `0.166.0`. The executable
+The current development integration target is Codex CLI `0.172.0`. The executable
 must be represented by a user-approved absolute path, SHA-256 digest, and
 version. The identity is configuration data, not committed source data. The
 identity is revalidated immediately before each launch; a missing or changed
@@ -73,4 +73,4 @@ credentials, stdout, and stderr must never be persisted or logged.
 
 The app-server launch boundary now rejects every attempt until a verified startup policy is implemented. Synthetic protocol success on CLI 0.172.0 is not approval for authenticated polling. The main window settings and startup registry identifiers are isolated; upstream settings and startup migration are removed. Installation scripts are intentionally removed pending acceptance.
 
-The client now waits for initialization before requesting quotas, enforces frame limits before allocation, uses a nonblocking bounded queue, and closes stdin for graceful shutdown. The current process launcher still assigns its Job Object after process creation; creation-time assignment and Windows fixture tests remain required before the launch freeze may be lifted. The 0.172.0 target is provisional, not an approved authenticated compatibility policy.
+The client now waits for initialization before requesting quotas, enforces frame limits before allocation, uses a nonblocking bounded queue, and closes stdin for graceful shutdown. The launcher assigns a kill-on-close Job Object at process creation and rejects uncontained fallback launches. The 0.172.0 target remains provisional: authenticated runtime acceptance and startup side-effect verification are still required, and the compiled launch freeze remains in force.

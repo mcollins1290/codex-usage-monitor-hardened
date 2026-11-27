@@ -569,7 +569,9 @@ struct EvidenceImport {
 
 pub fn inspect_evidence_file(path: &Path) -> Result<ApprovedExecutable, AppServerError> {
     let file = File::open(path).map_err(|_| AppServerError::InvalidIdentity)?;
-    let metadata = file.metadata().map_err(|_| AppServerError::InvalidIdentity)?;
+    let metadata = file
+        .metadata()
+        .map_err(|_| AppServerError::InvalidIdentity)?;
     if !metadata.is_file() {
         return Err(AppServerError::InvalidIdentity);
     }
@@ -603,7 +605,9 @@ fn inspect_evidence(import: EvidenceImport) -> Result<ApprovedExecutable, AppSer
     Ok(candidate)
 }
 
-pub fn confirm_evidence(candidate: ApprovedExecutable) -> Result<ApprovedExecutable, AppServerError> {
+pub fn confirm_evidence(
+    candidate: ApprovedExecutable,
+) -> Result<ApprovedExecutable, AppServerError> {
     let mut evidence = candidate
         .compatibility
         .clone()
@@ -987,11 +991,7 @@ mod tests {
             }),
             Err(AppServerError::CompatibilityRequired)
         ));
-        let candidate = inspect_evidence(EvidenceImport {
-            identity,
-            evidence,
-        })
-        .unwrap();
+        let candidate = inspect_evidence(EvidenceImport { identity, evidence }).unwrap();
         assert_eq!(
             check_compatibility(&candidate),
             Err(AppServerError::CompatibilityRequired)

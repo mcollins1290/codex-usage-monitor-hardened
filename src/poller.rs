@@ -124,4 +124,3 @@ pub fn app_server_error(error: app_server::AppServerError) -> PollError {
         _ => PollError::RequestFailed,
     }
 }
-

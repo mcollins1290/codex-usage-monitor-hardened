@@ -40,9 +40,7 @@ impl Attempt {
     }
 
     pub fn cancelled() -> Self {
-        Self {
-            result: None,
-        }
+        Self { result: None }
     }
 }
 pub struct Completion {
@@ -903,7 +901,9 @@ mod tests {
         );
         m.force(now + Duration::from_secs(1), false);
         let restored = m.plan(now + Duration::from_secs(1));
-        let auth = execute(&restored[0], || panic!("wake must not retry paused authentication"));
+        let auth = execute(&restored[0], || {
+            panic!("wake must not retry paused authentication")
+        });
         m.finish(&restored[0], auth, now, wall, 900_000, true);
         assert!(complete(&mut m, &restored[1], Ok(usage(20.0)), now, wall).successful);
         assert_eq!(m.services[0].error, Some(PollError::AuthRequired));
