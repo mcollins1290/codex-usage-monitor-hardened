@@ -102,6 +102,7 @@ pub enum AppServerError {
     InvalidIdentity,
     ExecutableMissing,
     HashMismatch,
+    #[allow(dead_code)]
     VersionMismatch,
     LaunchFailed,
     Timeout,

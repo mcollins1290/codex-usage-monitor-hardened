@@ -5,35 +5,24 @@ use crate::localization::Strings;
 use crate::models::{QuotaDisplayMode, UsageData, UsageSection};
 use std::time::{Duration, SystemTime};
 
-pub const CODEX_QUOTA_GROUP: &str = "Codex";
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PollError {
     AuthRequired,
+    #[allow(dead_code)]
     NoCredentials,
+    #[allow(dead_code)]
     TokenExpired,
+    #[allow(dead_code)]
     NetworkUnavailable,
+    #[allow(dead_code)]
     RateLimited(Option<u32>),
+    #[allow(dead_code)]
     ServerError,
     RequestFailed,
     ApprovalRequired,
     ExecutableChanged,
 }
-impl PollError {
-    pub fn category(self) -> &'static str {
-        match self {
-            Self::AuthRequired => "auth_required",
-            Self::NoCredentials => "credentials_unavailable",
-            Self::TokenExpired => "authentication_unavailable",
-            Self::NetworkUnavailable => "network_unavailable",
-            Self::RateLimited(_) => "rate_limited",
-            Self::ServerError => "server_error",
-            Self::RequestFailed => "protocol_error",
-            Self::ApprovalRequired => "approval_required",
-            Self::ExecutableChanged => "executable_changed",
-        }
-    }
-}
+impl PollError {}
 
 pub fn poll_provider(
     id: usize,

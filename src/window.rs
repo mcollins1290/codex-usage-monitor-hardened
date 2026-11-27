@@ -2130,7 +2130,7 @@ fn update_quota_tooltips() {
             let count = active_model_count();
             let (label_width, text_width) = current_usage_layout_widths(s);
             let width = model_usage_width(row_bar_segment_count(count), text_width, s.appearance);
-            let mut left = sc(LEFT_DIVIDER_W)
+            let left = sc(LEFT_DIVIDER_W)
                 + sc(DIVIDER_RIGHT_MARGIN)
                 + period_label_column_width(label_width, s.appearance);
             if s.show_codex {
@@ -2162,7 +2162,6 @@ fn update_quota_tooltips() {
                     },
                     text,
                 ));
-                left += width + sc(MODEL_RIGHT_MARGIN);
             }
         }
         (s.hwnd.to_hwnd(), regions)
@@ -2356,8 +2355,6 @@ fn paint_content(hdc: HDC, width: i32, height: i32, content: &WidgetContent<'_>)
     let active_models = i32::from(provider_visible);
     let segment_count = row_bar_segment_count(active_models);
     let bar_width = usage_bar_width(segment_count, appearance);
-    let model_width =
-        model_usage_width(segment_count, text_width, appearance) + sc(MODEL_RIGHT_MARGIN);
     appearance.font_size = appearance.font_size.fit(height, rows, sc);
 
     unsafe {
@@ -2425,14 +2422,12 @@ fn paint_content(hdc: HDC, width: i32, height: i32, content: &WidgetContent<'_>)
         let model_left = content_x + period_label_column_width(label_width, appearance);
         if !appearance.hide_provider_logos {
             let size = sc(provider_icons::SIZE).min(height);
-            let mut icon_x = model_left;
             if provider_visible {
-                provider_icons::draw(hdc, icon_x, (height - size) / 2, size);
+                provider_icons::draw(hdc, model_left, (height - size) / 2, size);
             }
         }
 
         let strings = language.strings();
-        let provider_text_colors = active_models > 1 && appearance.palette == Palette::System;
         for (row, label) in [strings.session_window, strings.weekly_window]
             .into_iter()
             .enumerate()
@@ -2455,13 +2450,9 @@ fn paint_content(hdc: HDC, width: i32, height: i32, content: &WidgetContent<'_>)
                     DT_LEFT | DT_VCENTER | DT_SINGLELINE,
                 );
             }
-            let mut model_x = model_left + provider_mark_width(appearance);
+            let model_x = model_left + provider_mark_width(appearance);
             if provider_visible {
-                let value_color = if provider_text_colors {
-                    codex_brand_color(is_dark)
-                } else {
-                    text_color
-                };
+                let value_color = text_color;
                 let used = used[row][0];
                 draw_usage_bar(
                     hdc,
