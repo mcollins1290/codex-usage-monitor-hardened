@@ -120,4 +120,4 @@ Added tests for pre-granted consent rejection, explicit approval, changed execut
 
 Production initialization now uses a fixed Codex-only constructor and no longer reconfigures provider selection at runtime. Reset observations and adaptive polling consume explicit Codex state. Windows CI pending.
 
-Generalized provider constructor, reselect and configure interfaces are now test-only; production uses the fixed Codex constructor. The three display slots remain for renderer compatibility. Final CI pending.
+The generalized provider constructor and three-slot display model have been removed from production. Final CI remains pending.

@@ -44,7 +44,7 @@ acceptance.
 - Imported evidence cannot grant its own consent.
 - The production launch freeze is unconditional and remains active.
 - The local Windows test run exercised the production app-server protocol and
-  containment paths: 104 passed, 0 failed, 4 ignored.
+  containment paths: 86 passed, 0 failed, 4 ignored.
 
 ## Blocking findings
 
@@ -77,11 +77,8 @@ acceptance.
 
 ## Required next work
 
-- Remove or decisively isolate the remaining provider-specific production
-  structures and assets.
-- Remove unused localization, error and version-probe code or make its test-only
-  role explicit without leaving production warnings.
-- Perform the dependency audit in an environment with reviewed audit tooling.
+- Reconcile remaining historical status wording and complete the item-level
+  evidence register for the final candidate.
 - Reconcile the full item-level A–T checklist after those changes.
 - Run the manually dispatched Windows workflow on the final candidate only.
 - Keep the authenticated launch freeze until independent runtime acceptance.
