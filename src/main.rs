@@ -2,13 +2,13 @@
 
 mod app_server;
 mod codex_colors;
+mod codex_icon;
 mod codex_poll;
 mod diagnose;
 mod localization;
 mod models;
 mod native_interop;
 mod poller;
-mod provider_icons;
 mod quota_alerts;
 mod quota_refresh;
 mod quota_text;

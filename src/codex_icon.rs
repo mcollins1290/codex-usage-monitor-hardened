@@ -13,12 +13,9 @@ pub fn draw(hdc: HDC, x: i32, y: i32, size: i32) {
 }
 
 fn original_icon() -> HICON {
-    // The handles live for the process lifetime. DrawIconEx scales the
-    // embedded 64px artwork to the current monitor's DPI without disk access.
     static CODEX: OnceLock<isize> = OnceLock::new();
-    let cache = &CODEX;
     let png = include_bytes!("icons/providers/openai.png");
-    let handle = *cache.get_or_init(|| unsafe {
+    let handle = *CODEX.get_or_init(|| unsafe {
         CreateIconFromResourceEx(png, true, 0x00030000, 64, 64, LR_DEFAULTCOLOR)
             .map(|icon| icon.0 as isize)
             .unwrap_or(0)

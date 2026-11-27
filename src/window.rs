@@ -19,6 +19,7 @@ use windows::Win32::UI::WindowsAndMessaging::*;
 
 use crate::app_server::ApprovedExecutable;
 use crate::codex_colors::{codex_brand_color, SingleColor};
+use crate::codex_icon;
 use crate::codex_poll;
 use crate::diagnose;
 use crate::localization::{self, LanguageId, Strings};
@@ -28,7 +29,6 @@ use crate::native_interop::{
     WM_APP_USAGE_UPDATED,
 };
 use crate::poller;
-use crate::provider_icons;
 use crate::quota_refresh;
 use crate::quota_text;
 use crate::quota_tooltip;
@@ -2421,9 +2421,9 @@ fn paint_content(hdc: HDC, width: i32, height: i32, content: &WidgetContent<'_>)
 
         let model_left = content_x + period_label_column_width(label_width, appearance);
         if !appearance.hide_provider_logos {
-            let size = sc(provider_icons::SIZE).min(height);
+            let size = sc(codex_icon::SIZE).min(height);
             if provider_visible {
-                provider_icons::draw(hdc, model_left, (height - size) / 2, size);
+                codex_icon::draw(hdc, model_left, (height - size) / 2, size);
             }
         }
 
@@ -3788,7 +3788,7 @@ fn provider_mark_width(appearance: Appearance) -> i32 {
     if appearance.hide_provider_logos {
         0
     } else {
-        sc(provider_icons::SIZE + provider_icons::RIGHT_MARGIN)
+        sc(codex_icon::SIZE + codex_icon::RIGHT_MARGIN)
     }
 }
 
