@@ -10,6 +10,7 @@ use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
+use std::os::windows::io::AsRawHandle;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -38,6 +39,104 @@ pub enum AppServerError {
     UnexpectedMessage,
     ProtocolError,
     InvalidQuota,
+}
+
+#[repr(C)]
+struct JobObjectBasicLimitInformation {
+    per_process_user_time_limit: i64,
+    per_job_user_time_limit: i64,
+    limit_flags: u32,
+    minimum_working_set_size: usize,
+    maximum_working_set_size: usize,
+    active_process_limit: u32,
+    affinity: usize,
+    priority_class: u32,
+    scheduling_class: u32,
+}
+
+#[repr(C)]
+struct IoCounters {
+    values: [u64; 6],
+}
+
+#[repr(C)]
+struct JobObjectExtendedLimitInformation {
+    basic: JobObjectBasicLimitInformation,
+    io: IoCounters,
+    process_memory_limit: usize,
+    job_memory_limit: usize,
+    peak_process_memory_used: usize,
+    peak_job_memory_used: usize,
+}
+
+const JOB_OBJECT_EXTENDED_LIMIT_INFORMATION: u32 = 9;
+const JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE: u32 = 0x0000_2000;
+
+unsafe extern "system" {
+    fn CreateJobObjectW(
+        attributes: *mut std::ffi::c_void,
+        name: *const u16,
+    ) -> *mut std::ffi::c_void;
+    fn SetInformationJobObject(
+        job: *mut std::ffi::c_void,
+        class: u32,
+        info: *mut std::ffi::c_void,
+        length: u32,
+    ) -> i32;
+    fn AssignProcessToJobObject(job: *mut std::ffi::c_void, process: *mut std::ffi::c_void) -> i32;
+    fn CloseHandle(handle: *mut std::ffi::c_void) -> i32;
+}
+
+struct JobGuard(*mut std::ffi::c_void);
+impl JobGuard {
+    fn attach(child: &std::process::Child) -> Result<Self, AppServerError> {
+        let job = unsafe { CreateJobObjectW(std::ptr::null_mut(), std::ptr::null()) };
+        if job.is_null() {
+            return Err(AppServerError::LaunchFailed);
+        }
+        let mut limits = JobObjectExtendedLimitInformation {
+            basic: JobObjectBasicLimitInformation {
+                per_process_user_time_limit: 0,
+                per_job_user_time_limit: 0,
+                limit_flags: JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
+                minimum_working_set_size: 0,
+                maximum_working_set_size: 0,
+                active_process_limit: 0,
+                affinity: 0,
+                priority_class: 0,
+                scheduling_class: 0,
+            },
+            io: IoCounters { values: [0; 6] },
+            process_memory_limit: 0,
+            job_memory_limit: 0,
+            peak_process_memory_used: 0,
+            peak_job_memory_used: 0,
+        };
+        let configured = unsafe {
+            SetInformationJobObject(
+                job,
+                JOB_OBJECT_EXTENDED_LIMIT_INFORMATION,
+                (&mut limits as *mut JobObjectExtendedLimitInformation).cast::<std::ffi::c_void>(),
+                std::mem::size_of_val(&limits) as u32,
+            )
+        } != 0;
+        let assigned = configured
+            && unsafe { AssignProcessToJobObject(job, child.as_raw_handle() as *mut _) } != 0;
+        if !assigned {
+            unsafe {
+                CloseHandle(job);
+            }
+            return Err(AppServerError::LaunchFailed);
+        }
+        Ok(Self(job))
+    }
+}
+impl Drop for JobGuard {
+    fn drop(&mut self) {
+        unsafe {
+            CloseHandle(self.0);
+        }
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -130,6 +229,7 @@ pub fn read_rate_limits(identity: &ApprovedExecutable) -> Result<UsageData, AppS
         .env_remove("CLAUDE_CODE_ENTRYPOINT");
 
     let mut child = command.spawn().map_err(|_| AppServerError::LaunchFailed)?;
+    let _job = JobGuard::attach(&child)?;
     let mut stdin = child.stdin.take().ok_or(AppServerError::LaunchFailed)?;
     let stdout = child.stdout.take().ok_or(AppServerError::LaunchFailed)?;
     let stderr = child.stderr.take().ok_or(AppServerError::LaunchFailed)?;
