@@ -576,10 +576,10 @@ struct SettingsFile {
     quota_display_mode: Option<QuotaDisplayMode>,
     #[serde(default = "default_widget_visible")]
     widget_visible: bool,
-    #[serde(default = "default_show_claude_code")]
-    show_claude_code: bool,
     #[serde(default = "default_show_codex")]
     show_codex: bool,
+    #[serde(default = "default_show_claude_code")]
+    show_claude_code: bool,
     #[serde(default = "default_show_antigravity")]
     show_antigravity: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -641,12 +641,12 @@ fn default_widget_visible() -> bool {
     true
 }
 
-fn default_show_claude_code() -> bool {
-    false
-}
-
 fn default_show_codex() -> bool {
     true
+}
+
+fn default_show_claude_code() -> bool {
+    false
 }
 
 fn default_show_antigravity() -> bool {
@@ -677,18 +677,15 @@ fn normalize_settings(mut settings: SettingsFile) -> SettingsFile {
     }
     settings.adaptive_refresh = false;
     settings.show_claude_code = false;
-    settings.show_antigravity = false;
     settings.show_codex = true;
-    if !settings.show_claude_code && !settings.show_codex && !settings.show_antigravity {
-        settings.show_codex = true;
-    }
+    settings.show_antigravity = false;
+    settings.antigravity_quota_group = None;
     if !settings.show_session_window && !settings.show_weekly_window {
         settings.show_session_window = true;
     }
     if !matches!(settings.alert_threshold_percent, 0 | 10 | 20 | 30) {
         settings.alert_threshold_percent = 0;
     }
-    settings.antigravity_quota_group = None;
     settings.notified_quota_windows.sort();
     settings.notified_quota_windows.dedup();
     settings

@@ -5522,7 +5522,7 @@ mod tests {
                     data: None,
                     poll_interval_ms: POLL_15_MIN,
                     adaptive_refresh: true,
-                    monitor: provider_poll::Monitor::new([true, true, true], Instant::now()),
+                    monitor: codex_poll::Monitor::new(Instant::now()),
                     recovery_watch: None,
                     recovery_debounce: recovery_events::Debounce::default(),
                     has_poll_result: false,
