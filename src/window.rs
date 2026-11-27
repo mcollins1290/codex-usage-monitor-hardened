@@ -3006,19 +3006,13 @@ fn do_poll(send_hwnd: SendHwnd) {
                 }
                 state.antigravity_quota_group.clone()
             };
-            provider_poll::execute(
-                job,
-                || {
-                    poller::poll_provider(
-                        job.id,
-                        group.as_deref(),
-                        lock_state()
-                            .as_ref()
-                            .and_then(|state| state.codex_identity.as_ref()),
-                    )
-                },
-                poller::credential_watch_snapshot,
-            )
+            provider_poll::Attempt::from_result(poller::poll_provider(
+                job.id,
+                group.as_deref(),
+                lock_state()
+                    .as_ref()
+                    .and_then(|state| state.codex_identity.as_ref()),
+            ))
         },
         move |job, attempt| complete_provider_poll(send_hwnd, job, attempt),
     );
