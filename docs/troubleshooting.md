@@ -2,17 +2,17 @@
 
 ## Taskbar error labels
 
-Codex Usage keeps authentication failures separate from transient service failures:
+The hardened monitor reports app-server and quota-read failures without exposing authentication details:
 
 | Simplified Chinese | Other languages | Meaning | Recommended action |
 |---|---|---|---|
-| `!` | `!` | Enabled service credentials are missing or expired | Sign in with the relevant CLI/app, then refresh Codex Usage. Claude Desktop login does not count as Claude Code CLI login. |
-| `网络` | `NET` | Network or TLS connection failed | Check connectivity, VPN, proxy, and firewall settings |
-| `限流` | `429` | Provider rate limit | Wait for the provider retry window; Codex Usage retries with backoff |
-| `服务` | `5XX` | Provider service failure | Wait and retry; check provider status if it persists |
+| `!` | `!` | Approved Codex executable is missing, changed, or unavailable | Verify the configured absolute path and SHA-256, then use the official Codex client to restore authentication if needed |
+| `网络` | `NET` | Official Codex app-server or account service unavailable | Check connectivity, VPN, proxy, and firewall settings in the official Codex client |
+| `限流` | `429` | Rate-limit data unavailable or request bounded by the monitor | Wait for the next scheduled poll or use manual refresh |
+| `服务` | `5XX` | Unsupported or failed app-server response | Check the installed Codex version against the approved version |
 | `错误` | `ERR` | Invalid or unsupported response | Enable diagnostics and inspect the log |
 
-Authentication failures pause provider polling until the credential source changes, preventing repeated login notifications. Transient failures use exponential backoff up to the configured refresh interval.
+The monitor never reads or modifies credential files. Failed reads preserve the last value only as explicitly stale and use bounded retry behavior.
 
 ## Diagnostic log
 
@@ -29,15 +29,14 @@ Run:
 The log is written to `%TEMP%\codex-usage.log`. It includes:
 
 - application version and executable path
-- install channel (direct or portable)
-- provider failure category and retry delay
+- approved Codex executable identity status and retry delay
 - window creation, taskbar placement, and relaunch events
 
 The log does not include access tokens, refresh tokens, credential file contents, or API response bodies.
 
-## Update failures
+## Updates
 
-Direct installations and portable copies download only the exact `codex-usage.exe` asset and verify it against `codex-usage.exe.sha256` from the same GitHub Release. The updater keeps the previous EXE until the downloaded version has been installed and restarted successfully. If restart fails, the old EXE is restored.
+The hardened build has no automatic update or self-replacement mechanism. Review and install future builds separately from a pinned, reviewed source commit.
 
 ## Reset local position without deleting settings
 
@@ -49,4 +48,4 @@ If **Start with Windows** was enabled but Codex Usage did not launch after signi
 
 ## Reinstall while preserving settings
 
-Normal uninstall keeps the settings file. Reinstalling restores the saved language, refresh interval, provider selection, widget visibility, and taskbar position. Use `uninstall.ps1 -RemoveSettings` only when a full reset is intended.
+Normal uninstall keeps the isolated settings file. Reinstalling restores the saved language, refresh interval, Codex executable identity, widget visibility, and taskbar position. Remove the settings directory only when a full reset is intended.

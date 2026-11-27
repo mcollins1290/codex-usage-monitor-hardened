@@ -15,7 +15,7 @@ The installer is per-user and does not request elevation. It verifies the releas
 
 ## Portable mode
 
-`codex-usage.exe` can be run from any user-writable directory without installation. Portable mode uses the same `%APPDATA%\CodexUsage\settings.json` settings as a direct installation and supports in-app self-updates.
+`codex-usage.exe` can be run from any user-writable directory without installation. Portable mode uses the isolated `%APPDATA%\CodexUsageHardened\settings.json` settings path and has no in-app update mechanism.
 
 ## Settings and startup behavior
 
@@ -32,7 +32,7 @@ Codex Usage is not published to WinGet. Install it with `install.ps1` or run the
 
 ## Managed installations
 
-The **Privacy and updates** settings control passive monitoring and update checks. Passive monitoring is on by default. Provider credential discovery starts when its service is enabled. Authentication failures pause retries until credentials change or the user retries. Codex and Claude inference-based recovery is available only when passive monitoring is switched off.
+The hardened build is Codex-only. It does not read credential files, use direct HTTP clients, invoke model inference, run secondary providers, expose an MCP server, or perform automatic update checks. Authentication and network access are delegated to the approved local Codex executable through its app-server interface.
 
 For an offline, managed installation, supply a trusted local executable and its approved SHA256.
 
@@ -40,13 +40,10 @@ For an offline, managed installation, supply a trusted local executable and its 
 .\install.ps1 -Managed -SourcePath .\codex-usage.exe -ExpectedSha256 <approved-sha256> -NoLaunch
 ```
 
-The installer saves `passive_monitoring: true` and `updates_enabled: false` before launch. Other settings are copied from the existing JSON object. For an organization-wide policy, administrators can place a JSON object at `%ProgramData%\CodexUsage\policy.json` and restrict writes to authorized administrators.
+The installer saves the hardened settings path and approved Codex executable identity before launch. Other settings are copied from the existing JSON object. For an organization-wide policy, administrators can place a JSON object at `%ProgramData%\CodexUsage\policy.json` and restrict writes to authorized administrators.
 
 ```json
-{
-  "force_passive_monitoring": true,
-  "disable_updates": true
-}
+{}
 ```
 
-The application rechecks the policy at update boundaries, including the update helper. An unreadable or invalid policy enforces passive monitoring and disables updates.
+The application does not use the policy file to enable network or update behavior; an unreadable or invalid policy is treated conservatively.
