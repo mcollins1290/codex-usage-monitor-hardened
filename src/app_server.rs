@@ -13,6 +13,7 @@ use std::io::{BufRead, BufReader, Write};
 use std::os::windows::io::AsRawHandle;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::sync::mpsc::sync_channel;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 const MAX_JSON_LINE_BYTES: usize = 256 * 1024;
@@ -278,28 +279,29 @@ pub fn read_rate_limits(identity: &ApprovedExecutable) -> Result<UsageData, AppS
     }
     drop(stdin);
 
+    let (line_tx, line_rx) = sync_channel(16);
+    let stdout_thread = std::thread::spawn(move || read_stdout(stdout, line_tx));
     let deadline = std::time::Instant::now() + STARTUP_TIMEOUT + REQUEST_TIMEOUT;
-    let mut reader = BufReader::new(stdout);
-    let mut line = String::new();
     let mut result = None;
     while std::time::Instant::now() < deadline {
-        line.clear();
-        let read = reader
-            .read_line(&mut line)
-            .map_err(|_| AppServerError::LaunchFailed)?;
-        if read == 0 {
-            break;
-        }
-        if read > MAX_JSON_LINE_BYTES {
-            terminate(&mut child);
-            let _ = stderr_thread.join();
-            return Err(AppServerError::OutputTooLarge);
-        }
+        let remaining = deadline.saturating_duration_since(std::time::Instant::now());
+        let line = match line_rx.recv_timeout(remaining) {
+            Ok(Ok(line)) => line,
+            Ok(Err(error)) => {
+                terminate(&mut child);
+                let _ = stdout_thread.join();
+                let _ = stderr_thread.join();
+                return Err(error);
+            }
+            Err(std::sync::mpsc::RecvTimeoutError::Timeout) => break,
+            Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => break,
+        };
         let envelope: RpcEnvelope =
             serde_json::from_str(&line).map_err(|_| AppServerError::InvalidMessage)?;
         if envelope.id == Some(serde_json::json!(2)) {
             if envelope.error.is_some() {
                 terminate(&mut child);
+                let _ = stdout_thread.join();
                 let _ = stderr_thread.join();
                 return Err(AppServerError::ProtocolError);
             }
@@ -308,9 +310,36 @@ pub fn read_rate_limits(identity: &ApprovedExecutable) -> Result<UsageData, AppS
         }
     }
     terminate(&mut child);
+    let _ = stdout_thread.join();
     let _ = stderr_thread.join();
     let result = result.ok_or(AppServerError::Timeout)?;
     quota_data(result)
+}
+
+fn read_stdout(
+    stdout: impl std::io::Read,
+    sender: std::sync::mpsc::SyncSender<Result<String, AppServerError>>,
+) {
+    let mut reader = BufReader::new(stdout);
+    loop {
+        let mut line = String::new();
+        match reader.read_line(&mut line) {
+            Ok(0) => break,
+            Ok(size) if size > MAX_JSON_LINE_BYTES => {
+                let _ = sender.send(Err(AppServerError::OutputTooLarge));
+                break;
+            }
+            Ok(_) => {
+                if sender.send(Ok(line)).is_err() {
+                    break;
+                }
+            }
+            Err(_) => {
+                let _ = sender.send(Err(AppServerError::LaunchFailed));
+                break;
+            }
+        }
+    }
 }
 
 fn terminate(child: &mut std::process::Child) {
