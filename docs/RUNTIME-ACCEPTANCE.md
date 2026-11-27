@@ -20,7 +20,8 @@ only under the separately approved synthetic-test procedure, is:
 The harness validates the executable identity, creates a disposable synthetic
 profile, sends only the fixed T1 protocol sequence, bounds shutdown, and emits
 structured sanitized results. It is intentionally not a production launcher,
-does not handle credentials, and does not implement T2–T8 fixture observation;
+does not handle credentials, and does not execute T2–T8 against the official
+Codex executable;
 those scenarios remain subject to official-runtime execution and independent
 review; the synthetic fixture and observation controls are implemented below.
 

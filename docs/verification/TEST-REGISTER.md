@@ -9,7 +9,7 @@
 | `cargo audit --json` | Final `Cargo.lock` | Executed | 0 vulnerabilities |
 | `cargo deny check` | Final dependency graph | Executed | Advisories, bans, licenses and sources passed; duplicate `syn` warning |
 | T1 synthetic app-server harness | `verification/Verify-AppServer.ps1` | Implemented, not executed | Requires separately authorized synthetic runtime execution |
-| T2–T6 synthetic fixture/configuration scenarios | `verification/Verify-Fixtures.ps1` | Implemented, self-tested | Official Codex execution remains pending |
+| T2–T6 synthetic fixture/configuration scenarios | `verification/Verify-Fixtures.ps1` | Executed repeatedly | Synthetic fixtures, markers, loopback and config matrix passed; official Codex execution remains pending |
 | T7 normal/premature/timeout lifecycle controls | `verification/Verify-Fixtures.ps1` | Executed repeatedly | 10/10 complete synthetic runs passed |
 | T8 process/filesystem/network positive controls | `verification/Verify-Fixtures.ps1` | Executed repeatedly | 10/10 complete synthetic runs passed |
 | O40 deterministic fixture controls | `verification/Verify-Fixtures.ps1` | Executed repeatedly | Passed in 10/10 runs |

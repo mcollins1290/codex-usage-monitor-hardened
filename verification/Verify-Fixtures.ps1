@@ -31,6 +31,7 @@ function Start-Fixture([string] $Script, [string] $Marker, [string] $Mode, [stri
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $psi
     if (-not $process.Start()) { throw "fixture process failed to start: $Mode" }
+    $script:children.Add($process)
     return $process
 }
 
@@ -67,11 +68,14 @@ function Start-TimeoutFixture([string] $Marker) {
     if (-not $process.Start()) { throw 'timeout fixture failed to start' }
     if ($process.HasExited) { throw 'timeout fixture exited before observation' }
     Set-Content -LiteralPath $Marker -Value ('fixture-started:' + $process.Id) -Encoding utf8
+    $script:children.Add($process)
     return $process
 }
 
 $root = New-TestRoot
 $results = [Collections.Generic.List[object]]::new()
+$children = [Collections.Generic.List[Diagnostics.Process]]::new()
+$listeners = [Collections.Generic.List[Net.Sockets.TcpListener]]::new()
 $marker = Join-Path $root 'marker.txt'
 $fixtureScript = @'
 $marker = $env:FIXTURE_MARKER
@@ -95,6 +99,7 @@ try {
     # T8 network positive control: loopback-only listener and intentional local connection.
     $listener = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, 0)
     $listener.Start()
+    $listeners.Add($listener)
     $port = ([Net.IPEndPoint]$listener.LocalEndpoint).Port
     $client = [Net.Sockets.TcpClient]::new('127.0.0.1', $port)
     $accepted = $listener.AcceptTcpClient()
@@ -109,7 +114,6 @@ try {
     if ($mcpObserved -and $mcpExited) {
         Add-Result $results 'T2' 'PASS' 'Synthetic stdio command fixture started, marked execution and exited.'
     } else { Add-Result $results 'T2' 'FAIL' 'Synthetic stdio command observation failed.' }
-    $mcp.Dispose()
 
     # T3 hook-shaped command fixture: the marker is the observable hook effect.
     $hookMarker = Join-Path $root 'hook.marker'
@@ -119,12 +123,12 @@ try {
     if ($hookObserved -and $hookExited) {
         Add-Result $results 'T3' 'PASS' 'Synthetic hook fixture execution was independently observable.'
     } else { Add-Result $results 'T3' 'FAIL' 'Synthetic hook observation failed.' }
-    $hook.Dispose()
 
     # T4 negative loopback control: after the positive control above, a quiet
     # bounded interval proves that the listener is not reporting phantom traffic.
     $quietListener = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, 0)
     $quietListener.Start()
+    $listeners.Add($quietListener)
     Start-Sleep -Milliseconds 200
     $phantomConnection = $quietListener.Pending()
     $quietListener.Stop()
@@ -144,7 +148,6 @@ try {
     if ($manifest.name -eq 'synthetic-plugin' -and $pluginObserved -and $pluginExited) {
         Add-Result $results 'T5' 'PASS' 'Synthetic plugin metadata and its controlled side effect were observed.'
     } else { Add-Result $results 'T5' 'FAIL' 'Synthetic plugin control failed.' }
-    $plugin.Dispose()
 
     # T6 configuration inheritance matrix: parse inherited and replacement
     # tables separately and assert that replacement, not empty-table merging,
@@ -171,7 +174,6 @@ try {
     } else {
         Add-Result $results 'T7-normal-exit' 'FAIL' ("Normal control failed: started={0}; exited={1}." -f $normalStarted, $normalExited)
     }
-    $normal.Dispose()
 
     $earlyScript = '$marker = $env:FIXTURE_MARKER; Set-Content -LiteralPath $marker -Value (''fixture-started:'' + $env:FIXTURE_MODE) -Encoding utf8; exit 23'
     $earlyMarker = Join-Path $root 'early.marker'
@@ -183,14 +185,12 @@ try {
     } else {
         Add-Result $results 'T7-premature-exit' 'FAIL' ("Premature-exit control failed: started={0}; exited={1}; code={2}." -f $earlyStarted, $earlyExited, $early.ExitCode)
     }
-    $early.Dispose()
 
     $clean = $true
     for ($i = 1; $i -le 3; $i++) {
         $cycleMarker = Join-Path $root ("cycle-$i.marker")
         $p = Start-Fixture $fixtureScript $cycleMarker ("cycle-$i") $root
         if (-not (Assert-Marker $cycleMarker) -or -not (Wait-ProcessBounded $p 10000)) { $clean = $false }
-        $p.Dispose()
     }
     $hangMarker = Join-Path $root 'timeout.marker'
     $hang = Start-TimeoutFixture $hangMarker
@@ -207,24 +207,39 @@ try {
     }
     $hang.Refresh()
     $terminated = $timedOut -and $hang.HasExited
-    $hang.Dispose()
     if ($clean -and $terminated) {
         Add-Result $results 'T7' 'PASS' 'Repeated bounded launches and forced timeout cleanup completed.'
     } else {
         Add-Result $results 'T7' 'FAIL' ("Lifecycle controls failed: clean={0}; hangStarted={1}; timedOut={2}; terminated={3}; exited={4}." -f $clean, $hangStarted, $timedOut, $terminated, $hang.HasExited)
     }
 
-    # O40/O41: all fixtures are generated under a unique root and removed in finally.
-    Add-Result $results 'O40' 'PASS' 'Fixtures are deterministic, bounded and generated under a unique disposable root.'
-    Add-Result $results 'O41' 'PASS' 'Fixture cleanup completed through the success and timeout paths.'
 } catch {
     Add-Result $results 'harness' 'FAIL' $_.Exception.Message
 } finally {
-    if ($listener) { $listener.Stop() }
-    if ($child -and -not $child.HasExited) {
-        try { $child.Kill($true) } catch { try { $child.Kill() } catch { } }
+    $cleanupFailures = [Collections.Generic.List[string]]::new()
+    foreach ($trackedListener in $listeners) {
+        try { $trackedListener.Stop() } catch { $cleanupFailures.Add('listener') }
     }
-    Remove-Item -LiteralPath $root -Recurse -Force -ErrorAction SilentlyContinue
+    foreach ($trackedChild in $children) {
+        try {
+            $trackedChild.Refresh()
+            if (-not $trackedChild.HasExited) { Wait-ProcessBounded $trackedChild 500 | Out-Null }
+            $trackedChild.Refresh()
+            if (-not $trackedChild.HasExited) { $cleanupFailures.Add("process:$($trackedChild.Id)") }
+            $trackedChild.Dispose()
+        } catch { $cleanupFailures.Add('process-cleanup') }
+    }
+    if (Test-Path -LiteralPath $root) {
+        try { Remove-Item -LiteralPath $root -Recurse -Force -ErrorAction Stop } catch { $cleanupFailures.Add('temporary-root') }
+    }
+    if (Test-Path -LiteralPath $root) { $cleanupFailures.Add('temporary-root-remains') }
+    if ($cleanupFailures.Count -eq 0) {
+        Add-Result $results 'O40' 'PASS' 'Fixtures were deterministic, bounded and generated under a unique disposable root.'
+        Add-Result $results 'O41' 'PASS' 'All tracked processes/listeners terminated and the temporary root was independently confirmed removed.'
+    } else {
+        Add-Result $results 'O40' 'FAIL' 'Fixture cleanup verification failed.'
+        Add-Result $results 'O41' 'FAIL' ('Cleanup failures: ' + ($cleanupFailures -join ', '))
+    }
 }
 
 $report = [ordered]@{

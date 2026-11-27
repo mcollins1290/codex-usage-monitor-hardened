@@ -10,4 +10,5 @@
 | `cargo deny check` | 0 | Advisories, bans, licenses and sources passed; duplicate `syn` warning |
 | PowerShell JSON parse of `docs/verification/checklist-dispositions.json` | 0 | 524 item records, 524 unique identifiers |
 | `powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File verification/Verify-Fixtures.ps1` | 0 | Synthetic suite passed; official Codex was not executed |
-| Ten repeated synthetic fixture runs | 0 each | 10/10 passed; elapsed milliseconds: 3185, 3306, 3212, 3224, 3249, 3173, 3146, 3253, 3188, 3207 |
+| PowerShell parser checks for both verification scripts | 0 | Both scripts parsed without syntax errors |
+| Ten repeated synthetic fixture runs | 0 each | 10/10 passed; elapsed milliseconds: 3069, 3095, 2956, 3097, 3091, 3018, 2885, 3093, 3095, 3055 |
