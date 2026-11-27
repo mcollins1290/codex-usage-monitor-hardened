@@ -91,7 +91,10 @@ pub fn sha256_file(path: &Path) -> Result<String, AppServerError> {
 }
 
 pub fn validate_identity(identity: &ApprovedExecutable) -> Result<PathBuf, AppServerError> {
-    if !identity.path.is_absolute() || identity.sha256.len() != 64 {
+    if !identity.path.is_absolute()
+        || identity.sha256.len() != 64
+        || identity.version != CODEX_VERSION
+    {
         return Err(AppServerError::InvalidIdentity);
     }
     let canonical =
@@ -230,10 +233,15 @@ fn window(window: Option<&RateLimitWindow>, session: bool) -> Result<UsageSectio
     if duration != expected || !(0..=100).contains(&window.used_percent) {
         return Err(AppServerError::InvalidQuota);
     }
-    let reset = window.resets_at.and_then(|value| {
-        (value > UNIX_EPOCH.duration_since(UNIX_EPOCH).ok()?.as_secs() as i64)
-            .then(|| UNIX_EPOCH + Duration::from_secs(value as u64))
-    });
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .ok()
+        .map(|value| value.as_secs() as i64)
+        .unwrap_or_default();
+    let reset = window
+        .resets_at
+        .filter(|value| *value > now)
+        .map(|value| UNIX_EPOCH + Duration::from_secs(value as u64));
     Ok(UsageSection::reported(window.used_percent as f64, reset))
 }
 
