@@ -95,7 +95,7 @@ pub(super) const STRINGS: Strings = Strings {
     bar_segmented: "分段",
     bar_thickness: "進度列粗細",
     text_size: "文字大小",
-    show_provider_logos: "顯示服務圖示",
+    show_codex_logo: "顯示 Codex 圖示",
     show_period_labels: "顯示額度週期標籤",
     percentage_position: "百分比位置",
     percentage_outside_battery: "電池外",

@@ -94,7 +94,7 @@ pub(super) const STRINGS: Strings = Strings {
     bar_segmented: "분할형",
     bar_thickness: "막대 두께",
     text_size: "텍스트 크기",
-    show_provider_logos: "서비스 로고 표시",
+    show_codex_logo: "Codex 로고 표시",
     show_period_labels: "한도 기간 라벨 표시",
     percentage_position: "백분율 위치",
     percentage_outside_battery: "배터리 밖",

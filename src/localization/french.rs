@@ -94,7 +94,7 @@ pub(super) const STRINGS: Strings = Strings {
     bar_segmented: "Segmentée",
     bar_thickness: "Épaisseur de barre",
     text_size: "Taille du texte",
-    show_provider_logos: "Afficher les logos des services",
+    show_codex_logo: "Afficher le logo Codex",
     show_period_labels: "Afficher les périodes de quota",
     percentage_position: "Position du pourcentage",
     percentage_outside_battery: "Hors de la batterie",

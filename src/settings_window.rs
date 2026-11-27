@@ -649,9 +649,9 @@ fn rows(page: Page, s: &AppState) -> Vec<Row> {
                     },
                 ),
                 check(
-                    strings.show_provider_logos,
+                    strings.show_codex_logo,
                     IDM_PROVIDER_LOGOS,
-                    !a.hide_provider_logos,
+                    !a.hide_codex_logo,
                 ),
                 check(
                     strings.show_period_labels,

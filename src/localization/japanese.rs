@@ -94,7 +94,7 @@ pub(super) const STRINGS: Strings = Strings {
     bar_segmented: "分割",
     bar_thickness: "バーの太さ",
     text_size: "文字のサイズ",
-    show_provider_logos: "サービスのロゴを表示",
+    show_codex_logo: "Codex ロゴを表示",
     show_period_labels: "上限の期間ラベルを表示",
     percentage_position: "パーセント表示位置",
     percentage_outside_battery: "バッテリーの外側",

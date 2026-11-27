@@ -266,7 +266,7 @@ pub struct Strings {
     pub bar_segmented: &'static str,
     pub bar_thickness: &'static str,
     pub text_size: &'static str,
-    pub show_provider_logos: &'static str,
+    pub show_codex_logo: &'static str,
     pub show_period_labels: &'static str,
     pub percentage_position: &'static str,
     pub percentage_outside_battery: &'static str,
