@@ -63,9 +63,14 @@ fn check_compatibility(identity: &ApprovedExecutable) -> Result<(), AppServerErr
         || record.invocation_policy != INVOCATION_POLICY
         || record.release_tag != format!("rust-v{}", identity.version)
         || record.release_commit.len() != 40
-        || !record.release_commit.bytes().all(|byte| byte.is_ascii_hexdigit())
+        || !record
+            .release_commit
+            .bytes()
+            .all(|byte| byte.is_ascii_hexdigit())
         || record.observed_version != format!("codex-cli {}", identity.version)
-        || !record.observed_sha256.eq_ignore_ascii_case(&identity.sha256)
+        || !record
+            .observed_sha256
+            .eq_ignore_ascii_case(&identity.sha256)
         || !record.synthetic_passed
         || !record.authenticated_passed
         || !record.explicitly_approved
@@ -805,7 +810,11 @@ mod tests {
             Err(AppServerError::CompatibilityRequired)
         );
         identity.sha256 = "A".repeat(64);
-        identity.compatibility.as_mut().unwrap().authenticated_passed = false;
+        identity
+            .compatibility
+            .as_mut()
+            .unwrap()
+            .authenticated_passed = false;
         assert_eq!(
             check_compatibility(&identity),
             Err(AppServerError::CompatibilityRequired)
