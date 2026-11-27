@@ -621,7 +621,7 @@ impl Default for SettingsFile {
             taskbar_index: 0,
             monitor_device: None,
             poll_interval_ms: default_poll_interval(),
-            adaptive_refresh: true,
+            adaptive_refresh: false,
             language: None,
             appearance: Appearance::default(),
             quota_display_mode: Some(QuotaDisplayMode::Remaining),
@@ -645,11 +645,11 @@ impl Default for SettingsFile {
 }
 
 fn default_adaptive_refresh() -> bool {
-    true
+    false
 }
 
 fn default_poll_interval() -> u32 {
-    POLL_15_MIN
+    POLL_5_MIN
 }
 
 fn default_widget_visible() -> bool {
@@ -734,8 +734,9 @@ fn load_settings_from_paths(
 
 fn normalize_settings(mut settings: SettingsFile) -> SettingsFile {
     if !(POLL_1_MIN..=POLL_1_HOUR).contains(&settings.poll_interval_ms) {
-        settings.poll_interval_ms = POLL_15_MIN;
+        settings.poll_interval_ms = POLL_5_MIN;
     }
+    settings.adaptive_refresh = false;
     if !settings.show_claude_code && !settings.show_codex && !settings.show_antigravity {
         settings.show_codex = true;
     }
