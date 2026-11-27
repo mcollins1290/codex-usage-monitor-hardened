@@ -109,7 +109,7 @@ use windows::Win32::Foundation::{
 };
 use windows::Win32::Security::SECURITY_ATTRIBUTES;
 use windows::Win32::System::JobObjects::{
-    CreateJobObjectW, SetInformationJobObject, JobObjectExtendedLimitInformation,
+    CreateJobObjectW, JobObjectExtendedLimitInformation, SetInformationJobObject,
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION, JOB_OBJECT_LIMIT_ACTIVE_PROCESS,
     JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
 };
@@ -147,7 +147,11 @@ fn pipe(child_reads: bool) -> Result<(File, OwnedHandle), AppServerError> {
     launch_error(unsafe { CreatePipe(&mut read, &mut write, Some(&attrs), 4096) })?;
     let read = owned(read);
     let write = owned(write);
-    let (parent, child) = if child_reads { (write, read) } else { (read, write) };
+    let (parent, child) = if child_reads {
+        (write, read)
+    } else {
+        (read, write)
+    };
     launch_error(unsafe {
         SetHandleInformation(raw(&parent), HANDLE_FLAG_INHERIT.0, HANDLE_FLAGS(0))
     })?;
@@ -164,7 +168,12 @@ impl AttributeList {
     fn new() -> Result<Self, AppServerError> {
         let mut bytes = 0;
         let _ = unsafe {
-            InitializeProcThreadAttributeList(LPPROC_THREAD_ATTRIBUTE_LIST::default(), 2, 0, &mut bytes)
+            InitializeProcThreadAttributeList(
+                LPPROC_THREAD_ATTRIBUTE_LIST::default(),
+                2,
+                0,
+                &mut bytes,
+            )
         };
         if bytes == 0 || bytes > 1024 * 1024 {
             return Err(AppServerError::LaunchFailed);
@@ -172,14 +181,22 @@ impl AttributeList {
         let mut storage = vec![0usize; bytes.div_ceil(std::mem::size_of::<usize>())];
         let list = LPPROC_THREAD_ATTRIBUTE_LIST(storage.as_mut_ptr().cast());
         launch_error(unsafe { InitializeProcThreadAttributeList(list, 2, 0, &mut bytes) })?;
-        Ok(Self { _storage: storage, list })
+        Ok(Self {
+            _storage: storage,
+            list,
+        })
     }
 
     fn set_handles(&self, attribute: u32, handles: &[HANDLE]) -> Result<(), AppServerError> {
         launch_error(unsafe {
             UpdateProcThreadAttribute(
-                self.list, 0, attribute as usize,
-                Some(handles.as_ptr().cast()), std::mem::size_of_val(handles), None, None,
+                self.list,
+                0,
+                attribute as usize,
+                Some(handles.as_ptr().cast()),
+                std::mem::size_of_val(handles),
+                None,
+                None,
             )
         })
     }
@@ -203,7 +220,16 @@ fn wide(value: &std::ffi::OsStr) -> Result<Vec<u16>, AppServerError> {
 fn environment_block() -> Result<Vec<u16>, AppServerError> {
     let mut block = Vec::new();
     // Alphabetical, case-insensitive order as required by CreateProcessW.
-    for name in ["APPDATA", "CODEX_HOME", "LOCALAPPDATA", "SystemRoot", "TEMP", "TMP", "USERPROFILE", "WINDIR"] {
+    for name in [
+        "APPDATA",
+        "CODEX_HOME",
+        "LOCALAPPDATA",
+        "SystemRoot",
+        "TEMP",
+        "TMP",
+        "USERPROFILE",
+        "WINDIR",
+    ] {
         if let Some(value) = std::env::var_os(name) {
             let mut entry = std::ffi::OsString::from(format!("{name}="));
             entry.push(value);
@@ -223,14 +249,22 @@ struct ContainedChild {
 }
 
 impl ContainedChild {
-    fn launch(executable: &Path, workdir: &Path, arguments: &str) -> Result<(Self, File, File, File), AppServerError> {
-        let job = owned(launch_error(unsafe { CreateJobObjectW(None, PCWSTR::null()) })?);
+    fn launch(
+        executable: &Path,
+        workdir: &Path,
+        arguments: &str,
+    ) -> Result<(Self, File, File, File), AppServerError> {
+        let job = owned(launch_error(unsafe {
+            CreateJobObjectW(None, PCWSTR::null())
+        })?);
         let mut limits = JOBOBJECT_EXTENDED_LIMIT_INFORMATION::default();
-        limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE | JOB_OBJECT_LIMIT_ACTIVE_PROCESS;
+        limits.BasicLimitInformation.LimitFlags =
+            JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE | JOB_OBJECT_LIMIT_ACTIVE_PROCESS;
         limits.BasicLimitInformation.ActiveProcessLimit = 1;
         launch_error(unsafe {
             SetInformationJobObject(
-                raw(&job), JobObjectExtendedLimitInformation,
+                raw(&job),
+                JobObjectExtendedLimitInformation,
                 (&limits as *const JOBOBJECT_EXTENDED_LIMIT_INFORMATION).cast(),
                 std::mem::size_of_val(&limits) as u32,
             )
@@ -263,16 +297,29 @@ impl ContainedChild {
         // Failure has no fallback to an uncontained process.
         launch_error(unsafe {
             CreateProcessW(
-                PCWSTR(application.as_ptr()), PWSTR(command.as_mut_ptr()),
-                None, None, BOOL(1),
+                PCWSTR(application.as_ptr()),
+                PWSTR(command.as_mut_ptr()),
+                None,
+                None,
+                BOOL(1),
                 EXTENDED_STARTUPINFO_PRESENT | CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT,
-                Some(environment.as_ptr().cast()), PCWSTR(directory.as_ptr()),
-                &startup.StartupInfo, &mut info,
+                Some(environment.as_ptr().cast()),
+                PCWSTR(directory.as_ptr()),
+                &startup.StartupInfo,
+                &mut info,
             )
         })?;
         let process = owned(info.hProcess);
         drop(owned(info.hThread));
-        Ok((Self { process, job: Some(job) }, stdin, stdout, stderr))
+        Ok((
+            Self {
+                process,
+                job: Some(job),
+            },
+            stdin,
+            stdout,
+            stderr,
+        ))
     }
 
     fn wait(&self, timeout: Duration) -> Result<bool, AppServerError> {
@@ -288,7 +335,11 @@ impl ContainedChild {
             self.job.take();
             let mut code = 0;
             launch_error(unsafe { GetExitCodeProcess(raw(&self.process), &mut code) })?;
-            return if code == 0 { Ok(()) } else { Err(AppServerError::LaunchFailed) };
+            return if code == 0 {
+                Ok(())
+            } else {
+                Err(AppServerError::LaunchFailed)
+            };
         }
         self.job.take();
         if !self.wait(SHUTDOWN_TIMEOUT)? {
@@ -297,7 +348,11 @@ impl ContainedChild {
                 return Err(AppServerError::Timeout);
             }
         }
-        if graceful { Err(AppServerError::Timeout) } else { Ok(()) }
+        if graceful {
+            Err(AppServerError::Timeout)
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -340,7 +395,8 @@ fn hash_reader(file: &mut impl Read) -> Result<String, AppServerError> {
     let mut hasher = Sha256::new();
     let mut buffer = [0u8; 64 * 1024];
     loop {
-        let count = file.read(&mut buffer)
+        let count = file
+            .read(&mut buffer)
             .map_err(|_| AppServerError::LaunchFailed)?;
         if count == 0 {
             break;
