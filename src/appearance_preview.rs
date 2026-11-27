@@ -1,7 +1,7 @@
 //! Static sample painted by the same renderer as the taskbar widget.
 use super::*;
 
-const USED: [[f64; 3]; 2] = [[26.0, 62.0, 82.0], [11.0, 52.0, 83.0]];
+const USED: [[f64; 1]; 2] = [[26.0], [11.0]];
 
 fn sample(
     appearance: Appearance,
@@ -19,7 +19,7 @@ fn sample(
     let text = std::array::from_fn(|row| {
         std::array::from_fn(|column| {
             let remaining = 100.0 - USED[row][column];
-            let time = column + 1;
+            let time = 1;
             let reset = if appearance.reset_time_display == ResetTimeDisplay::Clock {
                 let reset = SYSTEMTIME {
                     wDay: if row == 0 {
@@ -43,7 +43,7 @@ fn sample(
         appearance,
         language,
         mode: QuotaDisplayMode::Remaining,
-        providers: [true; 3],
+        provider_visible: true,
         visible_rows: [true; 2],
         used: USED,
         text,

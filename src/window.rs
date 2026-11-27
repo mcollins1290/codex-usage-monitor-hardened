@@ -539,15 +539,11 @@ impl Appearance {
         .min((row_height - sc(2)).max(1))
     }
 
-    fn bar_color(self, provider: Provider, used: f64, dark: bool) -> Color {
+    fn bar_color(self, used: f64, dark: bool) -> Color {
         match self.color_mode {
             ColorMode::Remaining => remaining_bar_color(poller::remaining_percentage(used), dark),
             ColorMode::Single => self.single_color.bar(dark),
-            ColorMode::Brand => match provider {
-                Provider::Claude => claude_accent_color(),
-                Provider::Codex => codex_brand_color(dark),
-                Provider::Antigravity => antigravity_accent_color(),
-            },
+            ColorMode::Brand => codex_brand_color(dark),
         }
     }
 }
@@ -1699,8 +1695,8 @@ fn cursor_is_on_drag_handle(hwnd: HWND) -> bool {
     }
 }
 
-fn active_model_count(show_claude_code: bool, show_codex: bool, show_antigravity: bool) -> i32 {
-    (show_claude_code as i32 + show_codex as i32 + show_antigravity as i32).max(1)
+fn active_model_count() -> i32 {
+    1
 }
 
 fn row_bar_segment_count(active_models: i32) -> i32 {
@@ -1870,11 +1866,7 @@ fn widget_width_from_columns(
 
 fn total_widget_width_for_state(state: &AppState) -> i32 {
     widget_width_from_columns(
-        active_model_count(
-            state.show_claude_code,
-            state.show_codex,
-            state.show_antigravity,
-        ),
+        active_model_count(),
         state.appearance,
         current_usage_layout_widths(state),
     )
@@ -1883,32 +1875,24 @@ fn total_widget_width_for_state(state: &AppState) -> i32 {
 fn has_cross_day_reset(
     appearance: Appearance,
     session_visible: bool,
-    providers: [bool; 3],
-    session: [&str; 3],
+    provider_visible: bool,
+    session: &str,
 ) -> bool {
     appearance.reset_time_display == ResetTimeDisplay::Clock
         && session_visible
-        && providers.into_iter().zip(session).any(|(visible, value)| {
-            let reset = quota_text::parts(value).1.as_bytes();
-            // Cross-day session labels start with MM/DD HH:MM.
-            visible && reset.get(2) == Some(&b'/') && reset.get(8) == Some(&b':')
-        })
+        && provider_visible
+        && {
+            let reset = quota_text::parts(session).1.as_bytes();
+            reset.get(2) == Some(&b'/') && reset.get(8) == Some(&b':')
+        }
 }
 
 fn current_usage_layout_widths(state: &AppState) -> (i32, i32) {
     let cross_day = has_cross_day_reset(
         state.appearance,
         state.show_session_window,
-        [
-            state.show_claude_code,
-            state.show_codex,
-            state.show_antigravity,
-        ],
-        [
-            &state.session_text,
-            &state.codex_session_text,
-            &state.antigravity_session_text,
-        ],
+        state.show_codex,
+        &state.codex_session_text,
     );
     usage_layout_widths(state.language, state.appearance, cross_day)
 }
@@ -2053,11 +2037,7 @@ pub fn run() {
         let language = localization::resolve_language(language_override);
         // Create as layered popup (will be reparented into taskbar)
         let title = native_interop::wide_str(language.strings().window_title);
-        let initial_model_count = active_model_count(
-            settings.show_claude_code,
-            settings.show_codex,
-            settings.show_antigravity,
-        );
+        let initial_model_count = active_model_count();
         let hwnd = CreateWindowExW(
             WS_EX_TOOLWINDOW | WS_EX_LAYERED | WS_EX_NOACTIVATE,
             PCWSTR::from_raw(class_name.as_ptr()),
@@ -2242,7 +2222,7 @@ fn update_quota_tooltips() {
         let mut regions = Vec::new();
         if !s.dragging {
             let chinese = s.language == LanguageId::SimplifiedChinese;
-            let count = active_model_count(s.show_claude_code, s.show_codex, s.show_antigravity);
+            let count = active_model_count();
             let (label_width, text_width) = current_usage_layout_widths(s);
             let width = model_usage_width(row_bar_segment_count(count), text_width, s.appearance);
             let mut left = sc(LEFT_DIVIDER_W)
@@ -2307,48 +2287,24 @@ struct WidgetContent<'a> {
     language: LanguageId,
     mode: QuotaDisplayMode,
     // Provider column order: Claude Code, Codex, Antigravity.
-    providers: [bool; 3],
+    provider_visible: bool,
     visible_rows: [bool; 2],
-    used: [[f64; 3]; 2],
-    text: [[std::borrow::Cow<'a, str>; 3]; 2],
+    used: [[f64; 1]; 2],
+    text: [[std::borrow::Cow<'a, str>; 1]; 2],
 }
-
-const WIDGET_PROVIDERS: [Provider; 3] = [Provider::Claude, Provider::Codex, Provider::Antigravity];
 
 impl WidgetContent<'static> {
     fn from_state(s: &AppState) -> Self {
-        let values = |texts: [&String; 3]| texts.map(|text| text.clone().into());
+        let values = |text: &String| [text.clone().into()];
         Self {
             system_dark: s.is_dark,
             appearance: s.appearance,
             language: s.language,
             mode: s.quota_display_mode,
-            providers: [s.show_claude_code, s.show_codex, s.show_antigravity],
+            provider_visible: s.show_codex,
             visible_rows: [s.show_session_window, s.show_weekly_window],
-            used: [
-                [
-                    s.session_percent,
-                    s.codex_session_percent,
-                    s.antigravity_session_percent,
-                ],
-                [
-                    s.weekly_percent,
-                    s.codex_weekly_percent,
-                    s.antigravity_weekly_percent,
-                ],
-            ],
-            text: [
-                values([
-                    &s.session_text,
-                    &s.codex_session_text,
-                    &s.antigravity_session_text,
-                ]),
-                values([
-                    &s.weekly_text,
-                    &s.codex_weekly_text,
-                    &s.antigravity_weekly_text,
-                ]),
-            ],
+            used: [[s.codex_session_percent], [s.codex_weekly_percent]],
+            text: [values(&s.codex_session_text), values(&s.codex_weekly_text)],
         }
     }
 }
@@ -2489,7 +2445,7 @@ fn paint_content(hdc: HDC, width: i32, height: i32, content: &WidgetContent<'_>)
         mut appearance,
         language,
         mode,
-        providers,
+        provider_visible,
         visible_rows,
         used,
         ref text,
@@ -2504,15 +2460,11 @@ fn paint_content(hdc: HDC, width: i32, height: i32, content: &WidgetContent<'_>)
     let cross_day = has_cross_day_reset(
         appearance,
         visible_rows[0],
-        providers,
-        text[0].each_ref().map(|value| value.as_ref()),
+        provider_visible,
+        text[0][0].as_ref(),
     );
     let (label_width, text_width) = usage_layout_widths(language, appearance, cross_day);
-    let active_models = providers
-        .into_iter()
-        .filter(|visible| *visible)
-        .count()
-        .max(1) as i32;
+    let active_models = i32::from(provider_visible);
     let segment_count = row_bar_segment_count(active_models);
     let bar_width = usage_bar_width(segment_count, appearance);
     let model_width =
@@ -2585,11 +2537,8 @@ fn paint_content(hdc: HDC, width: i32, height: i32, content: &WidgetContent<'_>)
         if !appearance.hide_provider_logos {
             let size = sc(provider_icons::SIZE).min(height);
             let mut icon_x = model_left;
-            for (provider, visible) in WIDGET_PROVIDERS.into_iter().zip(providers) {
-                if visible {
-                    provider_icons::draw(hdc, icon_x, (height - size) / 2, size, provider);
-                    icon_x += model_width;
-                }
+            if provider_visible {
+                provider_icons::draw(hdc, icon_x, (height - size) / 2, size, Provider::Codex);
             }
         }
 
@@ -2618,19 +2567,13 @@ fn paint_content(hdc: HDC, width: i32, height: i32, content: &WidgetContent<'_>)
                 );
             }
             let mut model_x = model_left + provider_mark_width(appearance);
-            for (column, provider) in WIDGET_PROVIDERS.into_iter().enumerate() {
-                if !providers[column] {
-                    continue;
-                }
-                let value_color = match provider {
-                    Provider::Codex => codex_brand_color(is_dark),
-                    Provider::Claude if provider_text_colors => claude_usage_text_color(is_dark),
-                    Provider::Antigravity if provider_text_colors => {
-                        antigravity_usage_text_color(is_dark)
-                    }
-                    _ => text_color,
+            if provider_visible {
+                let value_color = if provider_text_colors {
+                    codex_brand_color(is_dark)
+                } else {
+                    text_color
                 };
-                let used = used[row][column];
+                let used = used[row][0];
                 draw_usage_bar(
                     hdc,
                     model_x,
@@ -2639,15 +2582,14 @@ fn paint_content(hdc: HDC, width: i32, height: i32, content: &WidgetContent<'_>)
                     segment_count,
                     bar_width,
                     mode.percentage(used),
-                    &text[row][column],
-                    &appearance.bar_color(provider, used, is_dark),
+                    &text[row][0],
+                    &appearance.bar_color(used, is_dark),
                     &track,
                     &value_color,
                     text_width,
                     is_dark,
                     appearance,
                 );
-                model_x += model_width;
             }
             row_y += row_height + row_gap;
         }
