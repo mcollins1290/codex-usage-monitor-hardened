@@ -1247,51 +1247,6 @@ fn now_unix_secs() -> u64 {
         .as_secs()
 }
 
-#[cfg(any())]
-fn update_check_interval() -> Duration {
-    Duration::from_secs(24 * 60 * 60)
-}
-
-#[cfg(any())]
-fn auto_update_check_due(last_update_check_unix: Option<u64>) -> bool {
-    let Some(last_update_check_unix) = last_update_check_unix else {
-        return true;
-    };
-
-    now_unix_secs().saturating_sub(last_update_check_unix) >= update_check_interval().as_secs()
-}
-
-#[cfg(any())]
-fn schedule_auto_update_check(hwnd: HWND) {
-    if !crate::privacy::updates_enabled() {
-        unsafe {
-            let _ = KillTimer(hwnd, TIMER_UPDATE_CHECK);
-        }
-        return;
-    }
-    let delay_ms = {
-        let state = lock_state();
-        let Some(s) = state.as_ref() else {
-            return;
-        };
-
-        if auto_update_check_due(s.last_update_check_unix) {
-            None
-        } else {
-            let elapsed = now_unix_secs().saturating_sub(s.last_update_check_unix.unwrap_or(0));
-            let remaining_secs = update_check_interval().as_secs().saturating_sub(elapsed);
-            Some((remaining_secs.saturating_mul(1000)).min(u32::MAX as u64) as u32)
-        }
-    };
-
-    unsafe {
-        let _ = KillTimer(hwnd, TIMER_UPDATE_CHECK);
-        if let Some(delay_ms) = delay_ms {
-            SetTimer(hwnd, TIMER_UPDATE_CHECK, delay_ms.max(1), None);
-        }
-    }
-}
-
 fn effective_poll_interval(state: &AppState) -> u32 {
     state
         .monitor
@@ -1496,24 +1451,6 @@ fn show_error_message(hwnd: HWND, title: &str, message: &str) {
             PCWSTR::from_raw(title_wide.as_ptr()),
             MB_OK | MB_ICONERROR,
         );
-    }
-}
-
-#[cfg(any())]
-fn show_update_prompt(hwnd: HWND, strings: Strings, release: &ReleaseDescriptor) -> bool {
-    let message = strings
-        .update_prompt_now
-        .replace("{version}", &release.latest_version);
-
-    unsafe {
-        let title_wide = native_interop::wide_str(strings.update_available);
-        let message_wide = native_interop::wide_str(&message);
-        MessageBoxW(
-            hwnd,
-            PCWSTR::from_raw(message_wide.as_ptr()),
-            PCWSTR::from_raw(title_wide.as_ptr()),
-            MB_YESNO | MB_ICONQUESTION,
-        ) == IDYES
     }
 }
 
