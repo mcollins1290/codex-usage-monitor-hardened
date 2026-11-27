@@ -259,9 +259,21 @@ pub fn read_rate_limits(identity: &ApprovedExecutable) -> Result<UsageData, AppS
         job: None,
     };
     guard.job = Some(JobGuard::attach(&guard.child)?);
-    let mut stdin = guard.child.stdin.take().ok_or(AppServerError::LaunchFailed)?;
-    let stdout = guard.child.stdout.take().ok_or(AppServerError::LaunchFailed)?;
-    let stderr = guard.child.stderr.take().ok_or(AppServerError::LaunchFailed)?;
+    let mut stdin = guard
+        .child
+        .stdin
+        .take()
+        .ok_or(AppServerError::LaunchFailed)?;
+    let stdout = guard
+        .child
+        .stdout
+        .take()
+        .ok_or(AppServerError::LaunchFailed)?;
+    let stderr = guard
+        .child
+        .stderr
+        .take()
+        .ok_or(AppServerError::LaunchFailed)?;
 
     let (tx, rx) = sync_channel(16);
     let output_limit = Arc::new(AtomicBool::new(false));
@@ -300,7 +312,12 @@ impl ChildGuard {
         }
         // Closing the job kills members before waiting for pipes to close.
         self.job.take();
-        if self.child.try_wait().map_err(|_| AppServerError::LaunchFailed)?.is_none() {
+        if self
+            .child
+            .try_wait()
+            .map_err(|_| AppServerError::LaunchFailed)?
+            .is_none()
+        {
             let _ = self.child.kill();
         }
         if self.wait_until(Instant::now() + SHUTDOWN_TIMEOUT)? {
@@ -312,7 +329,12 @@ impl ChildGuard {
 
     fn wait_until(&mut self, deadline: Instant) -> Result<bool, AppServerError> {
         loop {
-            if self.child.try_wait().map_err(|_| AppServerError::LaunchFailed)?.is_some() {
+            if self
+                .child
+                .try_wait()
+                .map_err(|_| AppServerError::LaunchFailed)?
+                .is_some()
+            {
                 return Ok(true);
             }
             if Instant::now() >= deadline {
@@ -359,21 +381,30 @@ fn exchange(
     writer: &mut impl Write,
     mut receive: impl FnMut(u64, Instant) -> Result<serde_json::Value, AppServerError>,
 ) -> Result<RateLimitsResult, AppServerError> {
-    send_message(writer, serde_json::json!({
-        "jsonrpc": "2.0", "id": 1, "method": "initialize",
-        "params": {"clientInfo": {"name": "codex-usage-monitor-hardened",
-        "version": env!("CARGO_PKG_VERSION")}, "capabilities": {}}
-    }))?;
+    send_message(
+        writer,
+        serde_json::json!({
+            "jsonrpc": "2.0", "id": 1, "method": "initialize",
+            "params": {"clientInfo": {"name": "codex-usage-monitor-hardened",
+            "version": env!("CARGO_PKG_VERSION")}, "capabilities": {}}
+        }),
+    )?;
     let initialized = receive(1, Instant::now() + STARTUP_TIMEOUT)?;
     if !initialized.is_object() {
         return Err(AppServerError::ProtocolError);
     }
-    send_message(writer, serde_json::json!({
-        "jsonrpc": "2.0", "method": "initialized", "params": {}
-    }))?;
-    send_message(writer, serde_json::json!({
-        "jsonrpc": "2.0", "id": 2, "method": "account/rateLimits/read", "params": {}
-    }))?;
+    send_message(
+        writer,
+        serde_json::json!({
+            "jsonrpc": "2.0", "method": "initialized", "params": {}
+        }),
+    )?;
+    send_message(
+        writer,
+        serde_json::json!({
+            "jsonrpc": "2.0", "id": 2, "method": "account/rateLimits/read", "params": {}
+        }),
+    )?;
     serde_json::from_value(receive(2, Instant::now() + REQUEST_TIMEOUT)?)
         .map_err(|_| AppServerError::InvalidMessage)
 }
@@ -406,12 +437,19 @@ fn receive_response(
         }
         match object.get("id") {
             None if object.get("method").and_then(|v| v.as_str()).is_some()
-                && !object.contains_key("result") && !object.contains_key("error") => continue,
+                && !object.contains_key("result")
+                && !object.contains_key("error") =>
+            {
+                continue
+            }
             Some(value) if value.as_u64() == Some(id) && !object.contains_key("method") => {
                 if object.contains_key("error") {
                     return Err(AppServerError::ProtocolError);
                 }
-                return object.get("result").cloned().ok_or(AppServerError::ProtocolError);
+                return object
+                    .get("result")
+                    .cloned()
+                    .ok_or(AppServerError::ProtocolError);
             }
             _ => return Err(AppServerError::UnexpectedMessage),
         }
@@ -423,7 +461,9 @@ fn receive_response(
 fn read_frame(reader: &mut impl BufRead) -> Result<Option<Vec<u8>>, AppServerError> {
     let mut frame = Vec::new();
     loop {
-        let available = reader.fill_buf().map_err(|_| AppServerError::LaunchFailed)?;
+        let available = reader
+            .fill_buf()
+            .map_err(|_| AppServerError::LaunchFailed)?;
         if available.is_empty() {
             return if frame.is_empty() {
                 Ok(None)
@@ -613,7 +653,12 @@ mod tests {
         let (tx, rx) = sync_channel(1);
         tx.send(Ok(br#"{"id":2,"result":{}}"#.to_vec())).unwrap();
         assert_eq!(
-            receive_response(&rx, &AtomicBool::new(false), 1, Instant::now() + STARTUP_TIMEOUT),
+            receive_response(
+                &rx,
+                &AtomicBool::new(false),
+                1,
+                Instant::now() + STARTUP_TIMEOUT
+            ),
             Err(AppServerError::UnexpectedMessage)
         );
     }
@@ -648,7 +693,11 @@ mod tests {
         );
 
         let mut changed = identity.clone();
-        let replacement = if changed.sha256.starts_with('0') { "1" } else { "0" };
+        let replacement = if changed.sha256.starts_with('0') {
+            "1"
+        } else {
+            "0"
+        };
         changed.sha256.replace_range(..1, replacement);
         assert_eq!(
             validate_identity(&changed),

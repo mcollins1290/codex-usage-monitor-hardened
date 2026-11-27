@@ -664,9 +664,8 @@ fn default_show_usage_window() -> bool {
 }
 
 fn load_settings() -> SettingsFile {
-    let mut settings = normalize_settings(
-        load_settings_from_path(&settings_path()).unwrap_or_default(),
-    );
+    let mut settings =
+        normalize_settings(load_settings_from_path(&settings_path()).unwrap_or_default());
     if settings.quota_display_mode.is_none() {
         settings.quota_display_mode = Some(QuotaDisplayMode::Remaining);
     }
