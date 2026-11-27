@@ -518,6 +518,11 @@ fn rows(page: Page, s: &AppState) -> Vec<Row> {
                     s.show_codex,
                     codex.error,
                 ),
+                action(
+                    "Executable approval",
+                    info("Review compatibility status. Live polling remains blocked."),
+                    vec![OptionItem::command("Review status", IDM_COMPATIBILITY_STATUS)],
+                ),
                 section(strings.refresh_section),
                 choice(
                     strings.update_frequency,

@@ -545,6 +545,20 @@ fn prepare_compatibility_record(
     Ok(candidate)
 }
 
+// Read-only UI status: never execute a candidate, read credentials, or treat
+// a populated record as permission to lift the compiled launch freeze.
+pub fn compatibility_status(identity: Option<&ApprovedExecutable>) -> &'static str {
+    match identity {
+        None => "No Codex executable has been selected. Live polling is disabled pending independent verification and explicit approval.",
+        Some(identity) if check_compatibility(identity).is_err() => {
+            "The configured executable lacks matching compatibility evidence. Live polling is disabled."
+        }
+        Some(_) => {
+            "Compatibility evidence is recorded, but live polling remains disabled until runtime security acceptance is complete."
+        }
+    }
+}
+
 fn require_startup_acceptance() -> Result<(), AppServerError> {
     Err(AppServerError::StartupNotVerified)
 }

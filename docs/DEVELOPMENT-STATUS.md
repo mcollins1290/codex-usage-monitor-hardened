@@ -58,6 +58,18 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 - Startup integration side effects, authenticated behavior on 0.172.0 and full T2–T8 synthetic tests remain unverified. Do not infer safety from protocol success alone.
 - Never publish local executable paths, personal configuration, account data, credentials or private logs.
 
+## Standing development mandate (owner authorized)
+
+Complete autonomously as far as available evidence and permissions permit:
+
+- Path-bound compatibility approval: schema 2 committed; final CI pending.
+- User-facing approval workflow: read-only status entry added to Settings and tray menu; selection/import and explicit approval still pending.
+- Legacy code removal: dead updater functions, updater/privacy preference machinery and helper argument handling removed; residual multi-provider renderer/scheduler remains.
+- Dependency security audit: inventory and advisory assessment required; final locked build and audit required.
+- Authenticated runtime verification: synthetic tests and acceptance harness can be developed autonomously; genuine local authenticated evidence and startup safety acceptance remain required. Never substitute fabricated or CI credentials.
+
+Continue without intermediate automatic CI; restore full CI at final verification. No release, main merge, local install, or live launch gate change without acceptance.
+
 ## Next implementation milestone
 
 1. Verify schema 2 compatibility and approval validation tests on Windows.

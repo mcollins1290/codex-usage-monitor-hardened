@@ -130,7 +130,7 @@ const IDM_START_WITH_WINDOWS: u16 = 20;
 const IDM_SETTINGS: u16 = 21;
 const IDM_RESET_POSITION: u16 = 30;
 const IDM_ANCHOR_LEFT: u16 = 34;
-const IDM_VERSION_ACTION: u16 = 31;
+const IDM_COMPATIBILITY_STATUS: u16 = 31;
 const IDM_LANG_SYSTEM: u16 = 40;
 const IDM_LANG_ENGLISH: u16 = 41;
 const IDM_LANG_DUTCH: u16 = 42;
@@ -592,10 +592,6 @@ struct SettingsFile {
     alert_threshold_percent: u8,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     notified_quota_windows: Vec<String>,
-    #[serde(default = "crate::privacy::default_passive_monitoring")]
-    passive_monitoring: bool,
-    #[serde(default = "crate::privacy::default_updates_enabled")]
-    updates_enabled: bool,
     #[serde(default)]
     notify_on_reset: bool,
     #[serde(default)]
@@ -626,8 +622,6 @@ impl Default for SettingsFile {
             show_weekly_window: true,
             alert_threshold_percent: 0,
             notified_quota_windows: Vec::new(),
-            passive_monitoring: true,
-            updates_enabled: true,
             notify_on_reset: false,
             reset_observations: Default::default(),
             codex_executable: None,
@@ -669,12 +663,6 @@ fn load_settings() -> SettingsFile {
     if settings.quota_display_mode.is_none() {
         settings.quota_display_mode = Some(QuotaDisplayMode::Remaining);
     }
-    crate::privacy::set_preferences(crate::privacy::Preferences {
-        passive_monitoring: true,
-        updates_enabled: false,
-    });
-    settings.passive_monitoring = true;
-    settings.updates_enabled = false;
     settings
 }
 
@@ -719,7 +707,6 @@ fn save_settings(settings: &SettingsFile) {
 fn save_state_settings() {
     let result = settings_store::save(&settings_path(), || {
         let state = lock_state();
-        let privacy = crate::privacy::preferences();
         state.as_ref().map(|s| SettingsFile {
             tray_offset: s.tray_offset,
             anchor_left: s.anchor_left,
@@ -742,8 +729,6 @@ fn save_state_settings() {
             show_weekly_window: s.show_weekly_window,
             alert_threshold_percent: s.alert_threshold_percent,
             notified_quota_windows: s.notified_quota_windows.iter().cloned().collect(),
-            passive_monitoring: privacy.passive_monitoring,
-            updates_enabled: privacy.updates_enabled,
             notify_on_reset: s.notify_on_reset,
             reset_observations: s.reset_observations.clone(),
             codex_executable: s.codex_identity.clone(),
@@ -1452,169 +1437,6 @@ fn update_language_change() -> bool {
 
     apply_language_to_state(app_state, None);
     true
-}
-
-#[cfg(any())]
-fn begin_update_check(hwnd: HWND, interactive: bool) {
-    if !crate::privacy::updates_enabled() {
-        return;
-    }
-    let send_hwnd = SendHwnd::from_hwnd(hwnd);
-    let (strings, install_channel) = {
-        let mut state = lock_state();
-        let Some(app_state) = state.as_mut() else {
-            return;
-        };
-
-        if matches!(
-            app_state.update_status,
-            UpdateStatus::Checking | UpdateStatus::Applying
-        ) {
-            if interactive {
-                show_info_message(
-                    hwnd,
-                    app_state.language.strings().updates,
-                    app_state.language.strings().update_in_progress,
-                );
-            }
-            return;
-        }
-
-        app_state.update_status = UpdateStatus::Checking;
-        (app_state.language.strings(), app_state.install_channel)
-    };
-
-    std::thread::spawn(move || {
-        let hwnd = send_hwnd.to_hwnd();
-        let checked_at = now_unix_secs();
-        match updater::check_for_updates() {
-            Ok(UpdateCheckResult::UpToDate) => {
-                {
-                    let mut state = lock_state();
-                    if let Some(s) = state.as_mut() {
-                        s.update_status = UpdateStatus::UpToDate;
-                        s.last_update_check_unix = Some(checked_at);
-                    }
-                }
-                save_state_settings();
-                if interactive {
-                    show_info_message(hwnd, strings.updates, strings.up_to_date);
-                }
-                unsafe {
-                    let _ = PostMessageW(hwnd, WM_APP_UPDATE_CHECK_COMPLETE, WPARAM(0), LPARAM(0));
-                }
-            }
-            Ok(UpdateCheckResult::Available(release)) => {
-                {
-                    let mut state = lock_state();
-                    if let Some(s) = state.as_mut() {
-                        s.update_status = UpdateStatus::Available(release.clone());
-                        s.last_update_check_unix = Some(checked_at);
-                    }
-                }
-                save_state_settings();
-                if interactive && show_update_prompt(hwnd, strings, &release) {
-                    match install_channel {
-                        InstallChannel::Portable => begin_update_apply(hwnd, release),
-                        InstallChannel::Winget => begin_winget_update(hwnd),
-                    }
-                }
-                unsafe {
-                    let _ = PostMessageW(hwnd, WM_APP_UPDATE_CHECK_COMPLETE, WPARAM(0), LPARAM(0));
-                }
-            }
-            Err(error) => {
-                {
-                    let mut state = lock_state();
-                    if let Some(s) = state.as_mut() {
-                        s.update_status = UpdateStatus::Idle;
-                        s.last_update_check_unix = Some(checked_at);
-                    }
-                }
-                save_state_settings();
-                if interactive {
-                    let message = format!("{}.\n\n{}", strings.update_failed, error);
-                    show_error_message(hwnd, strings.updates, &message);
-                }
-                unsafe {
-                    let _ = PostMessageW(hwnd, WM_APP_UPDATE_CHECK_COMPLETE, WPARAM(0), LPARAM(0));
-                }
-            }
-        }
-    });
-}
-
-#[cfg(any())]
-fn begin_update_apply(hwnd: HWND, release: ReleaseDescriptor) {
-    if !crate::privacy::updates_enabled() {
-        return;
-    }
-    let send_hwnd = SendHwnd::from_hwnd(hwnd);
-    let strings = {
-        let mut state = lock_state();
-        let Some(app_state) = state.as_mut() else {
-            return;
-        };
-
-        if matches!(
-            app_state.update_status,
-            UpdateStatus::Checking | UpdateStatus::Applying
-        ) {
-            show_info_message(
-                hwnd,
-                app_state.language.strings().updates,
-                app_state.language.strings().update_in_progress,
-            );
-            return;
-        }
-
-        app_state.update_status = UpdateStatus::Applying;
-        app_state.language.strings()
-    };
-
-    std::thread::spawn(move || {
-        let hwnd = send_hwnd.to_hwnd();
-        match updater::begin_self_update(&release) {
-            Ok(()) => unsafe {
-                let _ = PostMessageW(hwnd, WM_CLOSE, WPARAM(0), LPARAM(0));
-            },
-            Err(error) => {
-                {
-                    let mut state = lock_state();
-                    if let Some(s) = state.as_mut() {
-                        s.update_status = UpdateStatus::Available(release);
-                    }
-                }
-                let message = format!("{}.\n\n{}", strings.update_failed, error);
-                show_error_message(hwnd, strings.updates, &message);
-                unsafe {
-                    let _ = PostMessageW(hwnd, WM_APP_UPDATE_CHECK_COMPLETE, WPARAM(0), LPARAM(0));
-                }
-            }
-        }
-    });
-}
-
-#[cfg(any())]
-fn begin_winget_update(hwnd: HWND) {
-    if !crate::privacy::updates_enabled() {
-        return;
-    }
-    let strings = {
-        let state = lock_state();
-        state.as_ref().map(|s| s.language.strings())
-    }
-    .unwrap_or(LanguageId::English.strings());
-
-    match updater::begin_winget_update() {
-        Ok(()) => unsafe {
-            let _ = PostMessageW(hwnd, WM_CLOSE, WPARAM(0), LPARAM(0));
-        },
-        Err(error) => {
-            let message = format!("{}.\n\n{}", strings.update_failed, error);
-            show_error_message(hwnd, strings.updates, &message);
-        }
-    }
 }
 
 const STARTUP_REGISTRY_PATH: &str = r"Software\Microsoft\Windows\CurrentVersion\Run";
@@ -3716,12 +3538,12 @@ unsafe extern "system" fn wnd_proc(
                     request_poll(sh, true);
                 }
                 IDM_SETTINGS => settings_window::show(hwnd),
-                IDM_VERSION_ACTION => {
-                    show_info_message(
-                        hwnd,
-                        "Updates disabled",
-                        "This hardened build has no automatic or in-app update mechanism.",
-                    );
+                IDM_COMPATIBILITY_STATUS => {
+                    let identity = lock_state()
+                        .as_ref()
+                        .and_then(|state| state.codex_identity.clone());
+                    let message = crate::app_server::compatibility_status(identity.as_ref());
+                    show_info_message(hwnd, "Codex executable approval", message);
                 }
                 2 => {
                     EXIT_REQUESTED.store(true, Ordering::Relaxed);
@@ -4116,6 +3938,11 @@ fn show_context_menu(hwnd: HWND) {
                 } else {
                     MENU_ITEM_FLAGS(0)
                 },
+            ),
+            (
+                IDM_COMPATIBILITY_STATUS,
+                "Codex executable approval…".to_owned(),
+                MENU_ITEM_FLAGS(0),
             ),
             (2, strings.exit.to_owned(), MENU_ITEM_FLAGS(0)),
         ] {

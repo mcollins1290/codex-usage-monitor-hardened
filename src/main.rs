@@ -7,7 +7,6 @@ mod localization;
 mod models;
 mod native_interop;
 mod poller;
-mod privacy;
 mod provider_icons;
 mod provider_poll;
 mod quota_alerts;
@@ -23,12 +22,12 @@ mod window;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    privacy::initialize(&args);
     let diagnose_enabled = args.iter().any(|arg| arg == "--diagnose");
     if diagnose_enabled {
         match diagnose::init() {
             Ok(path) => {
-                diagnose::log(format!("startup args={args:?} log_path={}", path.display()));
+                let _ = path;
+                diagnose::log("diagnostic startup");
                 diagnose::log(format!("version={}", env!("CARGO_PKG_VERSION")));
             }
             Err(error) => {
