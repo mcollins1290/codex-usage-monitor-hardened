@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "candidate_commit": "56c54951eebee398c2ecf4772d080bac6f539e2e",
+  "branch": "feature/security-remediation",
+  "status_legend": [
+    "PASS — VERIFIED",
+    "IMPLEMENTED — CI PENDING",
+    "EXTERNAL ACCEPTANCE PENDING",
+    "NOT APPLICABLE",
+    "FAIL / INCOMPLETE"
+  ],
+  "evidence": {
+    "repository": {
+      "status": "PASS — VERIFIED",
+      "source": "git status --short; git rev-parse HEAD; git log",
+      "result": "Clean working tree at the candidate commit; no Windows CI, release, installation, or publication was performed."
+    },
+    "codex_only_refactor": {
+      "status": "PASS — VERIFIED",
+      "source": [
+        "src/models.rs",
+        "src/codex_poll.rs",
+        "src/window.rs",
+        "src/settings_window.rs",
+        "src/codex_icon.rs",
+        "src/localization/"
+      ],
+      "result": "Production state, scheduling, layout and icon paths are Codex-specific. No Claude, Antigravity, Provider::, provider_poll, poll_provider, active_model_count, or MODEL_RIGHT_MARGIN symbols remain in src Rust files."
+    },
+    "protocol_and_freeze": {
+      "status": "PASS — VERIFIED",
+      "source": [
+        "src/app_server.rs",
+        "src/app_server.rs::require_startup_acceptance",
+        "src/app_server.rs::tests::unverified_startup_cannot_launch_even_with_configured_identity"
+      ],
+      "result": "The fixed protocol implementation and unconditional production launch freeze are covered by source inspection and regression tests."
+    },
+    "local_verification": {
+      "status": "PASS — VERIFIED",
+      "commands": [
+        "cargo fmt --all -- --check",
+        "cargo test --locked",
+        "cargo clippy --locked --all-targets",
+        "cargo build --release --locked",
+        "cargo audit --json",
+        "cargo deny check"
+      ],
+      "result": "Formatting, tests, clippy and release build passed; 86 tests passed, 0 failed, 4 ignored; cargo-audit reported 0 vulnerabilities; cargo-deny passed advisories, bans, licenses and sources."
+    },
+    "dependency_limitation": {
+      "status": "IMPLEMENTED — CI PENDING",
+      "source": "Cargo.lock; docs/DEPENDENCY-AUDIT.md",
+      "result": "Audit database revision c5279d0b0c9e8b70df666eb6d1edbabcfd1176bd was used. cargo-deny reports only the existing duplicate syn warning. Final Windows CI remains required."
+    },
+    "startup_security": {
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "source": "docs/RUNTIME-ACCEPTANCE.md; docs/hardened-architecture.md",
+      "result": "Authenticated startup-side-effect verification has not been performed and the production launch freeze remains enforced."
+    },
+    "windows_acceptance": {
+      "status": "IMPLEMENTED — CI PENDING",
+      "source": ".github/workflows/",
+      "result": "Windows-specific compilation, containment and release checks require the separately authorized final workflow run."
+    }
+  },
+  "remaining_gates": [
+    "Complete the item-level A–T reconciliation in docs/FINAL-CI-READINESS.md before declaring final candidate acceptance.",
+    "Run final Windows CI manually on this exact candidate commit.",
+    "Perform separately authorized authenticated runtime acceptance.",
+    "Keep the production authenticated launch freeze until runtime acceptance passes."
+  ],
+  "not_a_security_attestation": true
+}

@@ -6,11 +6,16 @@ This document records the current branch state after the latest local review. It
 is an evidence register for the present candidate, not a claim of production
 acceptance.
 
+The structured evidence companion is
+[`docs/verification/ci-readiness-checklist.json`](verification/ci-readiness-checklist.json).
+It records the current evidence boundary and does not represent deferred
+Windows or authenticated-runtime acceptance as passed.
+
 ## Candidate identity
 
 - Branch: `feature/security-remediation`
 - Starting reviewed remote HEAD: `858cd6dc61f5a67444788a3edceda9a444db3721`
-- Current local candidate: `6b6129cf055e1ffd0f24ac1f65a1bd5dda062148`
+- Current local candidate: `56c54951eebee398c2ecf4772d080bac6f539e2e` (documentation update pending)
 - Original handover: `168885d0b8616989834e83d38d5899737600776a`
 - Windows CI remains manual-only; no CI run was triggered by this review.
 - Authenticated app-server launch remains unconditionally frozen in
