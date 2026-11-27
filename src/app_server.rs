@@ -1324,6 +1324,77 @@ mod tests {
     }
 
     #[test]
+    fn frame_limit_accepts_exact_boundary_and_rejects_one_byte_over() {
+        let mut exact =
+            std::io::Cursor::new([vec![b'x'; MAX_JSON_LINE_BYTES - 1], vec![b'\n']].concat());
+        assert_eq!(
+            read_frame(&mut exact).unwrap().unwrap().len(),
+            MAX_JSON_LINE_BYTES
+        );
+        let mut over = std::io::Cursor::new(vec![b'x'; MAX_JSON_LINE_BYTES + 1]);
+        assert_eq!(read_frame(&mut over), Err(AppServerError::OutputTooLarge));
+    }
+
+    #[test]
+    fn stalled_response_deadline_is_bounded() {
+        let (_tx, rx) = sync_channel(1);
+        let started = Instant::now();
+        assert_eq!(
+            receive_response(
+                &rx,
+                &AtomicBool::new(false),
+                1,
+                started + Duration::from_millis(20)
+            ),
+            Err(AppServerError::Timeout)
+        );
+        assert!(started.elapsed() < Duration::from_secs(1));
+    }
+
+    #[test]
+    fn stdout_queue_and_total_floods_set_output_limit() {
+        let (tx, rx) = sync_channel(1);
+        tx.send(Ok(b"already queued\n".to_vec())).unwrap();
+        let limit = Arc::new(AtomicBool::new(false));
+        read_stdout(
+            std::io::Cursor::new(b"second\nthird\n".to_vec()),
+            tx,
+            Arc::clone(&limit),
+        );
+        assert!(limit.load(Ordering::Acquire));
+        drop(rx);
+
+        let (tx, _rx) = sync_channel(16);
+        let limit = Arc::new(AtomicBool::new(false));
+        let flood = vec![b'x'; MAX_TOTAL_OUTPUT_BYTES + 1];
+        read_stdout(std::io::Cursor::new(flood), tx, Arc::clone(&limit));
+        assert!(limit.load(Ordering::Acquire));
+    }
+
+    #[test]
+    fn stderr_flood_sets_output_limit_without_blocking() {
+        let limit = Arc::new(AtomicBool::new(false));
+        let flood = vec![b'x'; MAX_TOTAL_OUTPUT_BYTES + 1];
+        drain_stderr(std::io::Cursor::new(flood), Arc::clone(&limit));
+        assert!(limit.load(Ordering::Acquire));
+    }
+
+    #[test]
+    fn invalid_json_encoding_is_rejected_after_bounded_frame_read() {
+        let (tx, rx) = sync_channel(1);
+        tx.send(Ok(vec![0xff, b'\n'])).unwrap();
+        assert_eq!(
+            receive_response(
+                &rx,
+                &AtomicBool::new(false),
+                1,
+                Instant::now() + STARTUP_TIMEOUT
+            ),
+            Err(AppServerError::InvalidMessage)
+        );
+    }
+
+    #[test]
     fn unexpected_response_id_is_rejected() {
         let (tx, rx) = sync_channel(1);
         tx.send(Ok(br#"{"id":2,"result":{}}"#.to_vec())).unwrap();
