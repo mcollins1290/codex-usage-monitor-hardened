@@ -10,7 +10,7 @@ acceptance.
 
 - Branch: `feature/security-remediation`
 - Starting reviewed remote HEAD: `858cd6dc61f5a67444788a3edceda9a444db3721`
-- Current local candidate: `428d6a8ac5f1c5d2c40dee988031b73062d67da8`
+- Current local candidate: `5f8ecb212bbef9c03b346c682b12f30161c63b73`
 - Original handover: `168885d0b8616989834e83d38d5899737600776a`
 - Windows CI remains manual-only; no CI run was triggered by this review.
 - Authenticated app-server launch remains unconditionally frozen in
@@ -23,7 +23,7 @@ acceptance.
 | `cargo fmt --all -- --check` | Passed after formatting changes |
 | `cargo test --locked` | Exit 0; 86 passed, 0 failed, 4 ignored |
 | `cargo build --release --locked` | Exit 0; optimized build passed with no compiler warnings |
-| `cargo clippy --locked --all-targets` | Exit 0; dead-code and lint warnings remain |
+| `cargo clippy --locked --all-targets` | Exit 0; no warnings |
 | `cargo audit --json` | Exit 0; 0 vulnerabilities; advisory DB `c5279d0b0c9e8b70df666eb6d1edbabcfd1176bd` |
 | `cargo deny check` | Exit 0; advisories, bans, licenses and sources passed; duplicate `syn` warning remains |
 | Windows CI | Not executed by authorization |
@@ -67,19 +67,17 @@ acceptance.
 | Codex-only architecture | IMPLEMENTED — CI PENDING | `src/codex_poll.rs`, `src/models.rs`, `src/window.rs`, `src/codex_icon.rs`; residual-reference audit |
 | Quota presentation and scheduling | IMPLEMENTED — CI PENDING | `src/codex_poll.rs`, `src/quota_refresh.rs`, local 86-test run |
 | Identity and compatibility | IMPLEMENTED — CI PENDING | `src/app_server.rs` tests; Windows CI pending |
-| Protocol handling | PASS — VERIFIED locally | `src/app_server.rs` protocol tests; 104-test run |
+| Protocol handling | PASS — VERIFIED locally | `src/app_server.rs` protocol tests; 86-test run |
 | Process containment | IMPLEMENTED — CI PENDING | Windows fixture tests pass locally; CI rerun pending |
 | Startup security | EXTERNAL ACCEPTANCE PENDING | `docs/RUNTIME-ACCEPTANCE.md` |
 | Launch freeze | PASS — VERIFIED locally | `require_startup_acceptance()` and regression tests |
-| Dependency security | FAIL / INCOMPLETE | Manual review only; audit tools unavailable |
+| Dependency security | IMPLEMENTED — CI PENDING | `cargo audit --json` and `cargo deny check` passed locally; duplicate `syn` warning remains |
 | Documentation | IMPLEMENTED — CI PENDING | Status and acceptance documents; final consistency review pending |
-| Final candidate acceptance | FAIL / INCOMPLETE | Actionable legacy and warning cleanup remains |
+| Final candidate acceptance | IMPLEMENTED — CI PENDING | Local checks pass; Windows CI and runtime acceptance remain |
 
 ## Required next work
 
-- Reconcile remaining historical status wording and complete the item-level
-  evidence register for the final candidate.
-- Reconcile the full item-level A–T checklist after those changes.
+- Complete the item-level A–T evidence register for the final candidate.
 - Run the manually dispatched Windows workflow on the final candidate only.
 - Keep the authenticated launch freeze until independent runtime acceptance.
 

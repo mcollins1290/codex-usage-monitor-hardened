@@ -247,8 +247,7 @@ mod tests {
         let (label_width, text_width) = usage_layout_widths(content.language, appearance, false);
         let segments = row_bar_segment_count();
         let bar_width = usage_bar_width(segments, appearance);
-        let model_width =
-            model_usage_width(segments, text_width, appearance) + sc(MODEL_RIGHT_MARGIN);
+        let model_width = model_usage_width(segments, text_width, appearance);
         let bar_left = sc(LEFT_DIVIDER_W)
             + sc(DIVIDER_RIGHT_MARGIN)
             + period_label_column_width(label_width, appearance)
