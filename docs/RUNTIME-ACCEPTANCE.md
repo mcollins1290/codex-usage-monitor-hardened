@@ -2,6 +2,28 @@
 
 Production app-server launch remains frozen. This checklist does not authorize an authenticated launch or replace independent evidence.
 
+## Reusable harness
+
+The committed T1 harness is `verification/Verify-AppServer.ps1`. It requires an
+explicit absolute executable path, expected SHA-256 and expected stable version;
+it never discovers or approves replacements. Example usage, which must be run
+only under the separately approved synthetic-test procedure, is:
+
+```powershell
+& .\verification\Verify-AppServer.ps1 `
+  -ExecutablePath 'C:\Approved\codex.exe' `
+  -ExpectedSha256 '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef' `
+  -ExpectedVersion '0.172.0' `
+  -OutputPath .\verification-result.json
+```
+
+The harness validates the executable identity, creates a disposable synthetic
+profile, sends only the fixed T1 protocol sequence, bounds shutdown, and emits
+structured sanitized results. It is intentionally not a production launcher,
+does not handle credentials, and does not implement T2–T8 fixture observation;
+those scenarios remain explicitly unimplemented until their observation and
+containment requirements are added and independently reviewed.
+
 ## Synthetic phase (no real account)
 
 Record the exact executable canonical path, SHA-256, independently verified stable version and official release source revision locally. Never commit personal paths or private diagnostic logs. Use a fresh disposable profile and working directory, no real credentials, fixed stdio protocol, bounded output/timeouts, creation-time process containment and positive observation controls.
