@@ -33,6 +33,10 @@ Windows or authenticated-runtime acceptance as passed.
 | `cargo deny check` | Exit 0; advisories, bans, licenses and sources passed; duplicate `syn` warning remains |
 | Windows CI | Not executed by authorization |
 
+The manual Windows workflow also runs locked clippy with warnings denied. RustSec
+and cargo-deny remain documented local acceptance commands because the workflow
+does not install third-party audit binaries.
+
 ## Verified implementation
 
 - Fixed app-server protocol ordering is implemented in `src/app_server.rs`:
