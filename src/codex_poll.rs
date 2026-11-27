@@ -1,4 +1,4 @@
-//! Single-service Codex quota scheduler used by production.
+//! Codex-only quota scheduler used by production.
 
 use crate::models::{AppUsageData, UsageData};
 use crate::poller::PollError;
@@ -6,7 +6,7 @@ use crate::quota_refresh::{self, History, ResetRefresh};
 use std::sync::Arc;
 use std::time::{Duration, Instant, SystemTime};
 
-pub struct Service {
+pub struct CodexState {
     pub data: Option<UsageData>,
     pub history: History,
     pub error: Option<PollError>,
@@ -53,7 +53,7 @@ pub struct Completion {
 }
 
 pub struct Monitor {
-    pub service: Service,
+    pub codex: CodexState,
 }
 
 fn is_auth(error: PollError) -> bool {
@@ -101,7 +101,7 @@ pub fn launch(
 impl Monitor {
     pub fn new(now: Instant) -> Self {
         Self {
-            service: Service {
+            codex: CodexState {
                 data: None,
                 history: History::default(),
                 error: None,
@@ -119,15 +119,15 @@ impl Monitor {
     }
 
     pub fn job_is_current(&self, job: &Job) -> bool {
-        self.service.in_flight == Some(job.ticket) && self.service.generation() == job.generation
+        self.codex.in_flight == Some(job.ticket) && self.codex.generation() == job.generation
     }
 
     pub fn force(&mut self, now: Instant, include_auth: bool) {
-        self.service.due = self
-            .service
+        self.codex.due = self
+            .codex
             .retry_not_before
             .map_or(now, |deadline| deadline.max(now));
-        self.service.forced |= include_auth || !self.service.auth_paused;
+        self.codex.forced |= include_auth || !self.codex.auth_paused;
     }
 
     pub fn wake(&mut self, now: Instant, base: u32) -> (Vec<Job>, u32) {
@@ -136,7 +136,7 @@ impl Monitor {
     }
 
     fn plan(&mut self, now: Instant) -> Vec<Job> {
-        let s = &mut self.service;
+        let s = &mut self.codex;
         if s.in_flight.is_some() || s.due > now {
             return Vec::new();
         }
@@ -160,7 +160,7 @@ impl Monitor {
         base: u32,
         adaptive: bool,
     ) -> Completion {
-        let s = &mut self.service;
+        let s = &mut self.codex;
         if s.in_flight != Some(job.ticket) {
             return Completion {
                 accepted: false,
@@ -219,7 +219,7 @@ impl Monitor {
     }
 
     pub fn reconfigure(&mut self, base: u32, adaptive: bool, now: Instant, wall: SystemTime) {
-        let s = &mut self.service;
+        let s = &mut self.codex;
         if s.error.is_none() {
             s.interval_ms = quota_refresh::interval_ms(base, adaptive, s.data.as_ref());
             if let Some(ms) = s.data.as_ref().and_then(|data| next_reset_ms(data, wall)) {
@@ -233,8 +233,8 @@ impl Monitor {
     }
 
     pub fn delay_ms(&self, now: Instant, base: u32) -> u32 {
-        if self.service.in_flight.is_none() {
-            self.service
+        if self.codex.in_flight.is_none() {
+            self.codex
                 .due
                 .saturating_duration_since(now)
                 .as_millis()
@@ -246,12 +246,12 @@ impl Monitor {
 
     pub fn cached(&self) -> AppUsageData {
         AppUsageData {
-            codex: self.service.data.clone(),
+            codex: self.codex.data.clone(),
         }
     }
 }
 
-impl Service {
+impl CodexState {
     pub fn description(&self, now: SystemTime, _monotonic: Instant, chinese: bool) -> String {
         self.history
             .description(now, chinese, self.error.is_none(), self.interval_ms)

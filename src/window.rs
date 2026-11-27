@@ -1204,10 +1204,10 @@ fn refresh_usage_texts(state: &mut AppState) -> bool {
         if !visible {
             continue;
         }
-        let service = &state.monitor.service;
+        let codex = &state.monitor.codex;
         if let Some(usage) = usage {
-            let observed_at = service.history.last_success;
-            let stale = service.stale(now);
+            let observed_at = codex.history.last_success;
+            let stale = codex.stale(now);
             for (weekly, output, section) in [
                 (false, session, &usage.session),
                 (true, weekly, &usage.weekly),
@@ -1224,7 +1224,7 @@ fn refresh_usage_texts(state: &mut AppState) -> bool {
                 *output = text;
             }
         } else {
-            let label = service
+            let label = codex
                 .error
                 .map(|error| poll_error_display_label(error, state.language))
                 .unwrap_or("...");
@@ -2111,19 +2111,19 @@ fn update_quota_tooltips() {
             if s.show_codex {
                 let name = "Codex";
                 let session = &s.codex_session_text;
-                let service = &s.monitor.service;
+                let codex = &s.monitor.codex;
                 let now = SystemTime::now();
-                let description = service.description(now, Instant::now(), chinese);
+                let description = codex.description(now, Instant::now(), chinese);
                 let mut text = format!("{name}\n{description}");
-                if service.error.is_some() && session == "!" {
+                if codex.error.is_some() && session == "!" {
                     text.push_str(if chinese {
                         "\n本服务本次未返回额度。"
                     } else {
                         "\nThis provider did not return quota in the latest update."
                     });
                 }
-                if let Some(usage) = service.data.as_ref().filter(|_| service.error.is_none()) {
-                    for note in window_notes(usage, service.history.last_success, now, s.language) {
+                if let Some(usage) = codex.data.as_ref().filter(|_| codex.error.is_none()) {
+                    for note in window_notes(usage, codex.history.last_success, now, s.language) {
                         text.push('\n');
                         text.push_str(&note);
                     }
@@ -2629,7 +2629,7 @@ fn complete_codex_poll(send_hwnd: SendHwnd, job: &codex_poll::Job, attempt: code
         }
         let mut fresh = AppUsageData::default();
         if completion.successful {
-            fresh.codex = s.monitor.service.data.clone();
+            fresh.codex = s.monitor.codex.data.clone();
         }
         let previous_keys = s.notified_quota_windows.clone();
         let mut alerts = collect_low_quota_alerts(s, &fresh);
@@ -2649,10 +2649,10 @@ fn complete_codex_poll(send_hwnd: SendHwnd, job: &codex_poll::Job, attempt: code
         unsafe {
             SetTimer(hwnd, TIMER_POLL, effective_poll_interval(s), None);
         }
-        let service = &s.monitor.service;
+        let codex = &s.monitor.codex;
         diagnose::log(format!(
             "Codex poll completed error={:?} interval_ms={}",
-            service.error, service.interval_ms
+            codex.error, codex.interval_ms
         ));
         let notice = completion.notify_auth.then(|| {
             let strings = s.language.strings();
