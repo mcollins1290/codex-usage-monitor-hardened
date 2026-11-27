@@ -91,5 +91,26 @@ does not install third-party audit binaries.
 - Run the manually dispatched Windows workflow on the final candidate only.
 - Keep the authenticated launch freeze until independent runtime acceptance.
 
+## Final Windows CI procedure
+
+After reviewing the candidate commit locally, dispatch the workflow manually
+from GitHub Actions for `feature/security-remediation`:
+
+```text
+Actions → Windows build and tests → Run workflow → feature/security-remediation
+```
+
+The workflow must run on `windows-2022` with the pinned Rust toolchain and
+execute, in order, formatting verification, locked tests, locked Clippy with
+warnings denied, and the locked optimized build. A failed step blocks candidate
+acceptance; do not bypass or weaken the failed check. RustSec and cargo-deny
+must be rerun locally against the exact candidate lockfile if their results are
+needed for final acceptance.
+
+Only after final acceptance is separately approved should automatic `push` and
+`pull_request` triggers be restored in `.github/workflows/ci.yml`. Review the
+workflow diff, dispatch the restored workflow on a disposable branch if needed,
+and preserve least-privilege permissions before merging any branch.
+
 No installation, release, merge, tag, remote setting change or authenticated
 launch was performed.
