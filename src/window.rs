@@ -5065,7 +5065,7 @@ mod tests {
                 poll_interval_ms: interval,
                 ..SettingsFile::default()
             });
-            assert_eq!(settings.poll_interval_ms, POLL_15_MIN);
+            assert_eq!(settings.poll_interval_ms, POLL_5_MIN);
         }
     }
 
