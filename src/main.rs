@@ -2,6 +2,7 @@
 
 mod app_server;
 mod codex_colors;
+mod codex_poll;
 mod diagnose;
 mod localization;
 mod models;
