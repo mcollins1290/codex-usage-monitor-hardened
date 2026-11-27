@@ -16,6 +16,8 @@ pub enum PollError {
     RateLimited(Option<u32>),
     ServerError,
     RequestFailed,
+    ApprovalRequired,
+    ExecutableChanged,
 }
 impl PollError {
     pub fn category(self) -> &'static str {
@@ -27,6 +29,8 @@ impl PollError {
             Self::RateLimited(_) => "rate_limited",
             Self::ServerError => "server_error",
             Self::RequestFailed => "protocol_error",
+            Self::ApprovalRequired => "approval_required",
+            Self::ExecutableChanged => "executable_changed",
         }
     }
 }
@@ -48,7 +52,7 @@ pub fn poll_provider(
     if id != 1 {
         return Err(PollError::RequestFailed);
     }
-    let identity = identity.ok_or(PollError::NoCredentials)?;
+    let identity = identity.ok_or(PollError::ApprovalRequired)?;
     app_server::read_rate_limits(identity).map_err(app_server_error)
 }
 pub fn credential_watch_snapshot(_mode: CredentialWatchMode) -> CredentialWatchSnapshot {
@@ -121,8 +125,18 @@ fn format_countdown_from_secs(total_secs: u64, strings: Strings) -> String {
         format!("{total_secs}{}", strings.second_suffix)
     }
 }
-pub fn app_server_error(_error: app_server::AppServerError) -> PollError {
-    PollError::RequestFailed
+pub fn app_server_error(error: app_server::AppServerError) -> PollError {
+    use app_server::AppServerError;
+    match error {
+        AppServerError::StartupNotVerified | AppServerError::CompatibilityRequired => {
+            PollError::ApprovalRequired
+        }
+        AppServerError::InvalidIdentity
+        | AppServerError::ExecutableMissing
+        | AppServerError::HashMismatch => PollError::ExecutableChanged,
+        AppServerError::AuthenticationRequired => PollError::AuthRequired,
+        _ => PollError::RequestFailed,
+    }
 }
 
 pub fn execute(

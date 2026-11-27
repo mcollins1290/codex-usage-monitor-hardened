@@ -42,9 +42,9 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 | M2 | Independent executable version verification | Open |
 | M3 | Initialization handshake | Implemented and unit tested |
 | M4 | Tests exercise production protocol | Implemented and unit tested |
-| M5 | Upgrade-friendly compatibility records | Open |
+| M5 | Upgrade-friendly compatibility records | Record schema and identity binding implemented; approval workflow and CI verification outstanding |
 | M6 | Child environment and working directory | Partial; authenticated configuration policy unresolved |
-| M7 | Sanitized actionable error categories | Open |
+| M7 | Sanitized actionable error categories | Approval, executable change and authentication classifications implemented; UI review outstanding |
 | M8 | UI lock during polling | Remediated in source |
 | L1 | Residual provider/updater code | Open |
 | L2 | Toolchain pinning | Implemented |

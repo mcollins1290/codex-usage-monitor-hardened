@@ -424,6 +424,8 @@ impl Service {
                     PollError::RateLimited(_) => "请求过于频繁，正在退避",
                     PollError::ServerError => "服务暂时不可用",
                     PollError::RequestFailed => "无法读取额度响应",
+                    PollError::ApprovalRequired => "需要批准 Codex 版本",
+                    PollError::ExecutableChanged => "Codex 程序已更改",
                 }
             } else {
                 error.category()

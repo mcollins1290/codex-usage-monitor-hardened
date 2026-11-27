@@ -2836,6 +2836,8 @@ fn poll_error_display_label(error: poller::PollError, language: LanguageId) -> &
                 "5XX"
             }
         }
+        poller::PollError::ApprovalRequired => "!",
+        poller::PollError::ExecutableChanged => "!",
         poller::PollError::RequestFailed => {
             if language == LanguageId::SimplifiedChinese {
                 "错误"

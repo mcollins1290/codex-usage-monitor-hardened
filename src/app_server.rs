@@ -24,6 +24,9 @@ const MAX_TOTAL_OUTPUT_BYTES: usize = 1024 * 1024;
 const SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(2);
 const STARTUP_TIMEOUT: Duration = Duration::from_secs(3);
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(7);
+const COMPATIBILITY_SCHEMA: u32 = 1;
+const INVOCATION_POLICY: &str = "account-only-stdio-v1";
+#[cfg(test)]
 const CODEX_VERSION: &str = "0.172.0";
 
 #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -31,11 +34,62 @@ pub struct ApprovedExecutable {
     pub path: PathBuf,
     pub sha256: String,
     pub version: String,
+    #[serde(default)]
+    pub compatibility: Option<CompatibilityRecord>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CompatibilityRecord {
+    pub schema: u32,
+    pub invocation_policy: String,
+    pub release_tag: String,
+    pub release_commit: String,
+    pub observed_version: String,
+    pub observed_sha256: String,
+    pub synthetic_passed: bool,
+    pub authenticated_passed: bool,
+    pub explicitly_approved: bool,
+}
+
+// Evidence is bound to the actual configured identity. This is a local
+// administrative record, not a signature, sandbox or security trust anchor.
+fn check_compatibility(identity: &ApprovedExecutable) -> Result<(), AppServerError> {
+    let record = identity
+        .compatibility
+        .as_ref()
+        .ok_or(AppServerError::CompatibilityRequired)?;
+    if record.schema != COMPATIBILITY_SCHEMA
+        || record.invocation_policy != INVOCATION_POLICY
+        || record.release_tag != format!("rust-v{}", identity.version)
+        || record.release_commit.len() != 40
+        || !record.release_commit.bytes().all(|byte| byte.is_ascii_hexdigit())
+        || record.observed_version != format!("codex-cli {}", identity.version)
+        || !record.observed_sha256.eq_ignore_ascii_case(&identity.sha256)
+        || !record.synthetic_passed
+        || !record.authenticated_passed
+        || !record.explicitly_approved
+    {
+        return Err(AppServerError::CompatibilityRequired);
+    }
+    Ok(())
+}
+
+fn stable_version(version: &str) -> bool {
+    let parts: Vec<_> = version.split('.').collect();
+    parts.len() == 3
+        && parts.iter().all(|part| {
+            !part.is_empty()
+                && part.bytes().all(|byte| byte.is_ascii_digit())
+                && part.parse::<u32>().is_ok()
+        })
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum AppServerError {
     StartupNotVerified,
+    CompatibilityRequired,
+    AuthenticationRequired,
     InvalidIdentity,
     ExecutableMissing,
     HashMismatch,
@@ -277,10 +331,6 @@ struct RateLimitWindow {
     resets_at: Option<i64>,
 }
 
-pub fn expected_version() -> &'static str {
-    CODEX_VERSION
-}
-
 pub fn sha256_file(path: &Path) -> Result<String, AppServerError> {
     let mut file = File::open(path).map_err(|_| AppServerError::ExecutableMissing)?;
     hash_reader(&mut file)
@@ -303,7 +353,7 @@ fn hash_reader(file: &mut impl Read) -> Result<String, AppServerError> {
 pub fn validate_identity(identity: &ApprovedExecutable) -> Result<PathBuf, AppServerError> {
     if !identity.path.is_absolute()
         || identity.sha256.len() != 64
-        || identity.version != CODEX_VERSION
+        || !stable_version(&identity.version)
     {
         return Err(AppServerError::InvalidIdentity);
     }
@@ -331,6 +381,7 @@ fn require_startup_acceptance() -> Result<(), AppServerError> {
 pub fn read_rate_limits(identity: &ApprovedExecutable) -> Result<UsageData, AppServerError> {
     // Deliberately not configurable: no authenticated invocation has been accepted.
     require_startup_acceptance()?;
+    check_compatibility(identity)?;
     let executable = validate_identity(identity)?;
     // Hold a read-only, no-write/no-delete sharing handle across process creation.
     let mut locked = std::fs::OpenOptions::new()
@@ -466,7 +517,15 @@ fn receive_response(
                 continue
             }
             Some(value) if value.as_u64() == Some(id) && !object.contains_key("method") => {
-                if object.contains_key("error") {
+                if let Some(error) = object.get("error") {
+                    if id == 2
+                        && !object.contains_key("result")
+                        && error.get("code").and_then(|value| value.as_i64()) == Some(-32600)
+                        && error.get("message").and_then(|value| value.as_str())
+                            == Some("codex account authentication required to read rate limits")
+                    {
+                        return Err(AppServerError::AuthenticationRequired);
+                    }
                     return Err(AppServerError::ProtocolError);
                 }
                 return object
@@ -655,11 +714,70 @@ mod tests {
     }
 
     #[test]
+    fn compatibility_requires_matching_version_hash_and_completed_approval() {
+        let mut identity = ApprovedExecutable {
+            path: PathBuf::from(r"C:\fixture\codex.exe"),
+            sha256: "A".repeat(64),
+            version: "0.173.0".to_string(),
+            compatibility: None,
+        };
+        assert_eq!(
+            check_compatibility(&identity),
+            Err(AppServerError::CompatibilityRequired)
+        );
+        identity.compatibility = Some(CompatibilityRecord {
+            schema: COMPATIBILITY_SCHEMA,
+            invocation_policy: INVOCATION_POLICY.to_string(),
+            release_tag: "rust-v0.173.0".to_string(),
+            release_commit: "b".repeat(40),
+            observed_version: "codex-cli 0.173.0".to_string(),
+            observed_sha256: identity.sha256.clone(),
+            synthetic_passed: true,
+            authenticated_passed: true,
+            explicitly_approved: true,
+        });
+        assert_eq!(check_compatibility(&identity), Ok(()));
+        // Even a fully populated synthetic record cannot lift the current
+        // compiled-in launch freeze.
+        assert!(matches!(
+            read_rate_limits(&identity),
+            Err(AppServerError::StartupNotVerified)
+        ));
+        identity.sha256 = "C".repeat(64);
+        assert_eq!(
+            check_compatibility(&identity),
+            Err(AppServerError::CompatibilityRequired)
+        );
+        identity.sha256 = "A".repeat(64);
+        identity.compatibility.as_mut().unwrap().authenticated_passed = false;
+        assert_eq!(
+            check_compatibility(&identity),
+            Err(AppServerError::CompatibilityRequired)
+        );
+    }
+
+    #[test]
+    fn legacy_identity_deserializes_without_granting_approval() {
+        let identity: ApprovedExecutable = serde_json::from_value(serde_json::json!({
+            "path": "C:\\fixture\\codex.exe",
+            "version": "0.172.0",
+            "sha256": "A".repeat(64)
+        }))
+        .unwrap();
+        assert!(identity.compatibility.is_none());
+        assert_eq!(
+            check_compatibility(&identity),
+            Err(AppServerError::CompatibilityRequired)
+        );
+    }
+
+    #[test]
     fn unverified_startup_cannot_launch_even_with_configured_identity() {
         let identity = ApprovedExecutable {
             path: PathBuf::from("not-an-executable"),
             sha256: "0".repeat(64),
             version: CODEX_VERSION.to_string(),
+            compatibility: None,
         };
         assert!(matches!(
             read_rate_limits(&identity),
@@ -762,6 +880,7 @@ mod tests {
             path: path.canonicalize().unwrap(),
             sha256: hash,
             version: CODEX_VERSION.to_string(),
+            compatibility: None,
         };
         assert_eq!(
             validate_identity(&identity).unwrap(),
@@ -783,11 +902,12 @@ mod tests {
     }
 
     #[test]
-    fn identity_rejects_relative_paths_and_unapproved_versions() {
+    fn identity_rejects_relative_paths_and_prerelease_versions() {
         let relative = ApprovedExecutable {
             path: PathBuf::from("codex.exe"),
             sha256: "0".repeat(64),
             version: CODEX_VERSION.to_string(),
+            compatibility: None,
         };
         assert_eq!(
             validate_identity(&relative),
@@ -797,7 +917,8 @@ mod tests {
         let wrong_version = ApprovedExecutable {
             path: PathBuf::from(r"C:\codex.exe"),
             sha256: "0".repeat(64),
-            version: "0.167.0".to_string(),
+            version: "0.167.0-alpha.1".to_string(),
+            compatibility: None,
         };
         assert_eq!(
             validate_identity(&wrong_version),
