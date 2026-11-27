@@ -4,7 +4,6 @@ mod app_server;
 mod codex_colors;
 mod diagnose;
 mod localization;
-mod mcp_server;
 mod models;
 mod native_interop;
 mod poller;

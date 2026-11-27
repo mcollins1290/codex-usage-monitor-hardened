@@ -21,7 +21,6 @@ use crate::app_server::ApprovedExecutable;
 use crate::codex_colors::{codex_brand_color, SingleColor};
 use crate::diagnose;
 use crate::localization::{self, LanguageId, Strings};
-use crate::mcp_server;
 use crate::models::{AppUsageData, QuotaDisplayMode};
 use crate::native_interop::{
     self, Color, TIMER_COUNTDOWN, TIMER_FRESHNESS, TIMER_POLL, TIMER_TASKBAR_RETRY,
@@ -2557,19 +2556,7 @@ pub fn run() {
         // Initial poll
         let send_hwnd = SendHwnd::from_hwnd(hwnd);
         request_poll(send_hwnd, false);
-        apply_mcp_setting();
-
-        schedule_auto_update_check(hwnd);
-        let should_check_updates = {
-            let state = lock_state();
-            state
-                .as_ref()
-                .map(|s| auto_update_check_due(s.last_update_check_unix))
-                .unwrap_or(false)
-        };
-        if should_check_updates {
-            begin_update_check(hwnd, false);
-        }
+        // Hardened builds have no MCP listener or automatic update check.
 
         // Initial theme check
         check_theme_change();
@@ -2583,59 +2570,7 @@ pub fn run() {
             }
         }
         settings_window::close();
-        mcp_server::stop();
     }
-}
-
-/// Explain missing and expired quota in the provider’s hover region.
-/// The optional MCP server's port: `mcp_port` in settings, else the default.
-fn mcp_port(setting: Option<u16>) -> u16 {
-    setting
-        .filter(|port| *port >= 1024)
-        .unwrap_or(mcp_server::DEFAULT_PORT)
-}
-
-/// Start or stop the MCP server to match the setting. Polling is unaffected:
-/// the server only copies the monitor's state when a tool is called.
-fn apply_mcp_setting() {
-    let Some((enabled, port)) = lock_state()
-        .as_ref()
-        .map(|s| (s.mcp_enabled, mcp_port(s.mcp_port)))
-    else {
-        return;
-    };
-    let unavailable = if enabled {
-        match mcp_server::start(port, mcp_snapshot) {
-            Ok(()) => false,
-            Err(error) => {
-                diagnose::log_error("MCP server could not start", error);
-                true
-            }
-        }
-    } else {
-        mcp_server::stop();
-        false
-    };
-    if let Some(s) = lock_state().as_mut() {
-        s.mcp_unavailable = unavailable;
-    }
-}
-
-fn mcp_settings_hint(language: LanguageId, unavailable: bool, port: u16) -> String {
-    let strings = language.strings();
-    let template = if unavailable {
-        strings.mcp_port_unavailable
-    } else {
-        strings.mcp_server_hint
-    };
-    template.replace("{port}", &port.to_string())
-}
-
-fn mcp_snapshot() -> mcp_server::Snapshot {
-    let state = lock_state();
-    let s = state.as_ref()?;
-    // Tool order: Claude Code (service 0), then Codex (service 1).
-    Some([0, 1].map(|id| mcp_server::ProviderRecord::from_service(&s.monitor.services[id])))
 }
 
 fn update_quota_tooltips() {
@@ -3738,7 +3673,7 @@ unsafe extern "system" fn wnd_proc(
                     }
                 }
                 TIMER_UPDATE_CHECK => {
-                    begin_update_check(hwnd, false);
+                    let _ = KillTimer(hwnd, TIMER_UPDATE_CHECK);
                 }
                 _ => {}
             }
@@ -3755,10 +3690,7 @@ unsafe extern "system" fn wnd_proc(
             sync_tray_icons(hwnd);
             LRESULT(0)
         }
-        WM_APP_UPDATE_CHECK_COMPLETE => {
-            schedule_auto_update_check(hwnd);
-            LRESULT(0)
-        }
+        WM_APP_UPDATE_CHECK_COMPLETE => LRESULT(0),
         WM_SETCURSOR => {
             let is_dragging = {
                 let state = lock_state();
@@ -3976,36 +3908,11 @@ unsafe extern "system" fn wnd_proc(
                 }
                 IDM_SETTINGS => settings_window::show(hwnd),
                 IDM_VERSION_ACTION => {
-                    let (install_channel, release) = {
-                        let state = lock_state();
-                        match state.as_ref() {
-                            Some(s) => (
-                                s.install_channel,
-                                match &s.update_status {
-                                    UpdateStatus::Available(release) => Some(release.clone()),
-                                    _ => None,
-                                },
-                            ),
-                            None => (InstallChannel::Portable, None),
-                        }
-                    };
-
-                    match install_channel {
-                        InstallChannel::Winget => {
-                            if release.is_some() {
-                                begin_winget_update(hwnd);
-                            } else {
-                                begin_update_check(hwnd, true);
-                            }
-                        }
-                        InstallChannel::Portable => {
-                            if let Some(release) = release {
-                                begin_update_apply(hwnd, release);
-                            } else {
-                                begin_update_check(hwnd, true);
-                            }
-                        }
-                    }
+                    show_info_message(
+                        hwnd,
+                        "Updates disabled",
+                        "This hardened build has no automatic or in-app update mechanism.",
+                    );
                 }
                 2 => {
                     EXIT_REQUESTED.store(true, Ordering::Relaxed);
@@ -4039,27 +3946,13 @@ unsafe extern "system" fn wnd_proc(
                     save_state_settings();
                     position_at_taskbar();
                 }
-                IDM_PASSIVE_MONITORING | IDM_UPDATES_ENABLED => {
-                    let mut preferences = crate::privacy::preferences();
-                    let policy = crate::privacy::policy();
-                    if id == IDM_PASSIVE_MONITORING && !policy.force_passive_monitoring {
-                        preferences.passive_monitoring = !preferences.passive_monitoring;
-                    } else if id == IDM_UPDATES_ENABLED && !policy.disable_updates {
-                        preferences.updates_enabled = !preferences.updates_enabled;
-                    }
-                    crate::privacy::set_preferences(preferences);
-                    save_state_settings();
-                    schedule_auto_update_check(hwnd);
-                    if id == IDM_UPDATES_ENABLED && crate::privacy::updates_enabled() {
-                        begin_update_check(hwnd, false);
-                    }
-                }
+                IDM_PASSIVE_MONITORING | IDM_UPDATES_ENABLED => {}
                 IDM_MCP_SERVER => {
-                    if let Some(s) = lock_state().as_mut() {
-                        s.mcp_enabled = !s.mcp_enabled;
-                    }
-                    save_state_settings();
-                    apply_mcp_setting();
+                    show_info_message(
+                        hwnd,
+                        "MCP disabled",
+                        "The hardened build has no local MCP server.",
+                    );
                 }
                 IDM_START_WITH_WINDOWS => {
                     let enable = startup_status() != StartupStatus::Enabled;
@@ -5439,24 +5332,6 @@ mod tests {
         );
         assert_eq!(alerts.len(), 2);
         assert_eq!(notified.len(), 1);
-    }
-    #[test]
-    fn mcp_server_is_opt_in_and_keeps_older_settings_compatible() {
-        let older: SettingsFile = serde_json::from_str(r#"{"show_codex":true}"#).unwrap();
-        assert!(!older.mcp_server_enabled);
-        assert_eq!(mcp_port(older.mcp_port), mcp_server::DEFAULT_PORT);
-        let saved = serde_json::to_value(&older).unwrap();
-        assert_eq!(saved["mcp_server_enabled"], false);
-        assert!(saved.get("mcp_port").is_none());
-
-        let custom: SettingsFile =
-            serde_json::from_str(r#"{"mcp_server_enabled":true,"mcp_port":47000}"#).unwrap();
-        assert!(custom.mcp_server_enabled);
-        assert_eq!(mcp_port(custom.mcp_port), 47000);
-        // Privileged or zero ports fall back to the default.
-        assert_eq!(mcp_port(Some(80)), mcp_server::DEFAULT_PORT);
-        assert_eq!(mcp_port(Some(0)), mcp_server::DEFAULT_PORT);
-        assert!(mcp_settings_hint(LanguageId::English, true, 47000).contains("47000"));
     }
     #[test]
     fn hiding_provider_logos_reclaims_their_columns() {

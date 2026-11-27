@@ -815,82 +815,14 @@ fn rows(page: Page, s: &AppState) -> Vec<Row> {
             ]
         }
         Page::Privacy => {
-            let policy = crate::privacy::policy();
-            let updates = crate::privacy::updates_enabled();
-            let port = mcp_port(s.mcp_port);
-            let mcp_hint = mcp_settings_hint(s.language, s.mcp_unavailable, port);
-            let mut result = vec![
+            vec![
                 section(strings.privacy_section),
-                limited_check(
-                    strings.passive_monitoring,
-                    IDM_PASSIVE_MONITORING,
-                    crate::privacy::passive_monitoring(),
-                    !policy.force_passive_monitoring,
-                )
-                .hint(info(strings.passive_monitoring_hint)),
-                check(strings.local_mcp_server, IDM_MCP_SERVER, s.mcp_enabled).hint(Some(
-                    if s.mcp_unavailable {
-                        Hint::Warning(mcp_hint)
-                    } else {
-                        Hint::Info(mcp_hint)
-                    },
+                Row::Note(Hint::Info(
+                    "Codex-only mode: authentication and network access are delegated to the approved local Codex app-server. Updates, MCP, secondary providers, and inference refresh are disabled.".into(),
                 )),
-            ];
-            if policy.force_passive_monitoring || policy.disable_updates {
-                result.push(Row::Note(Hint::Info(strings.managed_by_policy.into())));
-            }
-            result.push(section(strings.updates));
-            result.push(limited_check(
-                strings.allow_updates,
-                IDM_UPDATES_ENABLED,
-                updates,
-                !policy.disable_updates,
-            ));
-            result.push(version_row(s, updates));
-            result
+            ]
         }
     }
-}
-
-/// The installed version, the update status, and the next update action.
-fn version_row(s: &AppState, updates: bool) -> Row {
-    let strings = s.language.strings();
-    let label = format!("Codex Usage v{}", env!("CARGO_PKG_VERSION"));
-    let check = || {
-        vec![OptionItem::command(
-            strings.check_for_updates,
-            IDM_VERSION_ACTION,
-        )]
-    };
-    if !updates {
-        return action(label, info(strings.update_checks_off), Vec::new());
-    }
-    let (hint, buttons) = match &s.update_status {
-        UpdateStatus::Idle => (None, check()),
-        UpdateStatus::Checking => (info(strings.checking_for_updates), Vec::new()),
-        UpdateStatus::Applying => (info(strings.applying_update), Vec::new()),
-        UpdateStatus::UpToDate => (info(strings.up_to_date_short), check()),
-        UpdateStatus::Available(release) => {
-            let button = match s.install_channel {
-                InstallChannel::Portable => {
-                    format!("{} v{}", strings.update_to, release.latest_version)
-                }
-                InstallChannel::Winget => format!(
-                    "{} v{}",
-                    localization::update_via_winget(s.language),
-                    release.latest_version
-                ),
-            };
-            let available = strings
-                .version_available
-                .replace("{version}", &release.latest_version.to_string());
-            (
-                Some(Hint::Warning(available)),
-                vec![OptionItem::command(button, IDM_VERSION_ACTION)],
-            )
-        }
-    };
-    action(label, hint, buttons)
 }
 
 // ---------------------------------------------------------------------------
