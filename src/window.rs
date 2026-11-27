@@ -4487,27 +4487,21 @@ mod tests {
         assert!(!appearance.hide_period_labels);
         assert!(!appearance.percent_inside_battery);
         let language = LanguageId::SimplifiedChinese;
-        let default_width = total_widget_width_for(3, language, appearance);
+        let default_width = total_widget_width_for(1, language, appearance);
         appearance.hide_period_labels = true;
-        let without_labels = total_widget_width_for(3, language, appearance);
+        let without_labels = total_widget_width_for(1, language, appearance);
         assert!(without_labels < default_width);
         appearance.percent_inside_battery = true;
-        let compact = total_widget_width_for(3, language, appearance);
+        let compact = total_widget_width_for(1, language, appearance);
         assert!(compact < without_labels);
         appearance.reset_time_display = ResetTimeDisplay::Clock;
-        assert!(total_widget_width_for(3, language, appearance) > compact);
+        assert!(total_widget_width_for(1, language, appearance) > compact);
         let short_clock = usage_layout_widths(language, appearance, false).1;
         let extended_clock = usage_layout_widths(language, appearance, true).1;
         assert!(extended_clock > short_clock);
-        let values = ["74%  20:04", "89%  11/23 00:30", "100%  11/28"];
-        assert!(has_cross_day_reset(appearance, true, [true; 3], values));
-        assert!(!has_cross_day_reset(
-            appearance,
-            true,
-            [true, false, true],
-            values
-        ));
-        assert!(!has_cross_day_reset(appearance, false, [true; 3], values));
+        assert!(has_cross_day_reset(appearance, true, true, "89%  11/23 00:30"));
+        assert!(!has_cross_day_reset(appearance, true, true, "74%  20:04"));
+        assert!(!has_cross_day_reset(appearance, false, true, "89%  11/23 00:30"));
         let json = serde_json::to_string(&appearance).unwrap();
         assert_eq!(
             serde_json::from_str::<Appearance>(&json).unwrap(),

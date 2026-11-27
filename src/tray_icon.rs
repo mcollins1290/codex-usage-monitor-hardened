@@ -10,8 +10,6 @@ use windows::Win32::UI::WindowsAndMessaging::*;
 use crate::native_interop::WM_APP_TRAY;
 
 const APP_TRAY_ICON_ID: u32 = 1;
-const LEGACY_CODEX_TRAY_ICON_ID: u32 = 2;
-const LEGACY_ANTIGRAVITY_TRAY_ICON_ID: u32 = 3;
 
 /// Menu item ID for toggling widget visibility (used by window.rs context menu).
 pub const IDM_TOGGLE_WIDGET: u16 = 70;
@@ -27,9 +25,7 @@ pub enum TrayAction {
 /// now use the one application tray icon rather than provider-specific icons.
 #[derive(Clone, Copy)]
 pub enum TrayIconKind {
-    Claude,
     Codex,
-    Antigravity,
 }
 
 pub struct TrayIconData {
@@ -145,10 +141,6 @@ fn remove_id(hwnd: HWND, id: u32) {
 }
 
 pub fn sync(hwnd: HWND, icon: Option<&TrayIconData>) {
-    // Remove provider-specific icons left by versions before v1.9.
-    remove_id(hwnd, LEGACY_CODEX_TRAY_ICON_ID);
-    remove_id(hwnd, LEGACY_ANTIGRAVITY_TRAY_ICON_ID);
-
     if let Some(icon) = icon {
         add(hwnd, &icon.tooltip);
         update(hwnd, &icon.tooltip);
@@ -159,8 +151,6 @@ pub fn sync(hwnd: HWND, icon: Option<&TrayIconData>) {
 
 pub fn remove_all(hwnd: HWND) {
     remove_id(hwnd, APP_TRAY_ICON_ID);
-    remove_id(hwnd, LEGACY_CODEX_TRAY_ICON_ID);
-    remove_id(hwnd, LEGACY_ANTIGRAVITY_TRAY_ICON_ID);
 }
 
 /// Interpret a tray callback message and return the action to take.

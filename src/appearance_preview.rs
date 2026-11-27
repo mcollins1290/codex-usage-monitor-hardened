@@ -245,7 +245,7 @@ mod tests {
         let bg = dib_rgb(background);
         let pixel = |x, y| pixels[(y * width + x) as usize] & 0x00FFFFFF;
         let (label_width, text_width) = usage_layout_widths(content.language, appearance, false);
-        let segments = row_bar_segment_count(3);
+        let segments = row_bar_segment_count(1);
         let bar_width = usage_bar_width(segments, appearance);
         let model_width =
             model_usage_width(segments, text_width, appearance) + sc(MODEL_RIGHT_MARGIN);
@@ -259,13 +259,13 @@ mod tests {
         let bar_height = drawn_bar_height(appearance, row_height);
         let inset = (row_height - bar_height) / 2;
 
-        for (column, provider) in WIDGET_PROVIDERS.into_iter().enumerate() {
+        for column in 0..1 {
             let left = bar_left + column as i32 * model_width;
             let text_left = left + bar_width + sc(BAR_RIGHT_MARGIN);
             for (row, values) in content.used.iter().enumerate() {
                 let top = row_top + row as i32 * (row_height + gap);
                 let bar = top + inset..top + inset + bar_height;
-                let accent = dib_rgb(appearance.bar_color(provider, values[column], dark));
+                let accent = dib_rgb(appearance.bar_color(values[column], dark));
                 let mut lit_pixels = 0;
                 for y in top..top + row_height {
                     for x in left..left + bar_width {
