@@ -2596,7 +2596,7 @@ fn do_poll(send_hwnd: SendHwnd) {
                 poller::poll_provider(job.id, None, identity.as_ref())
             })
         },
-        move |job, attempt| complete_provider_poll(send_hwnd, job, attempt),
+        move |job, attempt| complete_codex_poll(send_hwnd, job, attempt),
     );
 }
 
@@ -2641,11 +2641,7 @@ fn collect_reset_alerts(
     changed
 }
 
-fn complete_provider_poll(
-    send_hwnd: SendHwnd,
-    job: &codex_poll::Job,
-    attempt: codex_poll::Attempt,
-) {
+fn complete_codex_poll(send_hwnd: SendHwnd, job: &codex_poll::Job, attempt: codex_poll::Attempt) {
     let hwnd = send_hwnd.to_hwnd();
     let (alerts, auth_notice, settings_changed) = {
         let mut state = lock_state();
@@ -2697,8 +2693,8 @@ fn complete_provider_poll(
         }
         let service = &s.monitor.service;
         diagnose::log(format!(
-            "provider poll completed id={} error={:?} interval_ms={}",
-            job.id, service.error, service.interval_ms
+            "Codex poll completed error={:?} interval_ms={}",
+            service.error, service.interval_ms
         ));
         let notice = completion.notify_auth.then(|| {
             let strings = s.language.strings();
@@ -4499,9 +4495,19 @@ mod tests {
         let short_clock = usage_layout_widths(language, appearance, false).1;
         let extended_clock = usage_layout_widths(language, appearance, true).1;
         assert!(extended_clock > short_clock);
-        assert!(has_cross_day_reset(appearance, true, true, "89%  11/23 00:30"));
+        assert!(has_cross_day_reset(
+            appearance,
+            true,
+            true,
+            "89%  11/23 00:30"
+        ));
         assert!(!has_cross_day_reset(appearance, true, true, "74%  20:04"));
-        assert!(!has_cross_day_reset(appearance, false, true, "89%  11/23 00:30"));
+        assert!(!has_cross_day_reset(
+            appearance,
+            false,
+            true,
+            "89%  11/23 00:30"
+        ));
         let json = serde_json::to_string(&appearance).unwrap();
         assert_eq!(
             serde_json::from_str::<Appearance>(&json).unwrap(),
