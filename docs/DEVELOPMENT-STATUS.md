@@ -15,7 +15,7 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 - [Windows CI run 45932097829](https://github.com/mcollins1290/codex-usage-monitor-hardened/actions/runs/45932097829): success; formatting, locked dependency tests and optimized build passed.
 - Tests: 105 passed, 0 failed, 3 ignored (one child fixture invoked by parent tests).
 - Release build: 37 compiler warnings; cleanup outstanding.
-- Native child containment, descendant rejection, forced shutdown and compatibility regression tests passed. New isolated version probe code is pending CI and is not wired into production or exposed as a user command.
+- Native child containment, descendant rejection, forced shutdown and compatibility regression tests passed. New isolated version probe code is not wired into production or exposed as a user command. CI run 45932483340 stopped at rustfmt; the reported formatting correction and synthetic profile/negative probe tests are now committed, pending CI.
 
 ## Completed implementation (not necessarily runtime accepted)
 
@@ -39,7 +39,7 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 | H4 | Missing runtime security gate | Launch freeze enforced; accepted policy still required |
 | H5 | Application identity isolation | Partial; audit remaining metadata, paths and scripts |
 | M1 | Canonical path / hash-to-launch race | Read-only file sharing lock held and hash rechecked through launch; directory alias races still require review |
-| M2 | Independent executable version verification | Isolated bounded version probe and strict parser implemented; CI and approval workflow integration pending |
+| M2 | Independent executable version verification | Isolated bounded version probe and strict parser implemented; synthetic profile and negative probe integration tests added; CI and approval workflow integration pending |
 | M3 | Initialization handshake | Implemented and unit tested |
 | M4 | Tests exercise production protocol | Implemented and unit tested |
 | M5 | Upgrade-friendly compatibility records | Record schema and identity binding tests passed; approval workflow outstanding |
@@ -58,9 +58,9 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 
 ## Next implementation milestone
 
-1. Implement creation-time Windows process containment and bounded cleanup.
-2. Add synthetic child-process lifecycle and failure regression tests.
-3. Implement explicit executable compatibility records and fail-closed upgrade behavior.
+1. Verify isolated version probe and synthetic profile tests on Windows.
+2. Complete version verification and approval workflow, including release provenance and fresh-profile ownership.
+3. Review remaining executable alias races and output lifecycle failure cases.
 4. Improve sanitized errors, remove legacy code and resolve warnings.
 5. Audit dependencies, repeat Windows CI and review release candidate.
 6. Complete synthetic startup verification and separately authorized local authenticated acceptance.

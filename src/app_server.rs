@@ -451,7 +451,10 @@ fn validate_version_output(output: &[u8], expected: &str) -> Result<(), AppServe
     }
     let output = std::str::from_utf8(output).map_err(|_| AppServerError::VersionMismatch)?;
     let expected = format!("codex-cli {expected}");
-    if output == expected || output == format!("{expected}\n") || output == format!("{expected}\r\n") {
+    if output == expected
+        || output == format!("{expected}\n")
+        || output == format!("{expected}\r\n")
+    {
         Ok(())
     } else {
         Err(AppServerError::VersionMismatch)
@@ -480,6 +483,17 @@ fn verify_version_in_profile(
     let (mut child, stdin, stdout, stderr) =
         ContainedChild::launch(&executable, root, "--version", Some(root))?;
     drop(stdin);
+    let result = collect_version_output(&mut child, stdout, stderr, &identity.version);
+    drop(locked);
+    result
+}
+
+fn collect_version_output(
+    child: &mut ContainedChild,
+    stdout: File,
+    stderr: File,
+    expected: &str,
+) -> Result<(), AppServerError> {
     // Read only a bounded amount on each stream, even if a child floods output.
     let stdout_thread = std::thread::spawn(move || {
         let mut output = Vec::new();
@@ -492,7 +506,6 @@ fn verify_version_in_profile(
         Ok::<_, std::io::Error>(output.is_empty())
     });
     let shutdown = child.shutdown(true);
-    drop(locked);
     let deadline = Instant::now() + SHUTDOWN_TIMEOUT;
     while !stdout_thread.is_finished() || !stderr_thread.is_finished() {
         if Instant::now() >= deadline {
@@ -512,7 +525,7 @@ fn verify_version_in_profile(
     if !stderr_empty {
         return Err(AppServerError::VersionMismatch);
     }
-    validate_version_output(&output, &identity.version)
+    validate_version_output(&output, expected)
 }
 
 fn require_startup_acceptance() -> Result<(), AppServerError> {
@@ -916,6 +929,86 @@ mod tests {
             check_compatibility(&identity),
             Err(AppServerError::CompatibilityRequired)
         );
+    }
+
+    #[test]
+    #[ignore = "synthetic environment fixture; invoked by isolation test"]
+    fn isolated_profile_fixture() {
+        let root = std::env::current_dir().unwrap().canonicalize().unwrap();
+        for (name, relative) in [
+            ("CODEX_HOME", "codex"),
+            ("APPDATA", "roaming"),
+            ("LOCALAPPDATA", "local"),
+            ("TEMP", "temp"),
+            ("TMP", "temp"),
+        ] {
+            let actual = PathBuf::from(std::env::var_os(name).unwrap());
+            assert_eq!(actual.canonicalize().unwrap(), root.join(relative));
+        }
+        let profile = PathBuf::from(std::env::var_os("USERPROFILE").unwrap());
+        assert_eq!(profile.canonicalize().unwrap(), root);
+        assert!(std::env::var_os("OPENAI_API_KEY").is_none());
+        assert!(std::env::var_os("PATH").is_none());
+        println!("ISOLATED_PROFILE_OK");
+    }
+
+    struct FixtureProfile(PathBuf);
+
+    impl FixtureProfile {
+        fn new() -> Self {
+            let nonce = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos();
+            let path = std::env::temp_dir().join(format!(
+                "codex-hardened-profile-{}-{nonce}",
+                std::process::id()
+            ));
+            std::fs::create_dir(&path).unwrap();
+            Self(path.canonicalize().unwrap())
+        }
+    }
+
+    impl Drop for FixtureProfile {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
+    }
+
+    #[test]
+    fn version_probe_rejects_non_codex_executable_output() {
+        let profile = FixtureProfile::new();
+        let path = std::env::current_exe().unwrap().canonicalize().unwrap();
+        let identity = ApprovedExecutable {
+            sha256: sha256_file(&path).unwrap(),
+            path,
+            version: CODEX_VERSION.to_string(),
+            compatibility: None,
+        };
+        // The Rust test binary is trusted as a fixture but does not implement
+        // Codex's version command. Never interpret its output as approval.
+        assert!(verify_version_in_profile(&identity, &profile.0).is_err());
+    }
+
+    #[test]
+    fn synthetic_profile_is_passed_to_contained_child() {
+        let profile = FixtureProfile::new();
+        for name in ["codex", "roaming", "local", "temp"] {
+            std::fs::create_dir(profile.0.join(name)).unwrap();
+        }
+        let path = std::env::current_exe().unwrap().canonicalize().unwrap();
+        let (mut child, stdin, stdout, _stderr) = ContainedChild::launch(
+            &path,
+            &profile.0,
+            "--exact app_server::tests::isolated_profile_fixture --ignored --nocapture",
+            Some(&profile.0),
+        )
+        .unwrap();
+        drop(stdin);
+        child.shutdown(true).unwrap();
+        let mut output = String::new();
+        stdout.take(8192).read_to_string(&mut output).unwrap();
+        assert!(output.contains("ISOLATED_PROFILE_OK"));
     }
 
     #[test]
