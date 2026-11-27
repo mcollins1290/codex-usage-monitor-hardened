@@ -36,7 +36,6 @@ use crate::recovery_events;
 use crate::settings_store;
 use crate::theme;
 use crate::tray_icon;
-use crate::updater::{self, InstallChannel, ReleaseDescriptor, UpdateCheckResult};
 
 #[path = "settings_window.rs"]
 mod settings_window;
@@ -69,7 +68,6 @@ struct AppState {
     appearance: Appearance,
     quota_display_mode: QuotaDisplayMode,
     settings_theme: SettingsTheme,
-    install_channel: InstallChannel,
     codex_identity: Option<ApprovedExecutable>,
 
     session_percent: f64,
@@ -107,8 +105,6 @@ struct AppState {
     recovery_watch: Option<recovery_events::Watch>,
     recovery_debounce: recovery_events::Debounce,
     has_poll_result: bool,
-    update_status: UpdateStatus,
-    last_update_check_unix: Option<u64>,
 
     taskbar_index: usize,
     monitor_device: Option<String>,
@@ -120,15 +116,6 @@ struct AppState {
     drag_start_offset: i32,
 
     widget_visible: bool,
-}
-
-#[derive(Clone, Debug)]
-enum UpdateStatus {
-    Idle,
-    Checking,
-    Applying,
-    UpToDate,
-    Available(ReleaseDescriptor),
 }
 
 const POLL_1_MIN: u32 = 60_000;
@@ -599,8 +586,6 @@ struct SettingsFile {
     settings_theme: SettingsTheme,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     quota_display_mode: Option<QuotaDisplayMode>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    last_update_check_unix: Option<u64>,
     #[serde(default = "default_widget_visible")]
     widget_visible: bool,
     #[serde(default = "default_show_claude_code")]
@@ -648,7 +633,6 @@ impl Default for SettingsFile {
             appearance: Appearance::default(),
             quota_display_mode: Some(QuotaDisplayMode::Remaining),
             settings_theme: SettingsTheme::default(),
-            last_update_check_unix: None,
             widget_visible: true,
             show_claude_code: false,
             show_codex: true,
@@ -803,7 +787,6 @@ fn save_state_settings() {
             appearance: s.appearance,
             quota_display_mode: Some(s.quota_display_mode),
             settings_theme: s.settings_theme,
-            last_update_check_unix: s.last_update_check_unix,
             widget_visible: s.widget_visible,
             show_claude_code: s.show_claude_code,
             show_codex: s.show_codex,
@@ -1277,10 +1260,12 @@ fn now_unix_secs() -> u64 {
         .as_secs()
 }
 
+#[cfg(any())]
 fn update_check_interval() -> Duration {
     Duration::from_secs(24 * 60 * 60)
 }
 
+#[cfg(any())]
 fn auto_update_check_due(last_update_check_unix: Option<u64>) -> bool {
     let Some(last_update_check_unix) = last_update_check_unix else {
         return true;
@@ -1289,6 +1274,7 @@ fn auto_update_check_due(last_update_check_unix: Option<u64>) -> bool {
     now_unix_secs().saturating_sub(last_update_check_unix) >= update_check_interval().as_secs()
 }
 
+#[cfg(any())]
 fn schedule_auto_update_check(hwnd: HWND) {
     if !crate::privacy::updates_enabled() {
         unsafe {
@@ -1526,6 +1512,7 @@ fn show_error_message(hwnd: HWND, title: &str, message: &str) {
     }
 }
 
+#[cfg(any())]
 fn show_update_prompt(hwnd: HWND, strings: Strings, release: &ReleaseDescriptor) -> bool {
     let message = strings
         .update_prompt_now
@@ -1586,6 +1573,7 @@ fn update_language_change() -> bool {
     true
 }
 
+#[cfg(any())]
 fn begin_update_check(hwnd: HWND, interactive: bool) {
     if !crate::privacy::updates_enabled() {
         return;
@@ -1675,6 +1663,7 @@ fn begin_update_check(hwnd: HWND, interactive: bool) {
     });
 }
 
+#[cfg(any())]
 fn begin_update_apply(hwnd: HWND, release: ReleaseDescriptor) {
     if !crate::privacy::updates_enabled() {
         return;
@@ -1725,6 +1714,7 @@ fn begin_update_apply(hwnd: HWND, release: ReleaseDescriptor) {
     });
 }
 
+#[cfg(any())]
 fn begin_winget_update(hwnd: HWND) {
     if !crate::privacy::updates_enabled() {
         return;
@@ -2373,8 +2363,6 @@ pub fn run() {
         settings_window::apply_menu_theme(settings.settings_theme);
         let language_override = settings.language.as_deref().and_then(LanguageId::from_code);
         let language = localization::resolve_language(language_override);
-        let install_channel = updater::current_install_channel();
-
         // Create as layered popup (will be reparented into taskbar)
         let title = native_interop::wide_str(language.strings().window_title);
         let initial_model_count = active_model_count(
@@ -2434,7 +2422,6 @@ pub fn run() {
                 appearance: settings.appearance,
                 quota_display_mode: settings.quota_display_mode.unwrap_or_default(),
                 settings_theme: settings.settings_theme,
-                install_channel,
                 codex_identity: settings.codex_executable.clone(),
                 session_percent: 0.0,
                 session_text: "--".to_string(),
@@ -2477,8 +2464,6 @@ pub fn run() {
                 recovery_watch: Some(recovery_events::Watch::register(hwnd)),
                 recovery_debounce: recovery_events::Debounce::default(),
                 has_poll_result: false,
-                update_status: UpdateStatus::Idle,
-                last_update_check_unix: settings.last_update_check_unix,
                 taskbar_index: settings.taskbar_index,
                 monitor_device: settings.monitor_device.clone(),
                 tray_offset: settings.tray_offset,

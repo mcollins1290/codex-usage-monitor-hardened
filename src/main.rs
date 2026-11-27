@@ -19,7 +19,6 @@ mod reset_alerts;
 mod settings_store;
 mod theme;
 mod tray_icon;
-mod updater;
 mod window;
 
 fn main() {
