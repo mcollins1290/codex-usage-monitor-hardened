@@ -93,9 +93,6 @@ struct AppState {
     notified_quota_windows: BTreeSet<String>,
     notify_on_reset: bool,
     reset_observations: crate::reset_alerts::ResetObservations,
-    mcp_enabled: bool,
-    mcp_port: Option<u16>,
-    mcp_unavailable: bool,
 
     data: Option<AppUsageData>,
 
@@ -612,10 +609,6 @@ struct SettingsFile {
     notify_on_reset: bool,
     #[serde(default)]
     reset_observations: crate::reset_alerts::ResetObservations,
-    #[serde(default)]
-    mcp_server_enabled: bool,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    mcp_port: Option<u16>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     codex_executable: Option<ApprovedExecutable>,
 }
@@ -646,8 +639,6 @@ impl Default for SettingsFile {
             updates_enabled: true,
             notify_on_reset: false,
             reset_observations: Default::default(),
-            mcp_server_enabled: false,
-            mcp_port: None,
             codex_executable: None,
         }
     }
@@ -800,8 +791,6 @@ fn save_state_settings() {
             updates_enabled: privacy.updates_enabled,
             notify_on_reset: s.notify_on_reset,
             reset_observations: s.reset_observations.clone(),
-            mcp_server_enabled: s.mcp_enabled,
-            mcp_port: s.mcp_port,
             codex_executable: s.codex_identity.clone(),
         })
     });
@@ -2447,9 +2436,6 @@ pub fn run() {
                 notified_quota_windows: settings.notified_quota_windows.into_iter().collect(),
                 notify_on_reset: settings.notify_on_reset,
                 reset_observations: settings.reset_observations,
-                mcp_enabled: settings.mcp_server_enabled,
-                mcp_port: settings.mcp_port,
-                mcp_unavailable: false,
                 data: None,
                 poll_interval_ms: settings.poll_interval_ms,
                 adaptive_refresh: settings.adaptive_refresh,
