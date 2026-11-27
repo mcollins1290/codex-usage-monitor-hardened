@@ -131,6 +131,8 @@ const IDM_SETTINGS: u16 = 21;
 const IDM_RESET_POSITION: u16 = 30;
 const IDM_ANCHOR_LEFT: u16 = 34;
 const IDM_COMPATIBILITY_STATUS: u16 = 31;
+const IDM_COMPATIBILITY_IMPORT: u16 = 131;
+const IDM_COMPATIBILITY_REVOKE: u16 = 132;
 const IDM_LANG_SYSTEM: u16 = 40;
 const IDM_LANG_ENGLISH: u16 = 41;
 const IDM_LANG_DUTCH: u16 = 42;
@@ -1394,6 +1396,70 @@ fn show_error_message(hwnd: HWND, title: &str, message: &str) {
             MB_OK | MB_ICONERROR,
         );
     }
+}
+
+// Select a local JSON attestation, not an executable. Importing evidence never
+// starts Codex. The separate confirmation is deliberately default-No.
+fn import_compatibility_evidence(hwnd: HWND) {
+    use std::os::windows::ffi::OsStringExt;
+    use windows::core::PWSTR;
+    use windows::Win32::UI::Controls::Dialogs::{
+        GetOpenFileNameW, OFN_DONTADDTORECENT, OFN_FILEMUSTEXIST, OFN_NOCHANGEDIR,
+        OFN_PATHMUSTEXIST, OPENFILENAMEW,
+    };
+    let mut buffer = vec![0u16; 32768];
+    let filter: Vec<u16> = "JSON evidence (*.json)\0*.json\0\0".encode_utf16().collect();
+    let mut dialog = OPENFILENAMEW {
+        lStructSize: std::mem::size_of::<OPENFILENAMEW>() as u32,
+        hwndOwner: hwnd,
+        lpstrFilter: PCWSTR(filter.as_ptr()),
+        lpstrFile: PWSTR(buffer.as_mut_ptr()),
+        nMaxFile: buffer.len() as u32,
+        Flags: OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT,
+        ..Default::default()
+    };
+    if !unsafe { GetOpenFileNameW(&mut dialog) }.as_bool() {
+        return;
+    }
+    let end = buffer.iter().position(|&ch| ch == 0).unwrap_or(0);
+    let path = PathBuf::from(std::ffi::OsString::from_wide(&buffer[..end]));
+    let candidate = match crate::app_server::inspect_evidence_file(&path) {
+        Ok(candidate) => candidate,
+        Err(_) => {
+            show_error_message(hwnd, "Evidence rejected", "The evidence is incomplete, invalid or does not match the executable. No approval was recorded.");
+            return;
+        }
+    };
+    let text = format!(
+        "Record your explicit approval of this externally verified executable?\n\nPath: {}\nVersion: {}\nSHA-256: {}\n\nOnly accept evidence you independently verified. Import does not establish provenance or enable live polling.",
+        candidate.path.display(), candidate.version, candidate.sha256
+    );
+    let message = native_interop::wide_str(&text);
+    let accepted = unsafe {
+        MessageBoxW(hwnd, PCWSTR(message.as_ptr()), w!("Confirm compatibility evidence"),
+            MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2)
+    } == IDYES;
+    if !accepted {
+        return;
+    }
+    match crate::app_server::confirm_evidence(candidate) {
+        Ok(identity) => {
+            if let Some(state) = lock_state().as_mut() {
+                state.codex_identity = Some(identity);
+            }
+            save_state_settings();
+            show_info_message(hwnd, "Compatibility evidence recorded", "Live polling is still disabled pending runtime security acceptance.");
+        }
+        Err(_) => show_error_message(hwnd, "Evidence rejected", "The executable identity could not be revalidated. No approval was recorded."),
+    }
+}
+
+fn revoke_compatibility_evidence(hwnd: HWND) {
+    if let Some(state) = lock_state().as_mut() {
+        state.codex_identity = None;
+    }
+    save_state_settings();
+    show_info_message(hwnd, "Approval revoked", "The recorded executable approval has been cleared. Live polling remains disabled.");
 }
 
 fn language_command(language: LanguageId) -> u16 {
@@ -3538,6 +3604,8 @@ unsafe extern "system" fn wnd_proc(
                     request_poll(sh, true);
                 }
                 IDM_SETTINGS => settings_window::show(hwnd),
+                IDM_COMPATIBILITY_IMPORT => import_compatibility_evidence(hwnd),
+                IDM_COMPATIBILITY_REVOKE => revoke_compatibility_evidence(hwnd),
                 IDM_COMPATIBILITY_STATUS => {
                     let identity = lock_state()
                         .as_ref()

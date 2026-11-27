@@ -521,7 +521,11 @@ fn rows(page: Page, s: &AppState) -> Vec<Row> {
                 action(
                     "Executable approval",
                     info("Review compatibility status. Live polling remains blocked."),
-                    vec![OptionItem::command("Review status", IDM_COMPATIBILITY_STATUS)],
+                    vec![
+                        OptionItem::command("Review status", IDM_COMPATIBILITY_STATUS),
+                        OptionItem::command("Import evidence", IDM_COMPATIBILITY_IMPORT),
+                        OptionItem::command("Revoke", IDM_COMPATIBILITY_REVOKE),
+                    ],
                 ),
                 section(strings.refresh_section),
                 choice(

@@ -559,6 +559,55 @@ pub fn compatibility_status(identity: Option<&ApprovedExecutable>) -> &'static s
     }
 }
 
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct EvidenceImport {
+    identity: ApprovedExecutable,
+    evidence: CompatibilityRecord,
+}
+
+pub fn inspect_evidence_file(path: &Path) -> Result<ApprovedExecutable, AppServerError> {
+    let mut bytes = Vec::new();
+    File::open(path)
+        .map_err(|_| AppServerError::InvalidIdentity)?
+        .take(16 * 1024 + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|_| AppServerError::InvalidIdentity)?;
+    if bytes.len() > 16 * 1024 {
+        return Err(AppServerError::OutputTooLarge);
+    }
+    let import: EvidenceImport =
+        serde_json::from_slice(&bytes).map_err(|_| AppServerError::InvalidIdentity)?;
+    inspect_evidence(import)
+}
+
+fn inspect_evidence(import: EvidenceImport) -> Result<ApprovedExecutable, AppServerError> {
+    // Evidence is a user-supplied attestation, not independently authenticated
+    // provenance. Do not execute the file or accept pre-granted user consent.
+    if import.identity.compatibility.is_some() || import.evidence.explicitly_approved {
+        return Err(AppServerError::CompatibilityRequired);
+    }
+    let mut evidence = import.evidence;
+    evidence.explicitly_approved = true;
+    let mut candidate = prepare_compatibility_record(&import.identity, evidence)?;
+    if let Some(record) = candidate.compatibility.as_mut() {
+        record.explicitly_approved = false;
+    }
+    Ok(candidate)
+}
+
+pub fn confirm_evidence(candidate: ApprovedExecutable) -> Result<ApprovedExecutable, AppServerError> {
+    let mut evidence = candidate
+        .compatibility
+        .clone()
+        .ok_or(AppServerError::CompatibilityRequired)?;
+    if evidence.explicitly_approved {
+        return Err(AppServerError::CompatibilityRequired);
+    }
+    evidence.explicitly_approved = true;
+    prepare_compatibility_record(&candidate, evidence)
+}
+
 fn require_startup_acceptance() -> Result<(), AppServerError> {
     Err(AppServerError::StartupNotVerified)
 }
