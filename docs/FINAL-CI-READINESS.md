@@ -10,6 +10,8 @@ The structured evidence companion is
 [`docs/verification/ci-readiness-checklist.json`](verification/ci-readiness-checklist.json).
 It records the current evidence boundary and does not represent deferred
 Windows or authenticated-runtime acceptance as passed.
+The item-level dispositions are in
+[`docs/verification/checklist-dispositions.json`](verification/checklist-dispositions.json).
 
 ## Candidate identity
 

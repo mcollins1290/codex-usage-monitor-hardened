@@ -1,0 +1,3674 @@
+{
+  "schema_version": 2,
+  "candidate_commit": "2a9e44ab95a1dbc4ab953a9cbb47bb34bf1ac2d2",
+  "items": [
+    {
+      "id": "A01",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "A02",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "A03",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "A04",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "A05",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "A06",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "A07",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "A08",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "A09",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "A10",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "A11",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "A12",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "A13",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "A14",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "A15",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "A16",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "git history, clean tree, docs/FINAL-CI-READINESS.md",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "B01",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B02",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B03",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B04",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B05",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B06",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B07",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B08",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B09",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B10",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B11",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B12",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B13",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B14",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B15",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B16",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B17",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B18",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B19",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B20",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B21",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B22",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B23",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B24",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B25",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B26",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B27",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B28",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B29",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B30",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B31",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "B32",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/models.rs, src/codex_poll.rs, src/window.rs, src/codex_icon.rs; residual source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "C01",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C02",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C03",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C04",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C05",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C06",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C07",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C08",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C09",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C10",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C11",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C12",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C13",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C14",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C15",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C16",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C17",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C18",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C19",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C20",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C21",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C22",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C23",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C24",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C25",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C26",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C27",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C28",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C29",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "C30",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/window.rs, src/codex_poll.rs, local test suite",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D01",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D02",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D03",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D04",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D05",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D06",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D07",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D08",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D09",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D10",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D11",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D12",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D13",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D14",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D15",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D16",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D17",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D18",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D19",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "D20",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs identity validation and tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E01",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E02",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E03",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E04",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E05",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E06",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E07",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E08",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E09",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E10",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E11",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E12",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E13",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E14",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E15",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E16",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E17",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E18",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E19",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E20",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E21",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E22",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E23",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E24",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E25",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E26",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E27",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E28",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E29",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E30",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E31",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E32",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E33",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E34",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E35",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E36",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E37",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E38",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E39",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "E40",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs evidence schema/import tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "F01",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F02",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F03",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F04",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F05",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F06",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F07",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F08",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F09",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F10",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F11",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F12",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F13",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F14",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F15",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F16",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F17",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F18",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F19",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F20",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F21",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F22",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F23",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F24",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F25",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F26",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F27",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "F28",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs protocol implementation/tests",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "G01",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G02",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G03",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G04",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G05",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G06",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G07",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G08",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G09",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G10",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G11",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G12",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G13",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G14",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G15",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G16",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G17",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G18",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G19",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G20",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G21",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G22",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G23",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G24",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G25",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G26",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G27",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G28",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G29",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G30",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G31",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "G32",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/app_server.rs containment implementation/tests; Windows CI required",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "H01",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H02",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H03",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H04",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H05",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H06",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H07",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H08",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H09",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H10",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H11",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H12",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H13",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H14",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H15",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H16",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H17",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H18",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H19",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H20",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H21",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H22",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H23",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "H24",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; authenticated startup side effects remain unverified",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "I01",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs::require_startup_acceptance and regression test",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "I02",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs::require_startup_acceptance and regression test",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "I03",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs::require_startup_acceptance and regression test",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "I04",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs::require_startup_acceptance and regression test",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "I05",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs::require_startup_acceptance and regression test",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "I06",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs::require_startup_acceptance and regression test",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "I07",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs::require_startup_acceptance and regression test",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "I08",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs::require_startup_acceptance and regression test",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "I09",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs::require_startup_acceptance and regression test",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "I10",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs::require_startup_acceptance and regression test",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "I11",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs::require_startup_acceptance and regression test",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "I12",
+      "status": "PASS — VERIFIED",
+      "evidence": "src/app_server.rs::require_startup_acceptance and regression test",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "J01",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J02",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J03",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J04",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J05",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J06",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J07",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J08",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J09",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J10",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J11",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J12",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J13",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J14",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J15",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J16",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J17",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J18",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J19",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J20",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J21",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J22",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J23",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J24",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J25",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J26",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J27",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J28",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J29",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J30",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "J31",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "K01",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K02",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K03",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K04",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K05",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K06",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K07",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K08",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K09",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K10",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K11",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K12",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K13",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K14",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K15",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K16",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K17",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K18",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K19",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "K20",
+      "status": "EXTERNAL ACCEPTANCE PENDING",
+      "evidence": "docs/RUNTIME-ACCEPTANCE.md; no authenticated evidence manufactured",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "EXTERNAL ACCEPTANCE PENDING"
+    },
+    {
+      "id": "L01",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L02",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L03",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L04",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L05",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L06",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L07",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L08",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L09",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L10",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L11",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L12",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L13",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L14",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L15",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L16",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L17",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L18",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L19",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L20",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L21",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L22",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L23",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L24",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "src/codex_poll.rs, src/quota_refresh.rs, local tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M01",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M02",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M03",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M04",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M05",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M06",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M07",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M08",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M09",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M10",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M11",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M12",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M13",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M14",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M15",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M16",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M17",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M18",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M19",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M20",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M21",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M22",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M23",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M24",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M25",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M26",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M27",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M28",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M29",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M30",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "settings store, identity isolation source/tests",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N01",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N02",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N03",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N04",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N05",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N06",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N07",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N08",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N09",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N10",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N11",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N12",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N13",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N14",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N15",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N16",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N17",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N18",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N19",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N20",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N21",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N22",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N23",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N24",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N25",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N26",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N27",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N28",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N29",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N30",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N31",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N32",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N33",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "N34",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "Cargo.lock, cargo audit, cargo deny; final CI rerun pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O01",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O02",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O03",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O04",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O05",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O06",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O07",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O08",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O09",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O10",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O11",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O12",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O13",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O14",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O15",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O16",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O17",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O18",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O19",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O20",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O21",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O22",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O23",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O24",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O25",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O26",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O27",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O28",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O29",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O30",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O31",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O32",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O33",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O34",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O35",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O36",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O37",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O38",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O39",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O40",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O41",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O42",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O43",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O44",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O45",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "O46",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "unit/regression tests; Windows-specific execution pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "P01",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P02",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P03",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P04",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P05",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P06",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P07",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P08",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P09",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P10",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P11",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P12",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P13",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P14",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P15",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P16",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P17",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P18",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P19",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P20",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P21",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P22",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "P23",
+      "status": "PASS — VERIFIED",
+      "evidence": "cargo fmt, cargo test, cargo clippy, cargo build; source audit",
+      "verification": "Verified by current source inspection and executed local checks",
+      "limitation": "PASS — VERIFIED"
+    },
+    {
+      "id": "Q01",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q02",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q03",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q04",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q05",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q06",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q07",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q08",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q09",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q10",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q11",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q12",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q13",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q14",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q15",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q16",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q17",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q18",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q19",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q20",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "Q21",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": ".github/workflows/ci.yml; manual Windows dispatch not run",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "H1",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/FINAL-CI-READINESS.md; historical findings mapped to current evidence",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "H2",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/FINAL-CI-READINESS.md; historical findings mapped to current evidence",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "H3",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/FINAL-CI-READINESS.md; historical findings mapped to current evidence",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "H4",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/FINAL-CI-READINESS.md; historical findings mapped to current evidence",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "H5",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/FINAL-CI-READINESS.md; historical findings mapped to current evidence",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M1",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/FINAL-CI-READINESS.md; historical findings mapped to current evidence",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M2",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/FINAL-CI-READINESS.md; historical findings mapped to current evidence",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M3",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/FINAL-CI-READINESS.md; historical findings mapped to current evidence",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M4",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/FINAL-CI-READINESS.md; historical findings mapped to current evidence",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M5",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/FINAL-CI-READINESS.md; historical findings mapped to current evidence",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M6",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/FINAL-CI-READINESS.md; historical findings mapped to current evidence",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M7",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/FINAL-CI-READINESS.md; historical findings mapped to current evidence",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "M8",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/FINAL-CI-READINESS.md; historical findings mapped to current evidence",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L1",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/FINAL-CI-READINESS.md; historical findings mapped to current evidence",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "L2",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/FINAL-CI-READINESS.md; historical findings mapped to current evidence",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S01",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S02",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S03",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S04",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S05",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S06",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S07",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S08",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S09",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S10",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S11",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S12",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S13",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S14",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S15",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S16",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S17",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S18",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S19",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S20",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S21",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S22",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S23",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "S24",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "docs/README/status/acceptance documents; final consistency still pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T01",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T02",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T03",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T04",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T05",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T06",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T07",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T08",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T09",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T10",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T11",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T12",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T13",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T14",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T15",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T16",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T17",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T18",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T19",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T20",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T21",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    },
+    {
+      "id": "T22",
+      "status": "IMPLEMENTED — CI PENDING",
+      "evidence": "candidate review evidence; final CI/runtime gates pending",
+      "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
+      "limitation": "IMPLEMENTED — CI PENDING"
+    }
+  ]
+}
