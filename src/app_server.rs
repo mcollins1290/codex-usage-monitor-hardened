@@ -11,9 +11,9 @@ use sha2::{Digest, Sha256};
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 use std::os::windows::io::AsRawHandle;
+use std::os::windows::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
-use std::os::windows::process::CommandExt;
 use std::sync::mpsc::sync_channel;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -32,6 +32,7 @@ pub struct ApprovedExecutable {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum AppServerError {
+    StartupNotVerified,
     InvalidIdentity,
     ExecutableMissing,
     HashMismatch,
@@ -216,8 +217,15 @@ pub fn validate_identity(identity: &ApprovedExecutable) -> Result<PathBuf, AppSe
     Ok(canonical)
 }
 
+fn require_startup_acceptance() -> Result<(), AppServerError> {
+    Err(AppServerError::StartupNotVerified)
+}
+
 /// Retrieve quota data using only the fixed app-server request sequence.
 pub fn read_rate_limits(identity: &ApprovedExecutable) -> Result<UsageData, AppServerError> {
+    // Deliberately not configurable: no authenticated invocation has been accepted.
+    // Remove this gate only after startup isolation has been independently verified.
+    require_startup_acceptance()?;
     let executable = validate_identity(identity)?;
     let mut command = Command::new(&executable);
     command
@@ -392,6 +400,19 @@ fn window(window: Option<&RateLimitWindow>, session: bool) -> Result<UsageSectio
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn unverified_startup_cannot_launch_even_with_configured_identity() {
+        let identity = ApprovedExecutable {
+            path: PathBuf::from("not-an-executable"),
+            sha256: "0".repeat(64),
+            version: CODEX_VERSION.to_string(),
+        };
+        assert!(matches!(
+            read_rate_limits(&identity),
+            Err(AppServerError::StartupNotVerified)
+        ));
+    }
 
     #[test]
     fn expected_protocol_is_fixed_in_source() {

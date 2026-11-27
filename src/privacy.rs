@@ -122,7 +122,7 @@ pub fn policy_path() -> io::Result<PathBuf> {
             "Windows returned a non-absolute ProgramData path",
         ));
     }
-    Ok(directory.join("CodexUsage").join("policy.json"))
+    Ok(directory.join("CodexUsageHardened").join("policy.json"))
 }
 
 fn read_preferences(current: &Path, legacy: &Path) -> io::Result<Option<Preferences>> {

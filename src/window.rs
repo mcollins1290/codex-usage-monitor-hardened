@@ -373,20 +373,17 @@ fn lock_state() -> MutexGuard<'static, Option<AppState>> {
     STATE.lock().unwrap_or_else(|e| e.into_inner())
 }
 
-const SETTINGS_DIR: &str = "CodexUsage";
-const LEGACY_SETTINGS_DIR: &str = "ClaudeCodeUsageMonitor";
+const SETTINGS_DIR: &str = "CodexUsageHardened";
 
 fn appdata_path(directory: &str) -> PathBuf {
-    let appdata = std::env::var("APPDATA").unwrap_or_else(|_| ".".to_string());
-    PathBuf::from(appdata).join(directory).join("settings.json")
+    dirs::config_dir()
+        .unwrap_or_else(|| PathBuf::from(r"C:\Users\Default\AppData\Roaming"))
+        .join(directory)
+        .join("settings.json")
 }
 
 fn settings_path() -> PathBuf {
     appdata_path(SETTINGS_DIR)
-}
-
-fn legacy_settings_path() -> PathBuf {
-    appdata_path(LEGACY_SETTINGS_DIR)
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -667,63 +664,24 @@ fn default_show_usage_window() -> bool {
 }
 
 fn load_settings() -> SettingsFile {
-    let current_path = settings_path();
-    let legacy_path = legacy_settings_path();
-    let (settings, migrated) = load_settings_from_paths(&current_path, &legacy_path)
-        .unwrap_or_else(|| {
-            let privacy = crate::privacy::preferences();
-            (
-                SettingsFile {
-                    passive_monitoring: privacy.passive_monitoring,
-                    updates_enabled: privacy.updates_enabled,
-                    ..SettingsFile::default()
-                },
-                false,
-            )
-        });
-    let mut settings = normalize_settings(settings);
-    let legacy_display = settings.quota_display_mode.is_none();
-    if legacy_display {
-        let language = localization::resolve_language(
-            settings.language.as_deref().and_then(LanguageId::from_code),
-        );
-        settings.quota_display_mode = Some(if language == LanguageId::SimplifiedChinese {
-            QuotaDisplayMode::Remaining
-        } else {
-            QuotaDisplayMode::Used
-        });
+    let mut settings = normalize_settings(
+        load_settings_from_path(&settings_path()).unwrap_or_default(),
+    );
+    if settings.quota_display_mode.is_none() {
+        settings.quota_display_mode = Some(QuotaDisplayMode::Remaining);
     }
     crate::privacy::set_preferences(crate::privacy::Preferences {
-        passive_monitoring: settings.passive_monitoring,
-        updates_enabled: settings.updates_enabled,
+        passive_monitoring: true,
+        updates_enabled: false,
     });
-    if migrated || legacy_display {
-        save_settings(&settings);
-        if migrated {
-            diagnose::log(format!(
-                "migrated settings from {} to {}",
-                legacy_path.display(),
-                current_path.display()
-            ));
-        }
-    }
+    settings.passive_monitoring = true;
+    settings.updates_enabled = false;
     settings
 }
 
-fn load_settings_from_paths(
-    current_path: &std::path::Path,
-    legacy_path: &std::path::Path,
-) -> Option<(SettingsFile, bool)> {
-    if let Ok(content) = std::fs::read_to_string(current_path) {
-        return serde_json::from_str(&content)
-            .ok()
-            .map(|settings| (settings, false));
-    }
-
-    let content = std::fs::read_to_string(legacy_path).ok()?;
-    serde_json::from_str(&content)
-        .ok()
-        .map(|settings| (settings, true))
+fn load_settings_from_path(path: &std::path::Path) -> Option<SettingsFile> {
+    let content = std::fs::read_to_string(path).ok()?;
+    serde_json::from_str(&content).ok()
 }
 
 fn normalize_settings(mut settings: SettingsFile) -> SettingsFile {
@@ -1661,8 +1619,7 @@ fn begin_winget_update(hwnd: HWND) {
 }
 
 const STARTUP_REGISTRY_PATH: &str = r"Software\Microsoft\Windows\CurrentVersion\Run";
-const STARTUP_REGISTRY_KEY: &str = "CodexUsage";
-const LEGACY_STARTUP_REGISTRY_KEY: &str = "ClaudeCodeUsageMonitor";
+const STARTUP_REGISTRY_KEY: &str = "CodexUsageHardened";
 const STARTUP_APPROVAL_PATH: PCWSTR =
     w!("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run");
 static STARTUP_WRITE_FAILED: AtomicBool = AtomicBool::new(false);
@@ -1779,47 +1736,6 @@ fn read_startup_value(key: &str) -> Option<String> {
     }
 }
 
-fn delete_startup_value(key: &str) {
-    unsafe {
-        let path = native_interop::wide_str(STARTUP_REGISTRY_PATH);
-        let key_name = native_interop::wide_str(key);
-        let mut hkey = HKEY::default();
-        if RegOpenKeyExW(
-            HKEY_CURRENT_USER,
-            PCWSTR::from_raw(path.as_ptr()),
-            0,
-            KEY_SET_VALUE,
-            &mut hkey,
-        )
-        .is_ok()
-        {
-            let _ = RegDeleteValueW(hkey, PCWSTR::from_raw(key_name.as_ptr()));
-            let _ = RegCloseKey(hkey);
-        }
-    }
-}
-
-fn migrate_legacy_startup_entry() {
-    let legacy_exists = read_startup_value(LEGACY_STARTUP_REGISTRY_KEY).is_some();
-    let current_exists = read_startup_value(STARTUP_REGISTRY_KEY).is_some();
-    if !legacy_exists {
-        return;
-    }
-
-    if should_write_migrated_startup(legacy_exists, current_exists) {
-        let _ = set_startup_enabled(true);
-    }
-
-    if read_startup_value(STARTUP_REGISTRY_KEY).is_some() {
-        delete_startup_value(LEGACY_STARTUP_REGISTRY_KEY);
-        diagnose::log("migrated legacy startup registry entry to CodexUsage");
-    }
-}
-
-fn should_write_migrated_startup(legacy_exists: bool, current_exists: bool) -> bool {
-    legacy_exists && !current_exists
-}
-
 fn set_startup_enabled(enable: bool) -> bool {
     unsafe {
         let path = native_interop::wide_str(STARTUP_REGISTRY_PATH);
@@ -1867,11 +1783,7 @@ fn set_startup_enabled(enable: bool) -> bool {
             })
         } else {
             let removed = RegDeleteValueW(hkey, PCWSTR::from_raw(key_name.as_ptr()));
-            let legacy_key_name = native_interop::wide_str(LEGACY_STARTUP_REGISTRY_KEY);
-            let legacy_removed = RegDeleteValueW(hkey, PCWSTR::from_raw(legacy_key_name.as_ptr()));
-            [removed, legacy_removed]
-                .into_iter()
-                .all(|result| result.is_ok() || result == ERROR_FILE_NOT_FOUND)
+            removed.is_ok() || removed == ERROR_FILE_NOT_FOUND
         };
 
         let _ = RegCloseKey(hkey);
@@ -2225,7 +2137,7 @@ pub fn run() {
     // Exception: when relaunched after an explorer restart (ENV_RELAUNCH set),
     // wait for the previous instance to release the mutex, then take over.
     let is_relaunch = std::env::var(ENV_RELAUNCH).is_ok();
-    let mutex_name = native_interop::wide_str("Global\\CodexUsage");
+    let mutex_name = native_interop::wide_str("Global\\CodexUsageHardened");
     let _mutex = unsafe {
         let handle = CreateMutexW(None, true, PCWSTR::from_raw(mutex_name.as_ptr()));
         match handle {
@@ -2257,9 +2169,7 @@ pub fn run() {
         }
     };
 
-    migrate_legacy_startup_entry();
-
-    let class_name = native_interop::wide_str("CodexUsage");
+    let class_name = native_interop::wide_str("CodexUsageHardened");
 
     unsafe {
         let hinstance = GetModuleHandleW(PCWSTR::null()).unwrap();
@@ -2995,7 +2905,7 @@ fn do_poll(send_hwnd: SendHwnd) {
     provider_poll::launch(
         jobs,
         |job| {
-            let group = {
+            let identity = {
                 let state = lock_state();
                 let Some(state) = state.as_ref() else {
                     return provider_poll::Attempt::cancelled();
@@ -3004,14 +2914,12 @@ fn do_poll(send_hwnd: SendHwnd) {
                 if !enabled[job.id] || !state.monitor.job_is_current(job) {
                     return provider_poll::Attempt::cancelled();
                 }
-                state.antigravity_quota_group.clone()
+                state.codex_identity.clone()
             };
             provider_poll::Attempt::from_result(poller::poll_provider(
                 job.id,
-                group.as_deref(),
-                lock_state()
-                    .as_ref()
-                    .and_then(|state| state.codex_identity.as_ref()),
+                None,
+                identity.as_ref(),
             ))
         },
         move |job, attempt| complete_provider_poll(send_hwnd, job, attempt),
@@ -4810,58 +4718,22 @@ mod tests {
     }
 
     #[test]
-    fn loads_legacy_settings_when_new_path_is_missing() {
+    fn hardened_settings_do_not_import_upstream_settings() {
         let base = std::env::temp_dir().join(format!(
-            "codex-usage-settings-test-{}-{}",
+            "hardened-settings-test-{}-{}",
             std::process::id(),
             now_unix_secs()
         ));
-        let current = base.join("CodexUsage").join("settings.json");
-        let legacy = base.join("ClaudeCodeUsageMonitor").join("settings.json");
-        std::fs::create_dir_all(legacy.parent().unwrap()).unwrap();
-        std::fs::write(&legacy, test_settings_json("zh-CN")).unwrap();
-
-        let (settings, migrated) = load_settings_from_paths(&current, &legacy).unwrap();
-
-        assert!(migrated);
-        assert_eq!(settings.tray_offset, 321);
-        assert_eq!(settings.poll_interval_ms, 60_000);
-        assert_eq!(settings.language.as_deref(), Some("zh-CN"));
-        assert!(settings.show_codex);
-        assert!(!settings.show_claude_code);
-        assert!(settings.show_session_window);
-        assert!(settings.show_weekly_window);
-        assert_eq!(settings.alert_threshold_percent, 0);
-        let _ = std::fs::remove_dir_all(base);
-    }
-
-    #[test]
-    fn new_settings_take_precedence_over_legacy_settings() {
-        let base = std::env::temp_dir().join(format!(
-            "codex-usage-settings-precedence-test-{}-{}",
-            std::process::id(),
-            now_unix_secs()
-        ));
-        let current = base.join("CodexUsage").join("settings.json");
-        let legacy = base.join("ClaudeCodeUsageMonitor").join("settings.json");
+        let current = base.join("CodexUsageHardened").join("settings.json");
+        let upstream = base.join("CodexUsage").join("settings.json");
+        std::fs::create_dir_all(upstream.parent().unwrap()).unwrap();
+        std::fs::write(&upstream, test_settings_json("zh-CN")).unwrap();
+        assert!(load_settings_from_path(&current).is_none());
         std::fs::create_dir_all(current.parent().unwrap()).unwrap();
-        std::fs::create_dir_all(legacy.parent().unwrap()).unwrap();
         std::fs::write(&current, test_settings_json("en")).unwrap();
-        std::fs::write(&legacy, test_settings_json("zh-CN")).unwrap();
-
-        let (settings, migrated) = load_settings_from_paths(&current, &legacy).unwrap();
-
-        assert!(!migrated);
+        let settings = load_settings_from_path(&current).unwrap();
         assert_eq!(settings.language.as_deref(), Some("en"));
         let _ = std::fs::remove_dir_all(base);
-    }
-
-    #[test]
-    fn startup_migration_only_writes_when_legacy_exists_without_current_entry() {
-        assert!(should_write_migrated_startup(true, false));
-        assert!(!should_write_migrated_startup(false, false));
-        assert!(!should_write_migrated_startup(true, true));
-        assert!(!should_write_migrated_startup(false, true));
     }
 
     #[test]

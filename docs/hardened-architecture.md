@@ -68,3 +68,7 @@ monitor exit, and child failure.
 Only validated primary and secondary Codex windows may become `UsageData`.
 Missing windows remain unavailable. Raw protocol responses, account identifiers,
 credentials, stdout, and stderr must never be persisted or logged.
+
+## Remediation status
+
+The app-server launch boundary now rejects every attempt until a verified startup policy is implemented. Synthetic protocol success on CLI 0.172.0 is not approval for authenticated polling. The main window settings and startup registry identifiers are isolated; upstream settings and startup migration are removed. Installation scripts are intentionally removed pending acceptance.

@@ -33,9 +33,9 @@ mod dropdown;
 mod raster;
 use raster::opaque;
 
-const CLASS: PCWSTR = w!("CodexUsageSettings");
-const CONTENT_CLASS: PCWSTR = w!("CodexUsageSettingsContent");
-const OVERLAY_CLASS: PCWSTR = w!("CodexUsageSettingsTransition");
+const CLASS: PCWSTR = w!("CodexUsageHardenedSettings");
+const CONTENT_CLASS: PCWSTR = w!("CodexUsageHardenedSettingsContent");
+const OVERLAY_CLASS: PCWSTR = w!("CodexUsageHardenedSettingsTransition");
 const NAV: u16 = 990;
 const FIRST_FIELD: u16 = 1000;
 const FIELDS_PER_ROW: u16 = 4;

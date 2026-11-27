@@ -1,18 +1,18 @@
 [package]
-name = "codex-usage"
+name = "codex-usage-hardened"
 version = "1.11.0"
 edition = "2021"
 license = "MIT"
-description = "Codex Usage"
-homepage = "https://github.com/upstream-ray/codex-usage-monitor"
-repository = "https://github.com/upstream-ray/codex-usage-monitor"
+description = "Codex Usage Hardened"
+homepage = "https://github.com/mcollins1290/codex-usage-monitor-hardened"
+repository = "https://github.com/mcollins1290/codex-usage-monitor-hardened"
 
 [package.metadata.winres]
 CompanyName = "Ray"
-ProductName = "Codex Usage"
+ProductName = "Codex Usage Hardened"
 FileDescription = "Lightweight Codex usage monitor for Windows"
-OriginalFilename = "codex-usage.exe"
-InternalName = "CodexUsage"
+OriginalFilename = "codex-usage-hardened.exe"
+InternalName = "CodexUsageHardened"
 Comments = "Derived from Claude Code Usage Monitor under the MIT License"
 LegalCopyright = "Original copyright (C) 2026 Code Zeno Pty Ltd; modifications (C) 2026 Ray"
 
