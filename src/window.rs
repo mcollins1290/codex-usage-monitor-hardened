@@ -1844,10 +1844,6 @@ fn total_widget_width() -> i32 {
         .unwrap_or_else(|| total_widget_width_for(1, LanguageId::English, Appearance::default()))
 }
 
-fn claude_accent_color() -> Color {
-    Color::from_hex("#D97757")
-}
-
 fn appearance_colors(appearance: Appearance, system_is_dark: bool) -> (Color, Color, Color) {
     match appearance.palette {
         Palette::System if system_is_dark => (
@@ -1881,26 +1877,6 @@ fn reset_text_color(appearance: Appearance, is_dark: bool) -> Color {
         Palette::HighContrastDark => "#D8D8D8",
         Palette::HighContrastLight => "#38424C",
     })
-}
-
-fn antigravity_accent_color() -> Color {
-    Color::from_hex("#4285F4")
-}
-
-fn claude_usage_text_color(is_dark: bool) -> Color {
-    if is_dark {
-        Color::from_hex("#F09A7A")
-    } else {
-        Color::from_hex("#A94F32")
-    }
-}
-
-fn antigravity_usage_text_color(is_dark: bool) -> Color {
-    if is_dark {
-        Color::from_hex("#8AB4F8")
-    } else {
-        Color::from_hex("#1967D2")
-    }
 }
 
 pub fn run() {
@@ -4313,9 +4289,7 @@ mod tests {
   "poll_interval_ms": 60000,
   "language": "{language}",
   "widget_visible": true,
-  "show_claude_code": false,
-  "show_codex": true,
-  "show_antigravity": false
+  "show_codex": true
 }}"#
         )
     }
