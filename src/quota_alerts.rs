@@ -57,10 +57,10 @@ mod tests {
     #[test]
     fn missing_reset_and_restart_do_not_repeat_an_alert() {
         let mut keys = BTreeSet::new();
-        assert!(should_notify(&mut keys, "claude:session:", None, 5.0, 10.0));
+        assert!(should_notify(&mut keys, "codex:session:", None, 5.0, 10.0));
         assert!(!should_notify(
             &mut keys,
-            "claude:session:",
+            "codex:session:",
             Some(1000),
             4.0,
             10.0
@@ -69,21 +69,21 @@ mod tests {
         let mut restored = serde_json::from_str(&json).unwrap();
         assert!(!should_notify(
             &mut restored,
-            "claude:session:",
+            "codex:session:",
             None,
             3.0,
             10.0
         ));
         assert!(!should_notify(
             &mut restored,
-            "claude:session:",
+            "codex:session:",
             Some(1001),
             2.0,
             10.0
         ));
         assert!(should_notify(
             &mut restored,
-            "claude:session:",
+            "codex:session:",
             Some(19_000),
             5.0,
             10.0
@@ -95,7 +95,7 @@ mod tests {
         let mut keys = BTreeSet::new();
         assert!(should_notify(
             &mut keys,
-            "claude:session:",
+            "codex:session:",
             Some(1000),
             5.0,
             10.0
@@ -103,7 +103,7 @@ mod tests {
         for reset in [1001, 999, 1100, 1000] {
             assert!(!should_notify(
                 &mut keys,
-                "claude:session:",
+                "codex:session:",
                 Some(reset),
                 4.0,
                 10.0
@@ -118,14 +118,14 @@ mod tests {
         ));
         assert!(!should_notify(
             &mut keys,
-            "claude:session:",
+            "codex:session:",
             Some(1000),
             20.0,
             10.0
         ));
         assert!(!should_notify(
             &mut keys,
-            "claude:session:",
+            "codex:session:",
             Some(1000),
             4.0,
             10.0

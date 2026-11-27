@@ -4261,8 +4261,8 @@ mod tests {
             "Codex: 5h 剩余13% 19:04重置 | 7d 剩余86% 07/18重置"
         );
         assert_eq!(
-            service_tooltip("Claude Code", "13%", "86%", false, true),
-            "Claude Code: 7d 86%"
+            service_tooltip("Codex", "13%", "86%", false, true),
+            "Codex: 7d 86%"
         );
     }
 
