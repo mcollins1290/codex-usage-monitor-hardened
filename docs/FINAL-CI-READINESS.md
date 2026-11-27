@@ -10,7 +10,7 @@ acceptance.
 
 - Branch: `feature/security-remediation`
 - Starting reviewed remote HEAD: `858cd6dc61f5a67444788a3edceda9a444db3721`
-- Current local candidate: recorded after the final commit is created
+- Current local candidate: `86de82750cb9be4c3507c68a3ce9aa464da45706`
 - Original handover: `168885d0b8616989834e83d38d5899737600776a`
 - Windows CI remains manual-only; no CI run was triggered by this review.
 - Authenticated app-server launch remains unconditionally frozen in
@@ -21,11 +21,11 @@ acceptance.
 | Command | Result |
 | --- | --- |
 | `cargo fmt --all -- --check` | Passed after formatting changes |
-| `cargo test --locked` | Exit 0; 104 passed, 0 failed, 4 ignored |
-| `cargo build --release --locked` | Exit 0; 23 compiler warnings remain |
+| `cargo test --locked` | Exit 0; 86 passed, 0 failed, 4 ignored |
+| `cargo build --release --locked` | Exit 0; optimized build passed with no compiler warnings |
 | `cargo clippy --locked --all-targets` | Exit 0; dead-code and lint warnings remain |
-| `cargo audit` | Not executed; tool unavailable |
-| `cargo deny` | Not executed; tool unavailable |
+| `cargo audit --json` | Exit 0; 0 vulnerabilities; advisory DB `c5279d0b0c9e8b70df666eb6d1edbabcfd1176bd` |
+| `cargo deny check` | Exit 0; advisories, bans, licenses and sources passed; duplicate `syn` warning remains |
 | Windows CI | Not executed by authorization |
 
 ## Verified implementation
@@ -48,17 +48,11 @@ acceptance.
 
 ## Blocking findings
 
-1. Production still retains generalized three-slot provider scheduling and
-   provider-specific rendering/models/assets. `src/provider_poll.rs`,
-   `src/models.rs`, `src/window.rs`, `src/provider_icons.rs` and localization
-   modules contain Claude/Antigravity-era structures. These are not yet fully
-   removed or justified for a Codex-only product.
-2. Release compilation succeeds but emits 23 warnings, including unused
-   version-probe functions, update/local-MCP localization fields and legacy
-   provider error variants.
-3. Automated RustSec and registry-yank checks were not executable because
-   `cargo-audit` and `cargo-deny` are unavailable. The manual audit is recorded
-   in `docs/DEPENDENCY-AUDIT.md` but is not equivalent to an automated pass.
+1. The production Codex-only refactor is implemented and locally verified, but
+   Windows CI has not yet run against the current candidate.
+2. Generic provider-oriented appearance terminology and historical documentation
+   remain to be reconciled; they do not select or execute a secondary provider.
+3. `cargo deny check` reports a non-security duplicate `syn` version warning.
 4. T2–T8 startup side-effect verification and authenticated runtime acceptance
    remain external acceptance gates. The successful T1 protocol exchange does
    not prove absence of plugin, MCP or hook side effects.
@@ -70,8 +64,8 @@ acceptance.
 | Area | Status | Evidence |
 | --- | --- | --- |
 | Repository controls | IMPLEMENTED — CI PENDING | Git history, clean local branch, manual-only workflow |
-| Codex-only architecture | FAIL / INCOMPLETE | Legacy production models and rendering remain |
-| Quota presentation and scheduling | IMPLEMENTED — CI PENDING | Existing unit tests and `src/provider_poll.rs` |
+| Codex-only architecture | IMPLEMENTED — CI PENDING | `src/codex_poll.rs`, `src/models.rs`, `src/window.rs`, `src/codex_icon.rs`; residual-reference audit |
+| Quota presentation and scheduling | IMPLEMENTED — CI PENDING | `src/codex_poll.rs`, `src/quota_refresh.rs`, local 86-test run |
 | Identity and compatibility | IMPLEMENTED — CI PENDING | `src/app_server.rs` tests; Windows CI pending |
 | Protocol handling | PASS — VERIFIED locally | `src/app_server.rs` protocol tests; 104-test run |
 | Process containment | IMPLEMENTED — CI PENDING | Windows fixture tests pass locally; CI rerun pending |

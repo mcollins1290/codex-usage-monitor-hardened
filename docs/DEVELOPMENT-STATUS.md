@@ -1,6 +1,6 @@
 # Development status
 
-**Last updated:** 2026-11-26 (US Eastern)  
+**Last updated:** 2026-11-27 (US Eastern)  
 **Decision:** GO for development; NO GO for installation or authenticated polling.
 
 ## Objective
@@ -11,10 +11,10 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 
 - Active branch: `feature/security-remediation`
 - Preserved handover: `168885d0b8616989834e83d38d5899737600776a`
-- Last verified code commit: `6f58cbb97bb911e04cca79b8844301457bd027ac`
+- Current local candidate: `86de82750cb9be4c3507c68a3ce9aa464da45706`
 - [Windows CI run 45932899764](https://github.com/mcollins1290/codex-usage-monitor-hardened/actions/runs/45932899764): success; formatting, locked dependency tests and optimized build passed.
-- Tests: 108 passed, 0 failed, 4 ignored (two child fixtures invoked by parent tests).
-- Release build: warning cleanup remains outstanding; the last local test build reported 16 dead-code warnings.
+- Tests: 86 passed, 0 failed, 4 ignored (two child fixtures invoked by parent tests).
+- Local release build: passed with no compiler warnings.
 - Native child containment, descendant rejection, forced shutdown, compatibility, isolated profile and negative version-probe tests passed. Schema 2 now binds evidence to the executable path as well as version/hash/policy; tests pending CI. No version probe or approval action is exposed to users yet.
 
 **Temporary CI policy (owner authorized):** Windows CI is manual-only on this development branch until final verification. Intermediate commits are unverified; restore push and pull-request triggers and require a successful full Windows CI run before acceptance, merging or installation. All checks remain intact.
@@ -48,7 +48,7 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 | M6 | Child environment and working directory | Partial; authenticated configuration policy unresolved |
 | M7 | Sanitized actionable error categories | Approval, executable change and authentication classifications implemented; UI review outstanding |
 | M8 | UI lock during polling | Remediated in source |
-| L1 | Residual provider/updater code | Open |
+| L1 | Residual provider/updater code | Codex-only production refactor complete; generic wording and historical documentation remain to reconcile |
 | L2 | Toolchain pinning | Implemented |
 
 ## App-server evidence
@@ -64,7 +64,7 @@ Complete autonomously as far as available evidence and permissions permit:
 
 - Path-bound compatibility approval: schema 2 committed; final CI pending.
 - User-facing approval workflow: Settings status, bounded JSON evidence import, default-No explicit confirmation and revocation implemented. Final CI and UI acceptance outstanding; external evidence is an attestation, not proof of provenance.
-- Legacy code removal: dead updater functions, updater/privacy preference machinery and helper argument handling removed; obsolete update timers and unused polling adapter stubs removed; residual multi-provider renderer/scheduler remains.
+- Legacy code removal: provider scheduler, models, rendering arrays, icons and Claude/Antigravity localization removed. Generic appearance terminology and historical documentation remain to reconcile.
 - Dependency security audit: inventory and advisory assessment required; final locked build and audit required.
 - Authenticated runtime verification: synthetic tests and acceptance harness can be developed autonomously; genuine local authenticated evidence and startup safety acceptance remain required. Never substitute fabricated or CI credentials.
 
@@ -98,7 +98,7 @@ Continue without intermediate automatic CI; restore full CI at final verificatio
 
 ### Credential monitoring cleanup
 
-Removed credential snapshot types and callbacks. Production polling now uses the same explicit manual authentication retry gate as scheduler tests. The three-slot renderer/scheduler remains for now. Changes are pending final Windows CI.
+Removed credential snapshot types and callbacks. Production polling now uses explicit Codex-only state and the manual authentication retry gate.
 
 ### Verification preparation
 
@@ -118,6 +118,6 @@ Added tests for pre-granted consent rejection, explicit approval, changed execut
 
 ### Codex-only scheduler boundary
 
-Production initialization now uses a fixed Codex-only constructor and no longer reconfigures the provider selection at runtime. Added regression coverage for the single scheduled service. Legacy display slots and generalized scheduler tests remain. Windows CI pending.
+Production initialization now uses a fixed Codex-only constructor and no longer reconfigures provider selection at runtime. Reset observations and adaptive polling consume explicit Codex state. Windows CI pending.
 
 Generalized provider constructor, reselect and configure interfaces are now test-only; production uses the fixed Codex constructor. The three display slots remain for renderer compatibility. Final CI pending.
