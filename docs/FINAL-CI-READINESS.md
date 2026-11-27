@@ -17,7 +17,7 @@ The item-level dispositions are in
 
 - Branch: `feature/security-remediation`
 - Starting reviewed remote HEAD: `858cd6dc61f5a67444788a3edceda9a444db3721`
-- Current local candidate: `0d6b0ceb524d194ed41ad95ebdf098ee6a2cf727` (documentation update pending)
+- Current local candidate: `154baeac53ab7a59e2b32fde9bc16ead1d87d08e` (documentation update pending)
 - Original handover: `168885d0b8616989834e83d38d5899737600776a`
 - Windows CI remains manual-only; no CI run was triggered by this review.
 - Authenticated app-server launch remains unconditionally frozen in
