@@ -15,7 +15,7 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 - [Windows CI run 45930514524](https://github.com/mcollins1290/codex-usage-monitor-hardened/actions/runs/45930514524): success; formatting, locked dependency tests and optimized build passed.
 - Tests: 101 passed, 0 failed, 2 ignored.
 - Release build: 38 compiler warnings; cleanup outstanding.
-- This status document is a subsequent documentation-only change; its own CI result is not yet verified.
+- New process containment code is committed for CI verification; the prior verified baseline is unchanged.
 
 ## Completed implementation (not necessarily runtime accepted)
 
@@ -35,10 +35,10 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 | --- | --- | --- |
 | H1 | Output queue deadlock | Remediated in source; runtime tests outstanding |
 | H2 | Unbounded output allocation | Remediated in source; runtime tests outstanding |
-| H3 | Job Object assignment after process creation | Partial; creation-time containment and lifecycle tests required |
+| H3 | Job Object assignment after process creation | Creation-time JOB_LIST and HANDLE_LIST implemented; Windows CI and lifecycle tests outstanding |
 | H4 | Missing runtime security gate | Launch freeze enforced; accepted policy still required |
 | H5 | Application identity isolation | Partial; audit remaining metadata, paths and scripts |
-| M1 | Canonical path / hash-to-launch race | Partial; canonical path check improved, race unresolved |
+| M1 | Canonical path / hash-to-launch race | Read-only file sharing lock held and hash rechecked through launch; directory alias races still require review |
 | M2 | Independent executable version verification | Open |
 | M3 | Initialization handshake | Implemented and unit tested |
 | M4 | Tests exercise production protocol | Implemented and unit tested |

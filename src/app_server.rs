@@ -10,10 +10,10 @@ use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read, Write};
-use std::os::windows::io::AsRawHandle;
-use std::os::windows::process::CommandExt;
+use std::os::windows::ffi::OsStrExt;
+use std::os::windows::fs::OpenOptionsExt;
+use std::os::windows::io::{AsRawHandle, FromRawHandle, OwnedHandle};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{sync_channel, Receiver, SyncSender};
 use std::sync::Arc;
@@ -22,7 +22,6 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 const MAX_JSON_LINE_BYTES: usize = 256 * 1024;
 const MAX_TOTAL_OUTPUT_BYTES: usize = 1024 * 1024;
 const SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(2);
-const CREATE_NO_WINDOW: u32 = 0x0800_0000;
 const STARTUP_TIMEOUT: Duration = Duration::from_secs(3);
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(7);
 const CODEX_VERSION: &str = "0.172.0";
@@ -49,102 +48,208 @@ pub enum AppServerError {
     InvalidQuota,
 }
 
-#[repr(C)]
-struct JobObjectBasicLimitInformation {
-    per_process_user_time_limit: i64,
-    per_job_user_time_limit: i64,
-    limit_flags: u32,
-    minimum_working_set_size: usize,
-    maximum_working_set_size: usize,
-    active_process_limit: u32,
-    affinity: usize,
-    priority_class: u32,
-    scheduling_class: u32,
+use windows::core::{PCWSTR, PWSTR};
+use windows::Win32::Foundation::{
+    SetHandleInformation, BOOL, HANDLE, HANDLE_FLAGS, HANDLE_FLAG_INHERIT, WAIT_OBJECT_0,
+    WAIT_TIMEOUT,
+};
+use windows::Win32::Security::SECURITY_ATTRIBUTES;
+use windows::Win32::System::JobObjects::{
+    CreateJobObjectW, SetInformationJobObject, JobObjectExtendedLimitInformation,
+    JOBOBJECT_EXTENDED_LIMIT_INFORMATION, JOB_OBJECT_LIMIT_ACTIVE_PROCESS,
+    JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
+};
+use windows::Win32::System::Pipes::CreatePipe;
+use windows::Win32::System::Threading::{
+    CreateProcessW, DeleteProcThreadAttributeList, GetExitCodeProcess,
+    InitializeProcThreadAttributeList, TerminateProcess, UpdateProcThreadAttribute,
+    WaitForSingleObject, CREATE_NO_WINDOW, CREATE_UNICODE_ENVIRONMENT,
+    EXTENDED_STARTUPINFO_PRESENT, LPPROC_THREAD_ATTRIBUTE_LIST, PROCESS_INFORMATION,
+    PROC_THREAD_ATTRIBUTE_HANDLE_LIST, PROC_THREAD_ATTRIBUTE_JOB_LIST, STARTF_USESTDHANDLES,
+    STARTUPINFOEXW,
+};
+
+fn launch_error<T>(result: windows::core::Result<T>) -> Result<T, AppServerError> {
+    result.map_err(|_| AppServerError::LaunchFailed)
 }
 
-#[repr(C)]
-struct IoCounters {
-    values: [u64; 6],
+fn raw(handle: &OwnedHandle) -> HANDLE {
+    HANDLE(handle.as_raw_handle())
 }
 
-#[repr(C)]
-struct JobObjectExtendedLimitInformation {
-    basic: JobObjectBasicLimitInformation,
-    io: IoCounters,
-    process_memory_limit: usize,
-    job_memory_limit: usize,
-    peak_process_memory_used: usize,
-    peak_job_memory_used: usize,
+// Only called for successful Win32 APIs that transfer ownership.
+fn owned(handle: HANDLE) -> OwnedHandle {
+    unsafe { OwnedHandle::from_raw_handle(handle.0) }
 }
 
-const JOB_OBJECT_EXTENDED_LIMIT_INFORMATION: u32 = 9;
-const JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE: u32 = 0x0000_2000;
-const JOB_OBJECT_LIMIT_ACTIVE_PROCESS: u32 = 0x0000_0008;
-
-unsafe extern "system" {
-    fn CreateJobObjectW(
-        attributes: *mut std::ffi::c_void,
-        name: *const u16,
-    ) -> *mut std::ffi::c_void;
-    fn SetInformationJobObject(
-        job: *mut std::ffi::c_void,
-        class: u32,
-        info: *mut std::ffi::c_void,
-        length: u32,
-    ) -> i32;
-    fn AssignProcessToJobObject(job: *mut std::ffi::c_void, process: *mut std::ffi::c_void) -> i32;
-    fn CloseHandle(handle: *mut std::ffi::c_void) -> i32;
+fn pipe(child_reads: bool) -> Result<(File, OwnedHandle), AppServerError> {
+    let attrs = SECURITY_ATTRIBUTES {
+        nLength: std::mem::size_of::<SECURITY_ATTRIBUTES>() as u32,
+        lpSecurityDescriptor: std::ptr::null_mut(),
+        bInheritHandle: BOOL(1),
+    };
+    let mut read = HANDLE::default();
+    let mut write = HANDLE::default();
+    launch_error(unsafe { CreatePipe(&mut read, &mut write, Some(&attrs), 4096) })?;
+    let read = owned(read);
+    let write = owned(write);
+    let (parent, child) = if child_reads { (write, read) } else { (read, write) };
+    launch_error(unsafe {
+        SetHandleInformation(raw(&parent), HANDLE_FLAG_INHERIT.0, HANDLE_FLAGS(0))
+    })?;
+    Ok((File::from(parent), child))
 }
 
-struct JobGuard(*mut std::ffi::c_void);
-impl JobGuard {
-    fn attach(child: &std::process::Child) -> Result<Self, AppServerError> {
-        let job = unsafe { CreateJobObjectW(std::ptr::null_mut(), std::ptr::null()) };
-        if job.is_null() {
-            return Err(AppServerError::LaunchFailed);
-        }
-        let mut limits = JobObjectExtendedLimitInformation {
-            basic: JobObjectBasicLimitInformation {
-                per_process_user_time_limit: 0,
-                per_job_user_time_limit: 0,
-                limit_flags: JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE | JOB_OBJECT_LIMIT_ACTIVE_PROCESS,
-                minimum_working_set_size: 0,
-                maximum_working_set_size: 0,
-                active_process_limit: 1,
-                affinity: 0,
-                priority_class: 0,
-                scheduling_class: 0,
-            },
-            io: IoCounters { values: [0; 6] },
-            process_memory_limit: 0,
-            job_memory_limit: 0,
-            peak_process_memory_used: 0,
-            peak_job_memory_used: 0,
+struct AttributeList {
+    // Pointer-sized storage provides alignment for the opaque Windows structure.
+    _storage: Vec<usize>,
+    list: LPPROC_THREAD_ATTRIBUTE_LIST,
+}
+
+impl AttributeList {
+    fn new() -> Result<Self, AppServerError> {
+        let mut bytes = 0;
+        let _ = unsafe {
+            InitializeProcThreadAttributeList(LPPROC_THREAD_ATTRIBUTE_LIST::default(), 2, 0, &mut bytes)
         };
-        let configured = unsafe {
-            SetInformationJobObject(
-                job,
-                JOB_OBJECT_EXTENDED_LIMIT_INFORMATION,
-                (&mut limits as *mut JobObjectExtendedLimitInformation).cast::<std::ffi::c_void>(),
-                std::mem::size_of_val(&limits) as u32,
-            )
-        } != 0;
-        let assigned = configured
-            && unsafe { AssignProcessToJobObject(job, child.as_raw_handle() as *mut _) } != 0;
-        if !assigned {
-            unsafe {
-                CloseHandle(job);
-            }
+        if bytes == 0 || bytes > 1024 * 1024 {
             return Err(AppServerError::LaunchFailed);
         }
-        Ok(Self(job))
+        let mut storage = vec![0usize; bytes.div_ceil(std::mem::size_of::<usize>())];
+        let list = LPPROC_THREAD_ATTRIBUTE_LIST(storage.as_mut_ptr().cast());
+        launch_error(unsafe { InitializeProcThreadAttributeList(list, 2, 0, &mut bytes) })?;
+        Ok(Self { _storage: storage, list })
+    }
+
+    fn set_handles(&self, attribute: u32, handles: &[HANDLE]) -> Result<(), AppServerError> {
+        launch_error(unsafe {
+            UpdateProcThreadAttribute(
+                self.list, 0, attribute as usize,
+                Some(handles.as_ptr().cast()), std::mem::size_of_val(handles), None, None,
+            )
+        })
     }
 }
-impl Drop for JobGuard {
+
+impl Drop for AttributeList {
     fn drop(&mut self) {
-        unsafe {
-            CloseHandle(self.0);
+        unsafe { DeleteProcThreadAttributeList(self.list) };
+    }
+}
+
+fn wide(value: &std::ffi::OsStr) -> Result<Vec<u16>, AppServerError> {
+    let mut result: Vec<u16> = value.encode_wide().collect();
+    if result.contains(&0) {
+        return Err(AppServerError::InvalidIdentity);
+    }
+    result.push(0);
+    Ok(result)
+}
+
+fn environment_block() -> Result<Vec<u16>, AppServerError> {
+    let mut block = Vec::new();
+    // Alphabetical, case-insensitive order as required by CreateProcessW.
+    for name in ["APPDATA", "CODEX_HOME", "LOCALAPPDATA", "SystemRoot", "TEMP", "TMP", "USERPROFILE", "WINDIR"] {
+        if let Some(value) = std::env::var_os(name) {
+            let mut entry = std::ffi::OsString::from(format!("{name}="));
+            entry.push(value);
+            block.extend(wide(&entry)?);
         }
+    }
+    if block.is_empty() {
+        block.push(0);
+    }
+    block.push(0);
+    Ok(block)
+}
+
+struct ContainedChild {
+    process: OwnedHandle,
+    job: Option<OwnedHandle>,
+}
+
+impl ContainedChild {
+    fn launch(executable: &Path, workdir: &Path, arguments: &str) -> Result<(Self, File, File, File), AppServerError> {
+        let job = owned(launch_error(unsafe { CreateJobObjectW(None, PCWSTR::null()) })?);
+        let mut limits = JOBOBJECT_EXTENDED_LIMIT_INFORMATION::default();
+        limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE | JOB_OBJECT_LIMIT_ACTIVE_PROCESS;
+        limits.BasicLimitInformation.ActiveProcessLimit = 1;
+        launch_error(unsafe {
+            SetInformationJobObject(
+                raw(&job), JobObjectExtendedLimitInformation,
+                (&limits as *const JOBOBJECT_EXTENDED_LIMIT_INFORMATION).cast(),
+                std::mem::size_of_val(&limits) as u32,
+            )
+        })?;
+        let (stdin, child_stdin) = pipe(true)?;
+        let (stdout, child_stdout) = pipe(false)?;
+        let (stderr, child_stderr) = pipe(false)?;
+        let handles = [raw(&child_stdin), raw(&child_stdout), raw(&child_stderr)];
+        let jobs = [raw(&job)];
+        let attributes = AttributeList::new()?;
+        attributes.set_handles(PROC_THREAD_ATTRIBUTE_HANDLE_LIST, &handles)?;
+        attributes.set_handles(PROC_THREAD_ATTRIBUTE_JOB_LIST, &jobs)?;
+        let application = wide(executable.as_os_str())?;
+        let directory = wide(workdir.as_os_str())?;
+        // Arguments are fixed internal literals, never drawn from user settings.
+        let mut command = std::ffi::OsString::from("\"");
+        command.push(executable);
+        command.push(format!("\" {arguments}"));
+        let mut command = wide(&command)?;
+        let environment = environment_block()?;
+        let mut startup = STARTUPINFOEXW::default();
+        startup.StartupInfo.cb = std::mem::size_of::<STARTUPINFOEXW>() as u32;
+        startup.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
+        startup.StartupInfo.hStdInput = handles[0];
+        startup.StartupInfo.hStdOutput = handles[1];
+        startup.StartupInfo.hStdError = handles[2];
+        startup.lpAttributeList = attributes.list;
+        let mut info = PROCESS_INFORMATION::default();
+        // The kernel assigns the job before any child code can execute.
+        // Failure has no fallback to an uncontained process.
+        launch_error(unsafe {
+            CreateProcessW(
+                PCWSTR(application.as_ptr()), PWSTR(command.as_mut_ptr()),
+                None, None, BOOL(1),
+                EXTENDED_STARTUPINFO_PRESENT | CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT,
+                Some(environment.as_ptr().cast()), PCWSTR(directory.as_ptr()),
+                &startup.StartupInfo, &mut info,
+            )
+        })?;
+        let process = owned(info.hProcess);
+        drop(owned(info.hThread));
+        Ok((Self { process, job: Some(job) }, stdin, stdout, stderr))
+    }
+
+    fn wait(&self, timeout: Duration) -> Result<bool, AppServerError> {
+        match unsafe { WaitForSingleObject(raw(&self.process), timeout.as_millis() as u32) } {
+            WAIT_OBJECT_0 => Ok(true),
+            WAIT_TIMEOUT => Ok(false),
+            _ => Err(AppServerError::LaunchFailed),
+        }
+    }
+
+    fn shutdown(&mut self, graceful: bool) -> Result<(), AppServerError> {
+        if graceful && self.wait(SHUTDOWN_TIMEOUT)? {
+            self.job.take();
+            let mut code = 0;
+            launch_error(unsafe { GetExitCodeProcess(raw(&self.process), &mut code) })?;
+            return if code == 0 { Ok(()) } else { Err(AppServerError::LaunchFailed) };
+        }
+        self.job.take();
+        if !self.wait(SHUTDOWN_TIMEOUT)? {
+            let _ = unsafe { TerminateProcess(raw(&self.process), 1) };
+            if !self.wait(SHUTDOWN_TIMEOUT)? {
+                return Err(AppServerError::Timeout);
+            }
+        }
+        if graceful { Err(AppServerError::Timeout) } else { Ok(()) }
+    }
+}
+
+impl Drop for ContainedChild {
+    fn drop(&mut self) {
+        self.job.take();
     }
 }
 
@@ -178,10 +283,14 @@ pub fn expected_version() -> &'static str {
 
 pub fn sha256_file(path: &Path) -> Result<String, AppServerError> {
     let mut file = File::open(path).map_err(|_| AppServerError::ExecutableMissing)?;
+    hash_reader(&mut file)
+}
+
+fn hash_reader(file: &mut impl Read) -> Result<String, AppServerError> {
     let mut hasher = Sha256::new();
     let mut buffer = [0u8; 64 * 1024];
     loop {
-        let count = std::io::Read::read(&mut file, &mut buffer)
+        let count = file.read(&mut buffer)
             .map_err(|_| AppServerError::LaunchFailed)?;
         if count == 0 {
             break;
@@ -223,58 +332,24 @@ pub fn read_rate_limits(identity: &ApprovedExecutable) -> Result<UsageData, AppS
     // Deliberately not configurable: no authenticated invocation has been accepted.
     require_startup_acceptance()?;
     let executable = validate_identity(identity)?;
+    // Hold a read-only, no-write/no-delete sharing handle across process creation.
+    let mut locked = std::fs::OpenOptions::new()
+        .read(true)
+        .share_mode(1)
+        .open(&executable)
+        .map_err(|_| AppServerError::ExecutableMissing)?;
+    if !hash_reader(&mut locked)?.eq_ignore_ascii_case(&identity.sha256) {
+        return Err(AppServerError::HashMismatch);
+    }
     let workdir = dirs::config_dir()
         .ok_or(AppServerError::LaunchFailed)?
         .join("CodexUsageHardened")
         .join("app-server-work");
     std::fs::create_dir_all(&workdir).map_err(|_| AppServerError::LaunchFailed)?;
-    let mut command = Command::new(&executable);
-    command
-        .args(["app-server", "--listen", "stdio://"])
-        .creation_flags(CREATE_NO_WINDOW)
-        .current_dir(workdir)
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .env_clear();
-    for name in [
-        "CODEX_HOME",
-        "USERPROFILE",
-        "APPDATA",
-        "LOCALAPPDATA",
-        "TEMP",
-        "TMP",
-        "SystemRoot",
-        "WINDIR",
-    ] {
-        if let Some(value) = std::env::var_os(name) {
-            command.env(name, value);
-        }
-    }
+    let (mut guard, mut stdin, stdout, stderr) =
+        ContainedChild::launch(&executable, &workdir, "app-server --listen stdio://")?;
 
-    // The launch freeze stays in place until creation-time job assignment and
-    // the authenticated environment policy have been verified.
-    let mut guard = ChildGuard {
-        child: command.spawn().map_err(|_| AppServerError::LaunchFailed)?,
-        job: None,
-    };
-    guard.job = Some(JobGuard::attach(&guard.child)?);
-    let mut stdin = guard
-        .child
-        .stdin
-        .take()
-        .ok_or(AppServerError::LaunchFailed)?;
-    let stdout = guard
-        .child
-        .stdout
-        .take()
-        .ok_or(AppServerError::LaunchFailed)?;
-    let stderr = guard
-        .child
-        .stderr
-        .take()
-        .ok_or(AppServerError::LaunchFailed)?;
-
+    drop(locked);
     let (tx, rx) = sync_channel(16);
     let output_limit = Arc::new(AtomicBool::new(false));
     let stdout_limit = Arc::clone(&output_limit);
@@ -297,58 +372,6 @@ pub fn read_rate_limits(identity: &ApprovedExecutable) -> Result<UsageData, AppS
         return Err(AppServerError::OutputTooLarge);
     }
     quota_data(result?)
-}
-
-struct ChildGuard {
-    child: std::process::Child,
-    job: Option<JobGuard>,
-}
-
-impl ChildGuard {
-    fn shutdown(&mut self, graceful: bool) -> Result<(), AppServerError> {
-        if graceful && self.wait_until(Instant::now() + SHUTDOWN_TIMEOUT)? {
-            self.job.take();
-            return Ok(());
-        }
-        // Closing the job kills members before waiting for pipes to close.
-        self.job.take();
-        if self
-            .child
-            .try_wait()
-            .map_err(|_| AppServerError::LaunchFailed)?
-            .is_none()
-        {
-            let _ = self.child.kill();
-        }
-        if self.wait_until(Instant::now() + SHUTDOWN_TIMEOUT)? {
-            Ok(())
-        } else {
-            Err(AppServerError::Timeout)
-        }
-    }
-
-    fn wait_until(&mut self, deadline: Instant) -> Result<bool, AppServerError> {
-        loop {
-            if self
-                .child
-                .try_wait()
-                .map_err(|_| AppServerError::LaunchFailed)?
-                .is_some()
-            {
-                return Ok(true);
-            }
-            if Instant::now() >= deadline {
-                return Ok(false);
-            }
-            std::thread::sleep(Duration::from_millis(10));
-        }
-    }
-}
-
-impl Drop for ChildGuard {
-    fn drop(&mut self) {
-        let _ = self.shutdown(false);
-    }
 }
 
 fn finish_readers(readers: [std::thread::JoinHandle<()>; 2]) -> Result<(), AppServerError> {
