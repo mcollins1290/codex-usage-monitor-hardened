@@ -92,7 +92,7 @@ pub fn interval_ms(base: u32, adaptive: bool, usage: Option<&UsageData>) -> u32 
     let low = adaptive
         && usage.is_some_and(|usage| {
             let sections = [&usage.session, &usage.weekly];
-            // A provider blocked by an exhausted window cannot consume more quota.
+            // Codex blocked by an exhausted window cannot consume more quota.
             if sections.iter().any(|s| s.percentage >= 100.0) {
                 return false;
             }

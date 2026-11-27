@@ -6,7 +6,7 @@ use crate::models::UsageSection;
 pub struct ResetObservations([Option<u64>; 2]);
 
 impl ResetObservations {
-    /// Returns (baseline changed, new window evidenced by the provider).
+    /// Returns (baseline changed, new Codex quota window evidenced).
     pub fn observe(
         &mut self,
         weekly: bool,

@@ -21,8 +21,7 @@ pub enum TrayAction {
     ShowContextMenu,
 }
 
-/// Identifies the provider that originated a notification. All notifications
-/// now use the one application tray icon rather than provider-specific icons.
+/// Identifies the Codex quota notification.
 #[derive(Clone, Copy)]
 pub enum TrayIconKind {
     Codex,

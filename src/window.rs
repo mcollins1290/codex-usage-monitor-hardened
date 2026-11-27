@@ -483,7 +483,7 @@ struct Appearance {
     font_size: FontSize,
     color_mode: ColorMode,
     single_color: SingleColor,
-    hide_provider_logos: bool,
+    hide_codex_logo: bool,
     hide_period_labels: bool,
     percent_inside_battery: bool,
     reset_time_display: ResetTimeDisplay,
@@ -1588,7 +1588,6 @@ fn set_startup_enabled(enable: bool) -> bool {
 
 // Dimensions matching the C# version
 const SEGMENT_W: i32 = 10;
-const MULTI_PROVIDER_SEGMENT_W: i32 = 8;
 const SEGMENT_GAP: i32 = 1;
 const SEGMENT_COUNT: i32 = 10;
 
@@ -1640,11 +1639,8 @@ fn active_model_count() -> i32 {
 }
 
 fn row_bar_segment_count(active_models: i32) -> i32 {
-    match active_models {
-        1 => SEGMENT_COUNT,
-        2 => 5,
-        _ => 4,
-    }
+    let _ = active_models;
+    SEGMENT_COUNT
 }
 
 /// Labels and reset texts that can occupy the widest space in each column.
@@ -1815,12 +1811,12 @@ fn total_widget_width_for_state(state: &AppState) -> i32 {
 fn has_cross_day_reset(
     appearance: Appearance,
     session_visible: bool,
-    provider_visible: bool,
+    codex_visible: bool,
     session: &str,
 ) -> bool {
     appearance.reset_time_display == ResetTimeDisplay::Clock
         && session_visible
-        && provider_visible
+        && codex_visible
         && {
             let reset = quota_text::parts(session).1.as_bytes();
             reset.get(2) == Some(&b'/') && reset.get(8) == Some(&b':')
@@ -2175,7 +2171,7 @@ struct WidgetContent<'a> {
     appearance: Appearance,
     language: LanguageId,
     mode: QuotaDisplayMode,
-    provider_visible: bool,
+    codex_visible: bool,
     visible_rows: [bool; 2],
     used: [[f64; 1]; 2],
     text: [[std::borrow::Cow<'a, str>; 1]; 2],
@@ -2189,7 +2185,7 @@ impl WidgetContent<'static> {
             appearance: s.appearance,
             language: s.language,
             mode: s.quota_display_mode,
-            provider_visible: s.show_codex,
+            codex_visible: s.show_codex,
             visible_rows: [s.show_session_window, s.show_weekly_window],
             used: [[s.codex_session_percent], [s.codex_weekly_percent]],
             text: [values(&s.codex_session_text), values(&s.codex_weekly_text)],
@@ -2333,7 +2329,7 @@ fn paint_content(hdc: HDC, width: i32, height: i32, content: &WidgetContent<'_>)
         mut appearance,
         language,
         mode,
-        provider_visible,
+        codex_visible,
         visible_rows,
         used,
         ref text,
@@ -2348,11 +2344,11 @@ fn paint_content(hdc: HDC, width: i32, height: i32, content: &WidgetContent<'_>)
     let cross_day = has_cross_day_reset(
         appearance,
         visible_rows[0],
-        provider_visible,
+        codex_visible,
         text[0][0].as_ref(),
     );
     let (label_width, text_width) = usage_layout_widths(language, appearance, cross_day);
-    let active_models = i32::from(provider_visible);
+    let active_models = i32::from(codex_visible);
     let segment_count = row_bar_segment_count(active_models);
     let bar_width = usage_bar_width(segment_count, appearance);
     appearance.font_size = appearance.font_size.fit(height, rows, sc);
@@ -2420,9 +2416,9 @@ fn paint_content(hdc: HDC, width: i32, height: i32, content: &WidgetContent<'_>)
         let old_font = SelectObject(hdc, font);
 
         let model_left = content_x + period_label_column_width(label_width, appearance);
-        if !appearance.hide_provider_logos {
+        if !appearance.hide_codex_logo {
             let size = sc(codex_icon::SIZE).min(height);
-            if provider_visible {
+            if codex_visible {
                 codex_icon::draw(hdc, model_left, (height - size) / 2, size);
             }
         }
@@ -2450,8 +2446,8 @@ fn paint_content(hdc: HDC, width: i32, height: i32, content: &WidgetContent<'_>)
                     DT_LEFT | DT_VCENTER | DT_SINGLELINE,
                 );
             }
-            let model_x = model_left + provider_mark_width(appearance);
-            if provider_visible {
+            let model_x = model_left + codex_mark_width(appearance);
+            if codex_visible {
                 let value_color = text_color;
                 let used = used[row][0];
                 draw_usage_bar(
@@ -3470,8 +3466,7 @@ unsafe extern "system" fn wnd_proc(
                                 }
                                 IDM_APPEARANCE_RESET => s.appearance = Appearance::default(),
                                 IDM_PROVIDER_LOGOS => {
-                                    s.appearance.hide_provider_logos =
-                                        !s.appearance.hide_provider_logos
+                                    s.appearance.hide_codex_logo = !s.appearance.hide_codex_logo
                                 }
                                 IDM_PERIOD_LABELS => {
                                     s.appearance.hide_period_labels =
@@ -3765,7 +3760,7 @@ fn segment_width(segment_count: i32) -> i32 {
     sc(if segment_count == SEGMENT_COUNT {
         SEGMENT_W
     } else {
-        MULTI_PROVIDER_SEGMENT_W
+        SEGMENT_W
     })
 }
 
@@ -3779,8 +3774,8 @@ fn usage_bar_width(segment_count: i32, appearance: Appearance) -> i32 {
     }
 }
 
-fn provider_mark_width(appearance: Appearance) -> i32 {
-    if appearance.hide_provider_logos {
+fn codex_mark_width(appearance: Appearance) -> i32 {
+    if appearance.hide_codex_logo {
         0
     } else {
         sc(codex_icon::SIZE + codex_icon::RIGHT_MARGIN)
@@ -3788,7 +3783,7 @@ fn provider_mark_width(appearance: Appearance) -> i32 {
 }
 
 fn model_usage_width(segment_count: i32, text_width: i32, appearance: Appearance) -> i32 {
-    provider_mark_width(appearance)
+    codex_mark_width(appearance)
         + usage_bar_width(segment_count, appearance)
         + sc(BAR_RIGHT_MARGIN)
         + text_width
@@ -4109,14 +4104,14 @@ mod tests {
                 "quota_display_mode": "used", "color_presets": [{"name":"Old"}],
                 "appearance": {"font_size":font, "bar_thickness":thickness,
                      "bar_style":"classic_segmented", "compact_layout":true,
-                     "hide_provider_logos":true, "codex_colors":{"bar":"#112233"}}
+                     "hide_codex_logo":true, "codex_colors":{"bar":"#112233"}}
             });
             let settings: SettingsFile = serde_json::from_value(old).unwrap();
             assert_eq!(settings.appearance.bar_style, BarStyle::Segmented);
             assert_eq!(settings.appearance.font_size, expected_font);
             assert_eq!(settings.appearance.bar_thickness, expected_thickness);
             assert_eq!(settings.appearance.color_mode, ColorMode::Brand);
-            assert!(settings.appearance.hide_provider_logos);
+            assert!(settings.appearance.hide_codex_logo);
             assert_eq!(settings.tray_offset, 321);
             assert_eq!(settings.language.as_deref(), Some("it"));
             assert!(!settings.show_codex);
@@ -4649,13 +4644,13 @@ mod tests {
     fn hiding_provider_logos_reclaims_their_columns() {
         let original = Appearance::default();
         let hidden = Appearance {
-            hide_provider_logos: true,
+            hide_codex_logo: true,
             ..original
         };
         let regular = total_widget_width_for(2, LanguageId::SimplifiedChinese, original);
         let without_logos = total_widget_width_for(2, LanguageId::SimplifiedChinese, hidden);
-        assert_eq!(regular - without_logos, 2 * provider_mark_width(original));
-        assert_eq!(provider_mark_width(hidden), 0);
+        assert_eq!(regular - without_logos, 2 * codex_mark_width(original));
+        assert_eq!(codex_mark_width(hidden), 0);
     }
 
     #[test]

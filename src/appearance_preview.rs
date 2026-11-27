@@ -43,7 +43,7 @@ fn sample(
         appearance,
         language,
         mode: QuotaDisplayMode::Remaining,
-        provider_visible: true,
+        codex_visible: true,
         visible_rows: [true; 2],
         used: USED,
         text,
@@ -252,7 +252,7 @@ mod tests {
         let bar_left = sc(LEFT_DIVIDER_W)
             + sc(DIVIDER_RIGHT_MARGIN)
             + period_label_column_width(label_width, appearance)
-            + provider_mark_width(appearance);
+            + codex_mark_width(appearance);
         let row_height = appearance.row_height();
         let gap = (height - 2 * row_height).clamp(0, sc(5));
         let row_top = (height - 2 * row_height - gap) / 2;
