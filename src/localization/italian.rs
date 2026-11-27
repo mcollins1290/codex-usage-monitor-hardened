@@ -34,8 +34,6 @@ pub(super) const STRINGS: Strings = Strings {
     day_suffix: "g",
     hour_suffix: "h",
     minute_suffix: "m",
-    token_expired_title: "Errore di autenticazione Claude Code",
-    token_expired_body: "Esegui 'claude' nel terminale, poi usa '/login' e segui le istruzioni. Al termine, aggiorna o riavvia questa applicazione.",
     codex_token_expired_title: "Errore di autenticazione Codex",
     codex_token_expired_body: "Esegui 'codex' nel terminale e segui le istruzioni per accedere. Al termine, aggiorna o riavvia questa applicazione.",
     codex_window_title: "Monitor utilizzo Codex",

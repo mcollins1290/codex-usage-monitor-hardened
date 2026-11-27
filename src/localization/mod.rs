@@ -207,8 +207,6 @@ pub struct Strings {
     pub hour_suffix: &'static str,
     pub minute_suffix: &'static str,
     pub second_suffix: &'static str,
-    pub token_expired_title: &'static str,
-    pub token_expired_body: &'static str,
     pub codex_token_expired_title: &'static str,
     pub codex_token_expired_body: &'static str,
     pub codex_window_title: &'static str,

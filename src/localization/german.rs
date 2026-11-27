@@ -34,8 +34,6 @@ pub(super) const STRINGS: Strings = Strings {
     day_suffix: "T",
     hour_suffix: "h",
     minute_suffix: "m",
-    token_expired_title: "Authentifizierungsfehler",
-    token_expired_body: "Führen Sie 'claude' in einem Terminal aus, verwenden Sie dann '/login' und folgen Sie den Anweisungen. Aktualisieren oder starten Sie diese App anschließend neu.",
     codex_token_expired_title: "Codex-Authentifizierungsfehler",
     codex_token_expired_body: "Fuhren Sie 'codex' in einem Terminal aus und folgen Sie den Anmeldeanweisungen. Aktualisieren oder starten Sie diese App anschliessend neu.",
     codex_window_title: "Codex-Nutzungsmonitor",

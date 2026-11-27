@@ -35,9 +35,6 @@ pub(super) const STRINGS: Strings = Strings {
     hour_suffix: "h",
     minute_suffix: "m",
     second_suffix: "s",
-    token_expired_title: "Claude Code 登录已失效",
-    token_expired_body:
-        "请在终端中运行 'claude'，输入 '/login' 并按提示重新登录。完成后请刷新或重启本工具。",
     codex_token_expired_title: "Codex 登录已失效",
     codex_token_expired_body: "请在终端中运行 'codex' 并按提示重新登录。完成后请刷新或重启本工具。",
     codex_window_title: "Codex 用量监控",
