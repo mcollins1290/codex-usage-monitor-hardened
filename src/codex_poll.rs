@@ -143,7 +143,7 @@ impl Monitor {
         s.next_ticket = s.next_ticket.wrapping_add(1);
         s.in_flight = Some(s.next_ticket);
         vec![Job {
-            id: 0,
+            id: 1,
             generation: 0,
             ticket: s.next_ticket,
             forced: std::mem::take(&mut s.forced),
@@ -253,6 +253,11 @@ impl Monitor {
 }
 
 impl Service {
+    pub fn description(&self, now: SystemTime, _monotonic: Instant, chinese: bool) -> String {
+        self.history
+            .description(now, chinese, self.error.is_none(), self.interval_ms)
+    }
+
     pub fn stale(&self, now: SystemTime) -> bool {
         self.error.is_some() || self.history.is_stale(now)
     }

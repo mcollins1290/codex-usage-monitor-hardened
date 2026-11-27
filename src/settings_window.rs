@@ -500,7 +500,7 @@ fn rows(page: Page, s: &AppState) -> Vec<Row> {
         }
         Page::Usage => {
             let count = 1;
-            let codex = &s.monitor.services[1];
+            let codex = &s.monitor.service;
             let provider = |name: &str, id, monitored, error| {
                 let hint = match service_status(monitored, error, s.language) {
                     Some(status) => Some(Hint::Warning(status.into())),

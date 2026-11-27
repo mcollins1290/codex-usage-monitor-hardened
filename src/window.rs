@@ -19,6 +19,7 @@ use windows::Win32::UI::WindowsAndMessaging::*;
 
 use crate::app_server::ApprovedExecutable;
 use crate::codex_colors::{codex_brand_color, SingleColor};
+use crate::codex_poll;
 use crate::diagnose;
 use crate::localization::{self, LanguageId, Strings};
 use crate::models::{AppUsageData, QuotaDisplayMode};
@@ -28,7 +29,6 @@ use crate::native_interop::{
 };
 use crate::poller;
 use crate::provider_icons::{self, Provider};
-use crate::provider_poll;
 use crate::quota_refresh;
 use crate::quota_text;
 use crate::quota_tooltip;
@@ -97,7 +97,7 @@ struct AppState {
 
     poll_interval_ms: u32,
     adaptive_refresh: bool,
-    monitor: provider_poll::Monitor,
+    monitor: codex_poll::Monitor,
     recovery_watch: Option<recovery_events::Watch>,
     recovery_debounce: recovery_events::Debounce,
     has_poll_result: bool,
@@ -1318,7 +1318,7 @@ fn refresh_usage_texts(state: &mut AppState) -> bool {
         if !visible {
             continue;
         }
-        let service = &state.monitor.services[id];
+        let service = &state.monitor.service;
         let antigravity = id == 2;
         if let Some(usage) = usage.filter(|_| !antigravity || service.error.is_none()) {
             let observed_at = service.history.last_success;
@@ -2192,7 +2192,7 @@ pub fn run() {
                 data: None,
                 poll_interval_ms: settings.poll_interval_ms,
                 adaptive_refresh: settings.adaptive_refresh,
-                monitor: provider_poll::Monitor::codex_only(Instant::now()),
+                monitor: codex_poll::Monitor::new(Instant::now()),
                 recovery_watch: Some(recovery_events::Watch::register(hwnd)),
                 recovery_debounce: recovery_events::Debounce::default(),
                 has_poll_result: false,
@@ -2317,7 +2317,7 @@ fn update_quota_tooltips() {
                 if !visible {
                     continue;
                 }
-                let service = &s.monitor.services[id];
+                let service = &s.monitor.service;
                 let now = SystemTime::now();
                 let description = service.description(now, Instant::now(), chinese);
                 let mut text = format!("{name}\n{description}");
@@ -2803,21 +2803,21 @@ fn do_poll(send_hwnd: SendHwnd) {
             );
         }
     }
-    provider_poll::launch(
+    codex_poll::launch(
         jobs,
         |job| {
             let identity = {
                 let state = lock_state();
                 let Some(state) = state.as_ref() else {
-                    return provider_poll::Attempt::cancelled();
+                    return codex_poll::Attempt::cancelled();
                 };
                 let enabled = [false, state.show_codex, false];
                 if !enabled[job.id] || !state.monitor.job_is_current(job) {
-                    return provider_poll::Attempt::cancelled();
+                    return codex_poll::Attempt::cancelled();
                 }
                 state.codex_identity.clone()
             };
-            provider_poll::execute(job, || {
+            codex_poll::execute(job, || {
                 poller::poll_provider(job.id, None, identity.as_ref())
             })
         },
@@ -2877,8 +2877,8 @@ fn collect_reset_alerts(
 
 fn complete_provider_poll(
     send_hwnd: SendHwnd,
-    job: &provider_poll::Job,
-    attempt: provider_poll::Attempt,
+    job: &codex_poll::Job,
+    attempt: codex_poll::Attempt,
 ) {
     let hwnd = send_hwnd.to_hwnd();
     let (alerts, auth_notice, settings_changed) = {
@@ -2904,7 +2904,7 @@ fn complete_provider_poll(
         }
         let mut fresh = AppUsageData::default();
         if completion.successful {
-            let data = s.monitor.services[job.id].data.clone();
+            let data = s.monitor.service.data.clone();
             match job.id {
                 0 => fresh.claude_code = data,
                 1 => fresh.codex = data,
@@ -2950,7 +2950,7 @@ fn complete_provider_poll(
         unsafe {
             SetTimer(hwnd, TIMER_POLL, effective_poll_interval(s), None);
         }
-        let service = &s.monitor.services[job.id];
+        let service = &s.monitor.service;
         diagnose::log(format!(
             "provider poll completed id={} error={:?} interval_ms={}",
             job.id, service.error, service.interval_ms
