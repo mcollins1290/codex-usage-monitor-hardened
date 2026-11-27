@@ -30,6 +30,15 @@ the stable CLI help exposes no supported all-integrations-off switch. An empty
 per-server overrides require knowing every configured server and do not prove
 that plugin-injected integrations are absent.
 
+The current official app-server README documents plugin suppression through
+thread-scoped configuration (`plugins._default.enabled` and
+`disabledPluginIds`), while also documenting startup configuration and MCP
+startup status. The monitor does not create a thread or execute a turn, so
+thread-scoped suppression does not establish that app-scoped startup work is
+absent for an account-only request.
+
+Reference: <https://github.com/openai/codex/blob/main/codex-rs/app-server/README.md>
+
 Therefore live monitor integration is blocked until one of these is established
 from the official client:
 
