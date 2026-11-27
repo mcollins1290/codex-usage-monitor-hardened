@@ -183,7 +183,7 @@ impl Monitor {
                     .flatten()
                     .filter(|t| *t <= wall)
                     .max();
-                s.interval_ms = quota_refresh::interval_ms(base, adaptive, [&data]);
+                s.interval_ms = quota_refresh::interval_ms(base, adaptive, Some(&data));
                 if let Some(ms) = s.reset.interval_ms(reset, now) {
                     s.interval_ms = s.interval_ms.min(ms);
                 }
@@ -221,7 +221,7 @@ impl Monitor {
     pub fn reconfigure(&mut self, base: u32, adaptive: bool, now: Instant, wall: SystemTime) {
         let s = &mut self.service;
         if s.error.is_none() {
-            s.interval_ms = quota_refresh::interval_ms(base, adaptive, s.data.iter());
+            s.interval_ms = quota_refresh::interval_ms(base, adaptive, s.data.as_ref());
             if let Some(ms) = s.data.as_ref().and_then(|data| next_reset_ms(data, wall)) {
                 s.interval_ms = s.interval_ms.min(ms);
             }

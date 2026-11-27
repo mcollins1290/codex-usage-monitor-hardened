@@ -88,13 +88,9 @@ impl ResetRefresh {
     }
 }
 
-pub fn interval_ms<'a>(
-    base: u32,
-    adaptive: bool,
-    providers: impl IntoIterator<Item = &'a UsageData>,
-) -> u32 {
+pub fn interval_ms(base: u32, adaptive: bool, usage: Option<&UsageData>) -> u32 {
     let low = adaptive
-        && providers.into_iter().any(|usage| {
+        && usage.is_some_and(|usage| {
             let sections = [&usage.session, &usage.weekly];
             // A provider blocked by an exhausted window cannot consume more quota.
             if sections.iter().any(|s| s.percentage >= 100.0) {
@@ -215,19 +211,31 @@ mod tests {
     }
     #[test]
     fn low_quota_accelerates_and_recovery_restores_the_base_interval() {
-        assert_eq!(interval_ms(900_000, true, [&usage(98.0, 13.0)]), 60_000);
-        assert_eq!(interval_ms(900_000, true, [&usage(80.0, 13.0)]), 60_000);
-        assert_eq!(interval_ms(900_000, true, [&usage(79.0, 13.0)]), 900_000);
-        assert_eq!(interval_ms(30_000, true, [&usage(98.0, 13.0)]), 30_000);
-        assert_eq!(interval_ms(900_000, false, [&usage(98.0, 13.0)]), 900_000);
+        assert_eq!(interval_ms(900_000, true, Some(&usage(98.0, 13.0))), 60_000);
+        assert_eq!(interval_ms(900_000, true, Some(&usage(80.0, 13.0))), 60_000);
+        assert_eq!(
+            interval_ms(900_000, true, Some(&usage(79.0, 13.0))),
+            900_000
+        );
+        assert_eq!(interval_ms(30_000, true, Some(&usage(98.0, 13.0))), 30_000);
+        assert_eq!(
+            interval_ms(900_000, false, Some(&usage(98.0, 13.0))),
+            900_000
+        );
     }
     #[test]
     fn missing_and_exhausted_windows_do_not_accelerate() {
-        assert_eq!(interval_ms(900_000, true, [&UsageData::default()]), 900_000);
-        assert_eq!(interval_ms(900_000, true, [&usage(98.0, 100.0)]), 900_000);
         assert_eq!(
-            interval_ms(900_000, true, [&usage(100.0, 13.0), &usage(95.0, 20.0)]),
-            60_000
+            interval_ms(900_000, true, Some(&UsageData::default())),
+            900_000
+        );
+        assert_eq!(
+            interval_ms(900_000, true, Some(&usage(98.0, 100.0))),
+            900_000
+        );
+        assert_eq!(
+            interval_ms(900_000, true, Some(&usage(100.0, 13.0))),
+            900_000
         );
     }
     #[test]

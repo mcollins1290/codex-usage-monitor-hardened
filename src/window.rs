@@ -2583,9 +2583,7 @@ fn do_poll(send_hwnd: SendHwnd) {
                 }
                 state.codex_identity.clone()
             };
-            codex_poll::execute(job, || {
-                poller::poll_provider(job.id, None, identity.as_ref())
-            })
+            codex_poll::execute(job, || poller::poll_codex(identity.as_ref()))
         },
         move |job, attempt| complete_codex_poll(send_hwnd, job, attempt),
     );
@@ -2608,7 +2606,7 @@ fn collect_reset_alerts(
         (false, &usage.session, strings.session_window),
         (true, &usage.weekly, strings.weekly_window),
     ] {
-        let (saved, reset) = state.reset_observations.observe(1, weekly, section, now);
+        let (saved, reset) = state.reset_observations.observe(weekly, section, now);
         changed |= saved;
         if reset {
             let (title, message) = if state.language == LanguageId::SimplifiedChinese {

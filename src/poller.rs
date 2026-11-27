@@ -24,14 +24,9 @@ pub enum PollError {
 }
 impl PollError {}
 
-pub fn poll_provider(
-    id: usize,
-    _group: Option<&str>,
+pub fn poll_codex(
     identity: Option<&app_server::ApprovedExecutable>,
 ) -> Result<UsageData, PollError> {
-    if id != 1 {
-        return Err(PollError::RequestFailed);
-    }
     let identity = identity.ok_or(PollError::ApprovalRequired)?;
     app_server::read_rate_limits(identity).map_err(app_server_error)
 }

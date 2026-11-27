@@ -3,13 +3,12 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use crate::models::UsageSection;
 
 #[derive(Clone, Debug, Default, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct ResetObservations([Option<u64>; 6]);
+pub struct ResetObservations([Option<u64>; 2]);
 
 impl ResetObservations {
     /// Returns (baseline changed, new window evidenced by the provider).
     pub fn observe(
         &mut self,
-        provider: usize,
         weekly: bool,
         reading: &UsageSection,
         now: SystemTime,
@@ -21,7 +20,7 @@ impl ResetObservations {
         if !reading.has_reading() || reset <= now {
             return (false, false);
         }
-        let previous = &mut self.0[provider * 2 + usize::from(weekly)];
+        let previous = &mut self.0[usize::from(weekly)];
         match *previous {
             Some(old) if now >= old && reset > old && reading.percentage < 100.0 => {
                 *previous = (reading.percentage > 0.0).then_some(reset);
@@ -52,19 +51,16 @@ mod tests {
         let at = |secs| UNIX_EPOCH + Duration::from_secs(secs);
         let mut observed = ResetObservations::default();
         let before = UsageSection::reported(100.0, Some(at(1000)));
-        assert_eq!(observed.observe(1, false, &before, at(900)), (true, false));
+        assert_eq!(observed.observe(false, &before, at(900)), (true, false));
         let jitter = UsageSection::reported(100.0, Some(at(1030)));
-        assert_eq!(observed.observe(1, false, &jitter, at(920)), (false, false));
-        assert_eq!(
-            observed.observe(1, false, &before, at(1001)),
-            (false, false)
-        );
+        assert_eq!(observed.observe(false, &jitter, at(920)), (false, false));
+        assert_eq!(observed.observe(false, &before, at(1001)), (false, false));
 
         let mut restored: ResetObservations =
             serde_json::from_str(&serde_json::to_string(&observed).unwrap()).unwrap();
         let after = UsageSection::reported(0.0, Some(at(19_000)));
-        assert_eq!(restored.observe(1, false, &after, at(1001)), (true, true));
-        assert_eq!(restored.observe(1, false, &after, at(1002)), (false, false));
-        assert_eq!(restored.observe(1, true, &after, at(1002)), (false, false));
+        assert_eq!(restored.observe(false, &after, at(1001)), (true, true));
+        assert_eq!(restored.observe(false, &after, at(1002)), (false, false));
+        assert_eq!(restored.observe(true, &after, at(1002)), (false, false));
     }
 }
