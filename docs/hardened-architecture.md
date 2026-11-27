@@ -39,6 +39,11 @@ absent for an account-only request.
 
 Reference: <https://github.com/openai/codex/blob/main/codex-rs/app-server/README.md>
 
+The current app-server implementation also constructs a processor with a
+`plugin_startup_tasks` path during server setup, which is additional evidence
+that account-only RPC selection alone is not a startup-isolation guarantee.
+Reference: <https://github.com/openai/codex/blob/main/codex-rs/app-server/src/lib.rs>
+
 Therefore live monitor integration is blocked until one of these is established
 from the official client:
 
