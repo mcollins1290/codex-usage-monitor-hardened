@@ -911,6 +911,251 @@ fn window(window: Option<&RateLimitWindow>, session: bool) -> Result<UsageSectio
 mod tests {
     use super::*;
 
+    fn synthetic_arg(name: &str) -> Option<String> {
+        std::env::args().skip_while(|arg| arg != name).nth(1)
+    }
+
+    // Development-only app-server stand-in. It is launched through the same
+    // ContainedChild, bounded readers, exchange and shutdown path as the
+    // production client, but it never reads credentials or contacts Codex.
+    #[test]
+    #[ignore = "synthetic app-server fixture; invoked by shared runner tests"]
+    fn synthetic_app_server_fixture() {
+        let mode = synthetic_arg("--scenario").unwrap_or_else(|| "clean".to_string());
+        let marker = synthetic_arg("--marker");
+        let port = synthetic_arg("--port").and_then(|value| value.parse::<u16>().ok());
+        if let Some(path) = marker.as_ref() {
+            if mode != "clean" {
+                std::fs::write(path, format!("started:{mode}")).unwrap();
+            }
+        }
+        if mode == "premature" {
+            std::process::exit(23);
+        }
+        if mode == "stall" {
+            std::thread::sleep(Duration::from_secs(60));
+            return;
+        }
+        if mode == "network" {
+            if let Some(port) = port {
+                let _ = std::net::TcpStream::connect(("127.0.0.1", port));
+            }
+        }
+        if mode == "stdout-flood" {
+            print!("{}", "x".repeat(MAX_TOTAL_OUTPUT_BYTES + 1));
+            return;
+        }
+        if mode == "stderr-flood" {
+            eprint!("{}", "x".repeat(MAX_TOTAL_OUTPUT_BYTES + 1));
+            return;
+        }
+        let stdin = std::io::stdin();
+        for line in stdin.lock().lines() {
+            let line = line.unwrap();
+            let message: serde_json::Value = serde_json::from_str(&line).unwrap();
+            match message.get("method").and_then(|value| value.as_str()) {
+                Some("initialize") => {
+                    println!(
+                        "{}",
+                        serde_json::json!({
+                            "jsonrpc":"2.0", "id": message["id"], "result": {}
+                        })
+                    );
+                    std::io::Write::flush(&mut std::io::stdout()).unwrap();
+                }
+                Some("initialized") => {}
+                Some("account/rateLimits/read") => {
+                    if mode == "malformed" {
+                        println!("not-json");
+                    } else {
+                        println!(
+                            "{}",
+                            serde_json::json!({
+                                "jsonrpc":"2.0", "id": message["id"], "error": {
+                                    "code": -32600,
+                                    "message": "codex account authentication required to read rate limits"
+                                }
+                            })
+                        );
+                    }
+                    std::io::Write::flush(&mut std::io::stdout()).unwrap();
+                }
+                _ => {}
+            }
+        }
+    }
+
+    #[derive(Debug)]
+    struct SyntheticRun {
+        result: Result<(), AppServerError>,
+        marker_exists: bool,
+        network_seen: bool,
+        cleaned: bool,
+    }
+
+    // libtest may write its own human-readable status lines to the child
+    // stdout. The stand-in runner filters only those known non-JSON lines;
+    // production exchange remains strict and never performs this filtering.
+    fn receive_synthetic_response(
+        rx: &Receiver<Result<Vec<u8>, AppServerError>>,
+        limit: &AtomicBool,
+        id: u64,
+        deadline: Instant,
+    ) -> Result<serde_json::Value, AppServerError> {
+        loop {
+            let remaining = deadline.saturating_duration_since(Instant::now());
+            if remaining.is_zero() {
+                return Err(AppServerError::Timeout);
+            }
+            let line = rx.recv_timeout(remaining).map_err(|error| match error {
+                std::sync::mpsc::RecvTimeoutError::Timeout => AppServerError::Timeout,
+                std::sync::mpsc::RecvTimeoutError::Disconnected => AppServerError::LaunchFailed,
+            })??;
+            if limit.load(Ordering::Acquire) {
+                return Err(AppServerError::OutputTooLarge);
+            }
+            let Ok(envelope) = serde_json::from_slice::<serde_json::Value>(&line) else {
+                continue;
+            };
+            let Some(object) = envelope.as_object() else {
+                return Err(AppServerError::InvalidMessage);
+            };
+            if object.get("id").and_then(|value| value.as_u64()) != Some(id) {
+                continue;
+            }
+            if let Some(error) = object.get("error") {
+                if id == 2 && error.get("code").and_then(|value| value.as_i64()) == Some(-32600) {
+                    return Err(AppServerError::AuthenticationRequired);
+                }
+                return Err(AppServerError::ProtocolError);
+            }
+            return object
+                .get("result")
+                .cloned()
+                .ok_or(AppServerError::InvalidMessage);
+        }
+    }
+
+    fn run_synthetic_scenario(mode: &str) -> SyntheticRun {
+        let root = std::env::temp_dir().join(format!(
+            "codex-scenario-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(&root).unwrap();
+        let marker = root.join("side-effect.marker");
+        let listener = if mode == "network" {
+            Some(std::net::TcpListener::bind(("127.0.0.1", 0)).unwrap())
+        } else {
+            None
+        };
+        let port = listener
+            .as_ref()
+            .map(|socket| socket.local_addr().unwrap().port());
+        let executable = std::env::current_exe().unwrap().canonicalize().unwrap();
+        let args = format!(
+            "--exact app_server::tests::synthetic_app_server_fixture --ignored --nocapture -- --scenario {mode} --marker {}{}",
+            marker.display(),
+            port.map_or(String::new(), |port| format!(" --port {port}"))
+        );
+        let launched = ContainedChild::launch(&executable, &root, &args, Some(&root));
+        let (mut child, mut stdin, stdout, stderr) = match launched {
+            Ok(value) => value,
+            Err(error) => {
+                let _ = std::fs::remove_dir_all(&root);
+                return SyntheticRun {
+                    result: Err(error),
+                    marker_exists: false,
+                    network_seen: false,
+                    cleaned: !root.exists(),
+                };
+            }
+        };
+        let (tx, rx) = sync_channel(16);
+        let output_limit = Arc::new(AtomicBool::new(false));
+        let stdout_thread = std::thread::spawn({
+            let limit = Arc::clone(&output_limit);
+            move || read_stdout(stdout, tx, limit)
+        });
+        let stderr_limit = Arc::clone(&output_limit);
+        let stderr_thread = std::thread::spawn(move || drain_stderr(stderr, stderr_limit));
+        let result = if mode == "mcp"
+            || mode == "hook"
+            || mode == "plugin"
+            || mode == "premature"
+            || mode == "stall"
+            || mode == "stdout-flood"
+            || mode == "stderr-flood"
+            || mode == "malformed"
+            || mode == "clean"
+            || mode == "network"
+        {
+            exchange(&mut stdin, |id, deadline| {
+                receive_synthetic_response(&rx, &output_limit, id, deadline)
+            })
+            .map(|_| ())
+        } else {
+            Err(AppServerError::InvalidIdentity)
+        };
+        drop(stdin);
+        drop(rx);
+        let _ = child.shutdown(result.is_ok());
+        let _ = finish_readers([stdout_thread, stderr_thread]);
+        let network_seen = listener
+            .as_ref()
+            .map(|socket| socket.set_nonblocking(true).is_ok() && socket.accept().is_ok())
+            .unwrap_or(false);
+        let marker_exists = marker.exists();
+        let _ = child.shutdown(false);
+        drop(listener);
+        let _ = std::fs::remove_dir_all(&root);
+        SyntheticRun {
+            result,
+            marker_exists,
+            network_seen,
+            cleaned: !root.exists(),
+        }
+    }
+
+    #[test]
+    fn shared_runner_correlation_matrix_detects_permitted_and_prohibited_activity() {
+        let clean = run_synthetic_scenario("clean");
+        assert_eq!(
+            clean.result,
+            Err(AppServerError::AuthenticationRequired),
+            "clean={clean:?}"
+        );
+        assert!(!clean.marker_exists && clean.cleaned);
+
+        for mode in ["mcp", "hook", "plugin"] {
+            let run = run_synthetic_scenario(mode);
+            assert_eq!(run.result, Err(AppServerError::AuthenticationRequired));
+            assert!(run.marker_exists && run.cleaned, "{mode}");
+        }
+        let network = run_synthetic_scenario("network");
+        assert_eq!(network.result, Err(AppServerError::AuthenticationRequired));
+        assert!(network.network_seen && network.cleaned);
+    }
+
+    #[test]
+    fn shared_runner_rejects_malformed_excessive_stalled_and_premature_servers() {
+        for mode in [
+            "malformed",
+            "stdout-flood",
+            "stderr-flood",
+            "stall",
+            "premature",
+        ] {
+            let run = run_synthetic_scenario(mode);
+            assert!(run.result.is_err(), "{mode} unexpectedly succeeded");
+            assert!(run.cleaned, "{mode} leaked its scenario directory");
+        }
+    }
+
     // The fixture uses this test executable, not Codex. It must only be run
     // explicitly by the two parent tests below.
     #[test]

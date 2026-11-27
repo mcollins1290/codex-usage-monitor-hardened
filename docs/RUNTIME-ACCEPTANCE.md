@@ -4,24 +4,20 @@ Production app-server launch remains frozen. This checklist does not authorize a
 
 ## Reusable harness
 
-The committed T1 harness is `verification/Verify-AppServer.ps1`. It requires an
-explicit absolute executable path, expected SHA-256 and expected stable version;
-it never discovers or approves replacements. Example usage, which must be run
-only under the separately approved synthetic-test procedure, is:
+The committed `verification/Verify-AppServer.ps1` file is a reporting shim; it
+does not launch a process. The security-critical runner is the Rust test-only
+implementation in `src/app_server.rs`, which reuses production containment,
+bounded readers, protocol exchange and shutdown. Run the synthetic shared
+runner with:
 
 ```powershell
-& .\verification\Verify-AppServer.ps1 `
-  -ExecutablePath 'C:\Approved\codex.exe' `
-  -ExpectedSha256 '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef' `
-  -ExpectedVersion '0.172.0' `
-  -OutputPath .\verification-result.json
+cargo test --locked app_server::tests::shared_runner
 ```
 
-The harness validates the executable identity, creates a disposable synthetic
-profile, sends only the fixed T1 protocol sequence, bounds shutdown, and emits
-structured sanitized results. It is intentionally not a production launcher,
-does not handle credentials, and does not execute T2–T8 against the official
-Codex executable;
+The Rust runner validates synthetic process containment, bounded frame and total
+output limits, deadlines, fixed protocol sequencing and cleanup. It is not a
+production launcher, does not handle credentials, and does not execute T2–T8
+against the official Codex executable;
 those scenarios remain subject to official-runtime execution and independent
 review; the synthetic fixture and observation controls are implemented below.
 

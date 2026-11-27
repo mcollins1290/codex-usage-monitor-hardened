@@ -3,7 +3,8 @@
 | Command | Exit code | Result |
 | --- | ---: | --- |
 | `cargo fmt --all -- --check` | 0 | Formatting passed |
-| `cargo test --locked` | 0 | 86 passed, 0 failed, 4 ignored |
+| `cargo test --locked` | 0 | 93 passed, 0 failed, 5 ignored |
+| `cargo test --locked app_server::tests::shared_runner` | 0 | 2 passed, 0 failed; synthetic stand-in correlation matrix |
 | `cargo clippy --locked --all-targets` | 0 | No warnings |
 | `cargo build --release --locked` | 0 | Optimized release build passed |
 | `cargo audit --json` | 0 | 0 vulnerabilities; advisory DB `c5279d0b0c9e8b70df666eb6d1edbabcfd1176bd` |
