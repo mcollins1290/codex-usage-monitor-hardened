@@ -111,10 +111,15 @@ pub fn launch(
 impl Monitor {
     /// Production constructor: legacy display slots are permanently disabled.
     pub fn codex_only(now: Instant) -> Self {
-        Self::new([false, true, false], now)
+        Self::with_slots([false, true, false], now)
     }
 
+    #[cfg(test)]
     pub fn new(enabled: [bool; 3], now: Instant) -> Self {
+        Self::with_slots(enabled, now)
+    }
+
+    fn with_slots(enabled: [bool; 3], now: Instant) -> Self {
         Self {
             services: std::array::from_fn(|id| Service {
                 data: None,
@@ -141,6 +146,7 @@ impl Monitor {
             && service.in_flight == Some(job.ticket)
     }
 
+    #[cfg(test)]
     pub fn reselect(&mut self, id: usize, now: Instant) {
         let s = &mut self.services[id];
         s.generation = s.generation.wrapping_add(1);
@@ -153,6 +159,7 @@ impl Monitor {
         s.due = s.retry_not_before.map_or(now, |deadline| deadline.max(now));
         s.forced = s.enabled;
     }
+    #[cfg(test)]
     pub fn configure(&mut self, enabled: [bool; 3], now: Instant) {
         for (service, enabled) in self.services.iter_mut().zip(enabled) {
             if service.enabled != enabled {
