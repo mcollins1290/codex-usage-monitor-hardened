@@ -1599,7 +1599,6 @@ const BAR_RIGHT_MARGIN: i32 = 4;
 const TEXT_WIDTH: i32 = 110;
 const SIMPLIFIED_CHINESE_LABEL_WIDTH: i32 = 20;
 const SIMPLIFIED_CHINESE_TEXT_WIDTH: i32 = 138;
-const MODEL_RIGHT_MARGIN: i32 = 9;
 const RIGHT_MARGIN: i32 = 4;
 const WIDGET_HEIGHT: i32 = 46;
 
@@ -1634,12 +1633,7 @@ fn cursor_is_on_drag_handle(hwnd: HWND) -> bool {
     }
 }
 
-fn active_model_count() -> i32 {
-    1
-}
-
-fn row_bar_segment_count(active_models: i32) -> i32 {
-    let _ = active_models;
+fn row_bar_segment_count() -> i32 {
     SEGMENT_COUNT
 }
 
@@ -1776,36 +1770,23 @@ fn period_label_column_width(label_width: i32, appearance: Appearance) -> i32 {
     }
 }
 
-fn total_widget_width_for(active_models: i32, language: LanguageId, appearance: Appearance) -> i32 {
-    widget_width_from_columns(
-        active_models,
-        appearance,
-        usage_layout_widths(language, appearance, false),
-    )
+fn total_widget_width_for(language: LanguageId, appearance: Appearance) -> i32 {
+    widget_width_from_columns(appearance, usage_layout_widths(language, appearance, false))
 }
 
-fn widget_width_from_columns(
-    active_models: i32,
-    appearance: Appearance,
-    (label_width, text_width): (i32, i32),
-) -> i32 {
-    let bar_segments = row_bar_segment_count(active_models);
+fn widget_width_from_columns(appearance: Appearance, (label_width, text_width): (i32, i32)) -> i32 {
+    let bar_segments = row_bar_segment_count();
     let model_width = model_usage_width(bar_segments, text_width, appearance);
 
     sc(LEFT_DIVIDER_W)
         + sc(DIVIDER_RIGHT_MARGIN)
         + period_label_column_width(label_width, appearance)
-        + model_width * active_models
-        + sc(MODEL_RIGHT_MARGIN) * (active_models - 1)
+        + model_width
         + sc(RIGHT_MARGIN)
 }
 
 fn total_widget_width_for_state(state: &AppState) -> i32 {
-    widget_width_from_columns(
-        active_model_count(),
-        state.appearance,
-        current_usage_layout_widths(state),
-    )
+    widget_width_from_columns(state.appearance, current_usage_layout_widths(state))
 }
 
 fn has_cross_day_reset(
@@ -1837,7 +1818,7 @@ fn total_widget_width() -> i32 {
     lock_state()
         .as_ref()
         .map(total_widget_width_for_state)
-        .unwrap_or_else(|| total_widget_width_for(1, LanguageId::English, Appearance::default()))
+        .unwrap_or_else(|| total_widget_width_for(LanguageId::English, Appearance::default()))
 }
 
 fn appearance_colors(appearance: Appearance, system_is_dark: bool) -> (Color, Color, Color) {
@@ -1949,7 +1930,6 @@ pub fn run() {
         let language = localization::resolve_language(language_override);
         // Create as layered popup (will be reparented into taskbar)
         let title = native_interop::wide_str(language.strings().window_title);
-        let initial_model_count = active_model_count();
         let hwnd = CreateWindowExW(
             WS_EX_TOOLWINDOW | WS_EX_LAYERED | WS_EX_NOACTIVATE,
             PCWSTR::from_raw(class_name.as_ptr()),
@@ -1957,7 +1937,7 @@ pub fn run() {
             WS_POPUP,
             0,
             0,
-            total_widget_width_for(initial_model_count, language, settings.appearance),
+            total_widget_width_for(language, settings.appearance),
             sc(WIDGET_HEIGHT),
             HWND::default(),
             HMENU::default(),
@@ -2123,9 +2103,8 @@ fn update_quota_tooltips() {
         let mut regions = Vec::new();
         if !s.dragging {
             let chinese = s.language == LanguageId::SimplifiedChinese;
-            let count = active_model_count();
             let (label_width, text_width) = current_usage_layout_widths(s);
-            let width = model_usage_width(row_bar_segment_count(count), text_width, s.appearance);
+            let width = model_usage_width(row_bar_segment_count(), text_width, s.appearance);
             let left = sc(LEFT_DIVIDER_W)
                 + sc(DIVIDER_RIGHT_MARGIN)
                 + period_label_column_width(label_width, s.appearance);
@@ -2348,8 +2327,7 @@ fn paint_content(hdc: HDC, width: i32, height: i32, content: &WidgetContent<'_>)
         text[0][0].as_ref(),
     );
     let (label_width, text_width) = usage_layout_widths(language, appearance, cross_day);
-    let active_models = i32::from(codex_visible);
-    let segment_count = row_bar_segment_count(active_models);
+    let segment_count = row_bar_segment_count();
     let bar_width = usage_bar_width(segment_count, appearance);
     appearance.font_size = appearance.font_size.fit(height, rows, sc);
 
@@ -3757,11 +3735,8 @@ fn paint(hdc: HDC, hwnd: HWND) {
 }
 
 fn segment_width(segment_count: i32) -> i32 {
-    sc(if segment_count == SEGMENT_COUNT {
-        SEGMENT_W
-    } else {
-        SEGMENT_W
-    })
+    let _ = segment_count;
+    sc(SEGMENT_W)
 }
 
 fn usage_bar_width(segment_count: i32, appearance: Appearance) -> i32 {
@@ -4463,15 +4438,15 @@ mod tests {
         assert!(!appearance.hide_period_labels);
         assert!(!appearance.percent_inside_battery);
         let language = LanguageId::SimplifiedChinese;
-        let default_width = total_widget_width_for(1, language, appearance);
+        let default_width = total_widget_width_for(language, appearance);
         appearance.hide_period_labels = true;
-        let without_labels = total_widget_width_for(1, language, appearance);
+        let without_labels = total_widget_width_for(language, appearance);
         assert!(without_labels < default_width);
         appearance.percent_inside_battery = true;
-        let compact = total_widget_width_for(1, language, appearance);
+        let compact = total_widget_width_for(language, appearance);
         assert!(compact < without_labels);
         appearance.reset_time_display = ResetTimeDisplay::Clock;
-        assert!(total_widget_width_for(1, language, appearance) > compact);
+        assert!(total_widget_width_for(language, appearance) > compact);
         let short_clock = usage_layout_widths(language, appearance, false).1;
         let extended_clock = usage_layout_widths(language, appearance, true).1;
         assert!(extended_clock > short_clock);
@@ -4647,9 +4622,9 @@ mod tests {
             hide_codex_logo: true,
             ..original
         };
-        let regular = total_widget_width_for(2, LanguageId::SimplifiedChinese, original);
-        let without_logos = total_widget_width_for(2, LanguageId::SimplifiedChinese, hidden);
-        assert_eq!(regular - without_logos, 2 * codex_mark_width(original));
+        let regular = total_widget_width_for(LanguageId::SimplifiedChinese, original);
+        let without_logos = total_widget_width_for(LanguageId::SimplifiedChinese, hidden);
+        assert_eq!(regular - without_logos, codex_mark_width(original));
         assert_eq!(codex_mark_width(hidden), 0);
     }
 

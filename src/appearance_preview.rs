@@ -167,7 +167,7 @@ mod tests {
         dark: bool,
         language: LanguageId,
     ) {
-        let width = total_widget_width_for(3, language, appearance);
+        let width = total_widget_width_for(language, appearance);
         let height = sc(WIDGET_HEIGHT);
         unsafe {
             let dc = CreateCompatibleDC(HDC::default());
@@ -245,7 +245,7 @@ mod tests {
         let bg = dib_rgb(background);
         let pixel = |x, y| pixels[(y * width + x) as usize] & 0x00FFFFFF;
         let (label_width, text_width) = usage_layout_widths(content.language, appearance, false);
-        let segments = row_bar_segment_count(1);
+        let segments = row_bar_segment_count();
         let bar_width = usage_bar_width(segments, appearance);
         let model_width =
             model_usage_width(segments, text_width, appearance) + sc(MODEL_RIGHT_MARGIN);

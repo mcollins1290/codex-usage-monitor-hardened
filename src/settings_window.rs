@@ -3747,7 +3747,7 @@ impl Panel {
         };
         let mut cache = self.preview.borrow_mut();
         if cache.as_ref().is_none_or(|(cached, _)| *cached != key) {
-            let width = total_widget_width_for(3, language, appearance);
+            let width = total_widget_width_for(language, appearance);
             let height = sc(WIDGET_HEIGHT);
             *cache = Bitmap::new(width, height).map(|bitmap| {
                 appearance_preview::paint_sample(
