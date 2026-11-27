@@ -1,6 +1,6 @@
 # Dependency security review
 
-Status: locked-package manual RustSec review complete; zero applicable advisories at the recorded revision. Automated cargo-audit and yanked-package checks remain pending.
+Status: automated RustSec and cargo-deny checks completed for the current lockfile; zero vulnerabilities/advisories, bans and source-policy violations. Cargo-deny reports one duplicate `syn` version as a warning.
 
 Baseline lockfile: 34bff340d9203807e7ad7a86e93302d82a6d7be7. 50 external package/version entries (including platform-specific and build dependencies).
 
@@ -77,3 +77,17 @@ No applicable advisories identified in this snapshot. This is not an execution o
 - Assess Windows target relevance without ignoring build dependencies or target-independent vulnerabilities. Resolve applicable findings and rerun locked tests and release build.
 - Review dependency features and lockfile changes; no direct HTTP client, OAuth implementation, credential-store wrapper or automatic updater should be reintroduced.
 - Approval remains blocked until final audit and runtime acceptance. No Windows CI is triggered by this inventory.
+
+## Automated checks — 2026-11-27
+
+- `cargo-audit 0.23.0`, installed from crates.io with `--locked`.
+- Command: `cargo audit --json`; exit code `0`.
+- Advisory database revision: `c9f6c91a44dbad9d71742329e9df061279f9c4be`.
+- Database reported 1,568 advisories; the lockfile contained 51 dependency
+  entries; vulnerabilities found: `0`.
+- `cargo-deny 0.22.1`, installed from crates.io with `--locked`.
+- Command: `cargo deny check`; exit code `0` using the repository
+  `deny.toml` policy.
+- Cargo-deny result: advisories `ok`, bans `ok`, licenses `ok`, sources `ok`.
+- Cargo-deny warning: duplicate `syn` versions (`2.0.117` and `3.0.4`),
+  retained because they arrive through independent upstream dependency paths.

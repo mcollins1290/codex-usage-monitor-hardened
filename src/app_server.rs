@@ -448,7 +448,10 @@ pub fn validate_identity(identity: &ApprovedExecutable) -> Result<PathBuf, AppSe
     Ok(canonical)
 }
 
-// Version output is deliberately not logged, even on failure.
+// Version output is deliberately not logged, even on failure. The probe is a
+// verification-test helper; production approval consumes externally produced
+// evidence and never launches a version probe.
+#[cfg(test)]
 fn validate_version_output(output: &[u8], expected: &str) -> Result<(), AppServerError> {
     if !stable_version(expected) || output.len() > 256 {
         return Err(AppServerError::VersionMismatch);
@@ -468,6 +471,7 @@ fn validate_version_output(output: &[u8], expected: &str) -> Result<(), AppServe
 // Only called with an already verified executable hash and a freshly created,
 // dedicated synthetic profile. This is not an approval mechanism: callers
 // still need independently established official release provenance.
+#[cfg(test)]
 fn verify_version_in_profile(
     identity: &ApprovedExecutable,
     root: &Path,
@@ -492,6 +496,7 @@ fn verify_version_in_profile(
     result
 }
 
+#[cfg(test)]
 fn collect_version_output(
     child: &mut ContainedChild,
     stdout: File,

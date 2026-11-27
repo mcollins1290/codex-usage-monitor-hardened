@@ -25,7 +25,6 @@ impl UsageSection {
 pub struct UsageData {
     pub session: UsageSection,
     pub weekly: UsageSection,
-    pub antigravity_groups: Vec<String>,
 }
 
 #[derive(Clone, Debug, Default)]

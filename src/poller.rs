@@ -5,7 +5,7 @@ use crate::localization::Strings;
 use crate::models::{QuotaDisplayMode, UsageData, UsageSection};
 use std::time::{Duration, SystemTime};
 
-pub const GEMINI_QUOTA_GROUP: &str = "Codex";
+pub const CODEX_QUOTA_GROUP: &str = "Codex";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PollError {

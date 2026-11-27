@@ -5513,7 +5513,6 @@ mod tests {
                     show_codex: true,
                     show_antigravity: true,
                     antigravity_quota_group: None,
-                    antigravity_groups: Vec::new(),
                     show_session_window: true,
                     show_weekly_window: true,
                     alert_threshold_percent: 20,

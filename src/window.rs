@@ -86,7 +86,6 @@ struct AppState {
     show_codex: bool,
     show_antigravity: bool,
     antigravity_quota_group: Option<String>,
-    antigravity_groups: Vec<String>,
     show_session_window: bool,
     show_weekly_window: bool,
     alert_threshold_percent: u8,
@@ -695,12 +694,6 @@ fn normalize_settings(mut settings: SettingsFile) -> SettingsFile {
     settings
 }
 
-fn save_settings(settings: &SettingsFile) {
-    if let Err(error) = settings_store::save(&settings_path(), || Some(settings.clone())) {
-        diagnose::log_error("unable to save settings", error);
-    }
-}
-
 fn save_state_settings() -> bool {
     let result = settings_store::save(&settings_path(), || {
         let state = lock_state();
@@ -963,7 +956,7 @@ fn antigravity_label(state: &AppState) -> String {
     let group = state
         .antigravity_quota_group
         .as_deref()
-        .unwrap_or(poller::GEMINI_QUOTA_GROUP);
+        .unwrap_or(poller::CODEX_QUOTA_GROUP);
     format!("Antigravity ({group})")
 }
 
@@ -2189,7 +2182,6 @@ pub fn run() {
                 show_codex: settings.show_codex,
                 show_antigravity: settings.show_antigravity,
                 antigravity_quota_group: settings.antigravity_quota_group,
-                antigravity_groups: Vec::new(),
 
                 show_session_window: settings.show_session_window,
                 show_weekly_window: settings.show_weekly_window,
@@ -2916,14 +2908,7 @@ fn complete_provider_poll(
             match job.id {
                 0 => fresh.claude_code = data,
                 1 => fresh.codex = data,
-                _ => {
-                    if let Some(usage) = &data {
-                        if !usage.antigravity_groups.is_empty() {
-                            s.antigravity_groups = usage.antigravity_groups.clone();
-                        }
-                    }
-                    fresh.antigravity = data;
-                }
+                _ => fresh.antigravity = data,
             }
         }
         let previous_keys = s.notified_quota_windows.clone();
