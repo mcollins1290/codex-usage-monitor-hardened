@@ -76,11 +76,11 @@ impl Policy {
 }
 
 pub fn settings_path() -> PathBuf {
-    appdata_path("CodexUsage")
+    appdata_path("CodexUsageHardened")
 }
 
 pub fn legacy_settings_path() -> PathBuf {
-    appdata_path("ClaudeCodeUsageMonitor")
+    appdata_path("CodexUsageHardenedLegacy")
 }
 
 fn appdata_path(directory: &str) -> PathBuf {

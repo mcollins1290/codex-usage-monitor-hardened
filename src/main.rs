@@ -17,7 +17,6 @@ mod quota_text;
 mod quota_tooltip;
 mod recovery_events;
 mod reset_alerts;
-mod retry_after;
 mod settings_store;
 mod theme;
 mod tray_icon;
@@ -32,27 +31,13 @@ fn main() {
         match diagnose::init() {
             Ok(path) => {
                 diagnose::log(format!("startup args={args:?} log_path={}", path.display()));
-                diagnose::log(format!(
-                    "version={} install_channel={:?} executable={}",
-                    env!("CARGO_PKG_VERSION"),
-                    updater::current_install_channel(),
-                    std::env::current_exe()
-                        .map(|value| value.display().to_string())
-                        .unwrap_or_else(|error| format!("unavailable:{error}"))
-                ));
+                diagnose::log(format!("version={}", env!("CARGO_PKG_VERSION")));
             }
             Err(error) => {
                 // Logging may not be available yet, but keep startup behavior unchanged.
                 let _ = error;
             }
         }
-    }
-
-    if let Some(exit_code) = updater::handle_cli_mode(&args) {
-        if diagnose_enabled {
-            diagnose::log(format!("cli mode exited with code {exit_code}"));
-        }
-        std::process::exit(exit_code);
     }
 
     if diagnose_enabled {

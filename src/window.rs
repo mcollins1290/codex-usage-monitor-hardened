@@ -17,6 +17,7 @@ use windows::Win32::UI::Input::KeyboardAndMouse::{ReleaseCapture, SetCapture};
 use windows::Win32::UI::Shell::{ExtractIconExW, ShellExecuteW};
 use windows::Win32::UI::WindowsAndMessaging::*;
 
+use crate::app_server::ApprovedExecutable;
 use crate::codex_colors::{codex_brand_color, SingleColor};
 use crate::diagnose;
 use crate::localization::{self, LanguageId, Strings};
@@ -70,6 +71,7 @@ struct AppState {
     quota_display_mode: QuotaDisplayMode,
     settings_theme: SettingsTheme,
     install_channel: InstallChannel,
+    codex_identity: Option<ApprovedExecutable>,
 
     session_percent: f64,
     session_text: String,
@@ -630,6 +632,8 @@ struct SettingsFile {
     mcp_server_enabled: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     mcp_port: Option<u16>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    codex_executable: Option<ApprovedExecutable>,
 }
 
 impl Default for SettingsFile {
@@ -661,6 +665,7 @@ impl Default for SettingsFile {
             reset_observations: Default::default(),
             mcp_server_enabled: false,
             mcp_port: None,
+            codex_executable: None,
         }
     }
 }
@@ -815,6 +820,7 @@ fn save_state_settings() {
             reset_observations: s.reset_observations.clone(),
             mcp_server_enabled: s.mcp_enabled,
             mcp_port: s.mcp_port,
+            codex_executable: s.codex_identity.clone(),
         })
     });
     settings_window::note_save_result(result.is_ok());
@@ -2430,6 +2436,7 @@ pub fn run() {
                 quota_display_mode: settings.quota_display_mode.unwrap_or_default(),
                 settings_theme: settings.settings_theme,
                 install_channel,
+                codex_identity: settings.codex_executable.clone(),
                 session_percent: 0.0,
                 session_text: "--".to_string(),
                 weekly_percent: 0.0,
@@ -3093,7 +3100,7 @@ fn request_poll(hwnd: SendHwnd, force: bool) {
     {
         let mut state = lock_state();
         if let Some(s) = state.as_mut() {
-            let enabled = [s.show_claude_code, s.show_codex, s.show_antigravity];
+            let enabled = [false, s.show_codex, false];
             s.monitor.configure(enabled, Instant::now());
             if force {
                 s.monitor.force(Instant::now(), true);
@@ -3152,11 +3159,7 @@ fn do_poll(send_hwnd: SendHwnd) {
                 let Some(state) = state.as_ref() else {
                     return provider_poll::Attempt::cancelled();
                 };
-                let enabled = [
-                    state.show_claude_code,
-                    state.show_codex,
-                    state.show_antigravity,
-                ];
+                let enabled = [false, state.show_codex, false];
                 if !enabled[job.id] || !state.monitor.job_is_current(job) {
                     return provider_poll::Attempt::cancelled();
                 }
@@ -3164,7 +3167,15 @@ fn do_poll(send_hwnd: SendHwnd) {
             };
             provider_poll::execute(
                 job,
-                || poller::poll_provider(job.id, group.as_deref()),
+                || {
+                    poller::poll_provider(
+                        job.id,
+                        group.as_deref(),
+                        lock_state()
+                            .as_ref()
+                            .and_then(|state| state.codex_identity.as_ref()),
+                    )
+                },
                 poller::credential_watch_snapshot,
             )
         },

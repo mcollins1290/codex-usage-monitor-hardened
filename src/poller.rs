@@ -40,11 +40,16 @@ pub enum CredentialWatchMode {
 }
 pub type CredentialWatchSnapshot = Vec<String>;
 
-pub fn poll_provider(id: usize, _group: Option<&str>) -> Result<UsageData, PollError> {
+pub fn poll_provider(
+    id: usize,
+    _group: Option<&str>,
+    identity: Option<&app_server::ApprovedExecutable>,
+) -> Result<UsageData, PollError> {
     if id != 1 {
         return Err(PollError::RequestFailed);
     }
-    Err(PollError::RequestFailed)
+    let identity = identity.ok_or(PollError::NoCredentials)?;
+    app_server::read_rate_limits(identity).map_err(app_server_error)
 }
 pub fn credential_watch_snapshot(_mode: CredentialWatchMode) -> CredentialWatchSnapshot {
     Vec::new()
