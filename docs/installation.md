@@ -2,16 +2,12 @@
 
 Codex Usage remains a single native Windows executable. Installation only places the executable and an uninstall helper in a stable per-user directory; it does not add a runtime, service, driver, telemetry component, or machine-wide dependency.
 
-## Direct installation
+## Installation status
 
-- Install directory: `%LOCALAPPDATA%\Programs\CodexUsage`
-- Executable: `%LOCALAPPDATA%\Programs\CodexUsage\codex-usage.exe`
-- Uninstall helper: `%LOCALAPPDATA%\Programs\CodexUsage\uninstall.ps1`
-- Start menu shortcut: `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Codex Usage.lnk`
-- Desktop shortcut: `%USERPROFILE%\Desktop\Codex Usage.lnk`
-- Add/Remove Programs key: `HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\CodexUsage`
-
-The installer is per-user and does not request elevation. It verifies the release SHA256 before replacing an existing executable, launches the app after installation (unless `-NoLaunch` is passed), and does not modify `PATH`. Replacement uses a temporary file and keeps the previous executable until the new file has been placed successfully.
+No installer or release package is part of this development baseline. Any
+future installation procedure must be separately reviewed, use a pinned local
+build, remain per-user, request no elevation, and must not download or replace
+the executable automatically.
 
 ## Portable mode
 
@@ -25,10 +21,6 @@ The installer is per-user and does not request elevation. It verifies the releas
 - The installer does not enable startup automatically. If startup was already enabled, installation preserves that choice and updates the registry value to the stable installed executable. Users otherwise control startup under **Settings → General → Start with Windows**.
 - If Windows has disabled the startup entry in **Settings → Apps → Startup**, Codex Usage detects the blocked state and shows an **Open Startup apps** button on **Settings → General** so you can re-enable it directly in Windows Settings.
 - Uninstall removes the `CodexUsage` startup entry because its executable no longer exists.
-
-## WinGet
-
-Codex Usage is not published to WinGet. Install it with `install.ps1` or run the portable EXE.
 
 ## Managed installations
 

@@ -43,6 +43,12 @@ The local baseline was checked with `cargo check --locked --offline` and
 and 2 ignored. The application itself has not been launched, and no repository
 build script or installer has been executed.
 
+The direct runtime dependency set is limited to `serde`, `serde_json`, `dirs`,
+`sha2`, and the Windows API crate; `winres` is the only build dependency.
+`cargo tree --locked --offline --depth 1` found no HTTP client, TLS client,
+runtime updater, or Git dependency. The lockfile contains 51 package entries;
+transitive packages still require normal pinned-source review before release.
+
 ## Remaining gates
 
 - Complete removal of obsolete provider, update, and privacy-policy source
