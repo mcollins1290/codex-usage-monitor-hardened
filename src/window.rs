@@ -2800,11 +2800,9 @@ fn do_poll(send_hwnd: SendHwnd) {
                 }
                 state.codex_identity.clone()
             };
-            provider_poll::Attempt::from_result(poller::poll_provider(
-                job.id,
-                None,
-                identity.as_ref(),
-            ))
+            provider_poll::execute(job, || {
+                poller::poll_provider(job.id, None, identity.as_ref())
+            })
         },
         move |job, attempt| complete_provider_poll(send_hwnd, job, attempt),
     );

@@ -1,6 +1,6 @@
 //! Per-provider freshness, retry deadlines and selection-safe request completion.
 use crate::models::{AppUsageData, UsageData};
-use crate::poller::{CredentialWatchMode, CredentialWatchSnapshot, PollError};
+use crate::poller::PollError;
 use crate::quota_refresh::{self, History, ResetRefresh};
 use std::sync::Arc;
 use std::time::{Duration, Instant, SystemTime};
@@ -18,7 +18,7 @@ pub struct Service {
     retries: u32,
     due: Instant,
     retry_not_before: Option<Instant>,
-    auth: Option<(CredentialWatchMode, CredentialWatchSnapshot)>,
+    auth_paused: bool,
     reset: ResetRefresh,
 }
 #[derive(Clone)]
@@ -27,24 +27,21 @@ pub struct Job {
     generation: u64,
     ticket: u64,
     forced: bool,
-    auth: Option<(CredentialWatchMode, CredentialWatchSnapshot)>,
+    auth_paused: bool,
 }
 pub struct Attempt {
     result: Option<Result<UsageData, PollError>>,
-    auth: Option<(CredentialWatchMode, CredentialWatchSnapshot)>,
 }
 impl Attempt {
     pub fn from_result(result: Result<UsageData, PollError>) -> Self {
         Self {
             result: Some(result),
-            auth: None,
         }
     }
 
     pub fn cancelled() -> Self {
         Self {
             result: None,
-            auth: None,
         }
     }
 }
@@ -63,19 +60,6 @@ fn is_auth(error: PollError) -> bool {
         PollError::AuthRequired | PollError::TokenExpired | PollError::NoCredentials
     )
 }
-fn watch_mode(id: usize, error: PollError) -> CredentialWatchMode {
-    if id == 1 {
-        return CredentialWatchMode::Codex;
-    }
-    if id == 2 {
-        CredentialWatchMode::Antigravity
-    } else if error == PollError::NoCredentials {
-        CredentialWatchMode::AllSources
-    } else {
-        CredentialWatchMode::ActiveSource
-    }
-}
-
 fn next_reset_ms(data: &UsageData, wall: SystemTime) -> Option<u32> {
     [data.session.resets_at, data.weekly.resets_at]
         .into_iter()
@@ -86,38 +70,12 @@ fn next_reset_ms(data: &UsageData, wall: SystemTime) -> Option<u32> {
         .map(|delay| delay.as_millis().clamp(1000, u32::MAX as u128) as u32)
 }
 
-/// Also used by deterministic flow tests: paused services only call the API
-/// after a credential change or an explicit manual refresh.
-pub fn execute(
-    job: &Job,
-    poll: impl FnOnce() -> Result<UsageData, PollError>,
-    credentials: impl Fn(CredentialWatchMode) -> CredentialWatchSnapshot,
-) -> Attempt {
-    if !job.forced {
-        if let Some((mode, old)) = &job.auth {
-            let current = credentials(*mode);
-            if current == *old {
-                return Attempt {
-                    result: None,
-                    auth: Some((*mode, current)),
-                };
-            }
-        }
+/// Authentication retries require an explicit manual refresh.
+pub fn execute(job: &Job, poll: impl FnOnce() -> Result<UsageData, PollError>) -> Attempt {
+    if job.auth_paused && !job.forced {
+        return Attempt::cancelled();
     }
-    let result = poll();
-    let auth = result
-        .as_ref()
-        .err()
-        .copied()
-        .filter(|e| is_auth(*e))
-        .map(|error| {
-            let mode = watch_mode(job.id, error);
-            (mode, credentials(mode))
-        });
-    Attempt {
-        result: Some(result),
-        auth,
-    }
+    Attempt::from_result(poll())
 }
 
 /// Run planned jobs off the caller thread and publish each result as it arrives.
@@ -144,7 +102,6 @@ pub fn launch(
                 &job,
                 Attempt {
                     result: Some(Err(PollError::RequestFailed)),
-                    auth: None,
                 },
             );
         }
@@ -167,7 +124,7 @@ impl Monitor {
                 retries: 0,
                 due: now,
                 retry_not_before: None,
-                auth: None,
+                auth_paused: false,
                 reset: ResetRefresh::default(),
             }),
         }
@@ -185,7 +142,7 @@ impl Monitor {
         s.data = None;
         s.error = None;
         s.history = History::default();
-        s.auth = None;
+        s.auth_paused = false;
         s.retries = 0;
         s.reset = ResetRefresh::default();
         s.due = s.retry_not_before.map_or(now, |deadline| deadline.max(now));
@@ -208,7 +165,7 @@ impl Monitor {
             service.due = service
                 .retry_not_before
                 .map_or(now, |deadline| deadline.max(now));
-            service.forced |= include_auth || service.auth.is_none();
+            service.forced |= include_auth || !service.auth_paused;
         }
     }
     pub fn plan(&mut self, now: Instant) -> Vec<Job> {
@@ -227,7 +184,7 @@ impl Monitor {
                     generation: s.generation,
                     ticket: s.next_ticket,
                     forced,
-                    auth: s.auth.clone(),
+                    auth_paused: s.auth_paused,
                 })
             })
             .collect()
@@ -273,7 +230,7 @@ impl Monitor {
                 successful = true;
                 s.retries = 0;
                 s.error = None;
-                s.auth = None;
+                s.auth_paused = false;
                 s.retry_not_before = None;
                 let reset = [data.session.resets_at, data.weekly.resets_at]
                     .into_iter()
@@ -294,7 +251,7 @@ impl Monitor {
                 notify_auth = is_auth(error) && (s.error != Some(error) || job.forced);
                 s.error = Some(error);
                 s.retries = s.retries.saturating_add(1);
-                s.auth = attempt.auth;
+                s.auth_paused = is_auth(error);
                 s.retry_not_before = match error {
                     PollError::RateLimited(Some(ms)) => {
                         Some(now + Duration::from_millis(ms as u64))
@@ -303,7 +260,7 @@ impl Monitor {
                 };
                 s.interval_ms = if let PollError::RateLimited(Some(ms)) = error {
                     ms
-                } else if s.auth.is_some() {
+                } else if s.auth_paused {
                     base
                 } else {
                     quota_refresh::retry_interval_ms(base, s.retries)
@@ -393,11 +350,11 @@ impl Service {
                 .and_then(crate::native_interop::system_time_to_local)
                 .map(|t| format!("{:02}:{:02}:{:02}", t.wHour, t.wMinute, t.wSecond))
                 .unwrap_or_else(|| "--".into());
-            let label = if self.auth.is_some() {
+            let label = if self.auth_paused {
                 if chinese {
-                    "下次检查登录凭据"
+                    "等待手动刷新"
                 } else {
-                    "Next credential check"
+                    "Manual refresh required"
                 }
             } else if self.error.is_some() {
                 if chinese {
@@ -439,7 +396,7 @@ impl Service {
                 },
                 reason
             ));
-            if self.auth.is_some() {
+            if self.auth_paused {
                 text.push_str(if chinese {
                     "\n已暂停接口重试，等待登录凭据更新；也可手动刷新。"
                 } else {
@@ -633,7 +590,7 @@ mod tests {
         complete(&mut monitor, &job, Err(PollError::NoCredentials), now, wall);
         assert!(monitor.services[0]
             .description(wall, now, true)
-            .contains("下次检查登录凭据："));
+            .contains("等待手动刷新："));
     }
 
     #[test]
@@ -650,7 +607,7 @@ mod tests {
                 if job.id == 0 {
                     wait.lock().unwrap().recv().unwrap();
                 }
-                execute(job, || Ok(usage(40.0)), |_| vec![])
+                execute(job, || Ok(usage(40.0)))
             },
             move |job, _| {
                 finished.send(job.id).unwrap();
@@ -683,7 +640,7 @@ mod tests {
                 if job.id == 0 {
                     wait.lock().unwrap().recv().unwrap();
                 }
-                execute(job, || Ok(usage(90.0)), |_| vec![])
+                execute(job, || Ok(usage(90.0)))
             },
             move |job, attempt| {
                 assert!(
@@ -708,7 +665,7 @@ mod tests {
         let state = monitor.clone();
         launch(
             jobs,
-            |job| execute(job, || Ok(usage(85.0)), |_| vec![]),
+            |job| execute(job, || Ok(usage(85.0))),
             move |job, attempt| {
                 assert!(
                     state
@@ -767,7 +724,7 @@ mod tests {
         now: Instant,
         wall: SystemTime,
     ) -> Completion {
-        let attempt = execute(j, || result, |_| vec!["credential-v1".into()]);
+        let attempt = execute(j, || result);
         m.finish(j, attempt, now, wall, 900_000, true)
     }
     #[test]
@@ -828,7 +785,7 @@ mod tests {
         assert!(complete(&mut m, &new, Ok(usage(25.0)), now, wall).accepted);
     }
     #[test]
-    fn auth_failure_does_not_pause_other_service_and_recovers_only_after_credentials_change() {
+    fn auth_failure_does_not_pause_other_service_and_requires_manual_refresh() {
         let now = Instant::now();
         let wall = SystemTime::now();
         let mut m = Monitor::new([true, true, false], now);
@@ -838,11 +795,7 @@ mod tests {
         assert_eq!(m.plan(now + Duration::from_secs(60))[0].id, 1);
         let jobs = m.plan(now + Duration::from_secs(900));
         let cc = jobs.iter().find(|j| j.id == 0).unwrap();
-        let skipped = execute(
-            cc,
-            || panic!("must not retry unchanged auth"),
-            |_| vec!["credential-v1".into()],
-        );
+        let skipped = execute(cc, || panic!("must not retry paused auth"));
         m.finish(
             cc,
             skipped,
@@ -851,10 +804,10 @@ mod tests {
             900_000,
             true,
         );
-        m.force(now + Duration::from_secs(901), false);
+        m.force(now + Duration::from_secs(901), true);
         let jobs = m.plan(now + Duration::from_secs(901));
         let cc = jobs.iter().find(|j| j.id == 0).unwrap();
-        let changed = execute(cc, || Ok(usage(20.0)), |_| vec!["credential-v2".into()]);
+        let changed = execute(cc, || Ok(usage(20.0)));
         assert!(
             m.finish(
                 cc,
@@ -923,11 +876,7 @@ mod tests {
         );
         m.force(now + Duration::from_secs(1), false);
         let restored = m.plan(now + Duration::from_secs(1));
-        let auth = execute(
-            &restored[0],
-            || panic!("wake must not retry paused authentication"),
-            |_| vec!["credential-v1".into()],
-        );
+        let auth = execute(&restored[0], || panic!("wake must not retry paused authentication"));
         m.finish(&restored[0], auth, now, wall, 900_000, true);
         assert!(complete(&mut m, &restored[1], Ok(usage(20.0)), now, wall).successful);
         assert_eq!(m.services[0].error, Some(PollError::AuthRequired));
@@ -935,28 +884,17 @@ mod tests {
         assert!(m.services[1].history.last_success.is_some());
     }
     #[test]
-    fn codex_auth_watch_uses_codex_credentials_and_manual_refresh_survives_a_recovery_event() {
+    fn codex_manual_auth_refresh_survives_a_recovery_event() {
         let now = Instant::now();
         let wall = SystemTime::now();
         let mut m = Monitor::new([false, true, false], now);
         let job = m.plan(now).remove(0);
-        let attempt = execute(
-            &job,
-            || Err(PollError::TokenExpired),
-            |mode| {
-                assert_eq!(mode, CredentialWatchMode::Codex);
-                vec!["codex-credential-v1".into()]
-            },
-        );
+        let attempt = execute(&job, || Err(PollError::TokenExpired));
         m.finish(&job, attempt, now, wall, 900_000, true);
         m.force(now, true);
         m.force(now, false);
         let job = m.plan(now).remove(0);
-        let fresh = execute(
-            &job,
-            || Ok(usage(50.0)),
-            |_| panic!("manual refresh bypasses unchanged credentials"),
-        );
+        let fresh = execute(&job, || Ok(usage(50.0)));
         assert!(m.finish(&job, fresh, now, wall, 900_000, true).successful);
     }
     #[test]

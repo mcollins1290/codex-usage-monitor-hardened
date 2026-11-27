@@ -35,15 +35,6 @@ impl PollError {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum CredentialWatchMode {
-    ActiveSource,
-    AllSources,
-    Antigravity,
-    Codex,
-}
-pub type CredentialWatchSnapshot = Vec<String>;
-
 pub fn poll_provider(
     id: usize,
     _group: Option<&str>,

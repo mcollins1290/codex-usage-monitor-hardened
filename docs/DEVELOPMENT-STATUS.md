@@ -95,3 +95,7 @@ Continue without intermediate automatic CI; restore full CI at final verificatio
 - [Commit history](https://github.com/mcollins1290/codex-usage-monitor-hardened/commits/feature/security-remediation/)
 - [CI runs](https://github.com/mcollins1290/codex-usage-monitor-hardened/actions)
 - [Changes since handover](https://github.com/mcollins1290/codex-usage-monitor-hardened/compare/168885d0b8616989834e83d38d5899737600776a...feature/security-remediation)
+
+### Credential monitoring cleanup
+
+Removed credential snapshot types and callbacks. Production polling now uses the same explicit manual authentication retry gate as scheduler tests. The three-slot renderer/scheduler remains for now. Changes are pending final Windows CI.
