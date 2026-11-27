@@ -2251,7 +2251,7 @@ impl Panel {
             .and_then(|module| {
                 LoadImageW(
                     HINSTANCE(module.0),
-                    PCWSTR(1usize as *const u16),
+                    PCWSTR(std::ptr::dangling()),
                     IMAGE_ICON,
                     size,
                     size,
@@ -4562,7 +4562,7 @@ pub(super) unsafe fn show(widget: HWND) {
         hInstance: instance,
         lpszClassName: CLASS,
         hCursor: cursor,
-        hIcon: LoadIconW(instance, PCWSTR(1usize as *const u16)).unwrap_or_default(),
+        hIcon: LoadIconW(instance, PCWSTR(std::ptr::dangling())).unwrap_or_default(),
         ..Default::default()
     });
     let _ = RegisterClassW(&WNDCLASSW {
@@ -5535,7 +5535,7 @@ mod tests {
                 hInstance: instance,
                 lpszClassName: CLASS,
                 hCursor: cursor,
-                hIcon: LoadIconW(instance, PCWSTR(1usize as *const u16)).unwrap_or_default(),
+                hIcon: LoadIconW(instance, PCWSTR(std::ptr::dangling())).unwrap_or_default(),
                 ..Default::default()
             });
             let _ = RegisterClassW(&WNDCLASSW {

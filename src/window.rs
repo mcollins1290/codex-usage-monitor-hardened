@@ -2638,7 +2638,7 @@ fn complete_codex_poll(send_hwnd: SendHwnd, job: &codex_poll::Job, attempt: code
             return;
         };
         let completion = s.monitor.finish(
-            &job,
+            job,
             attempt,
             Instant::now(),
             SystemTime::now(),
@@ -2666,14 +2666,9 @@ fn complete_codex_poll(send_hwnd: SendHwnd, job: &codex_poll::Job, attempt: code
                 collect_reset_alerts(s, job.id, usage, SystemTime::now(), &mut alerts);
         }
         let cached = s.monitor.cached();
-        for (usage, session, weekly) in [(
-            cached.codex.as_ref(),
-            &mut s.codex_session_percent,
-            &mut s.codex_weekly_percent,
-        )] {
-            *session = usage.map_or(0.0, |u| u.session.percentage);
-            *weekly = usage.map_or(0.0, |u| u.weekly.percentage);
-        }
+        let usage = cached.codex.as_ref();
+        s.codex_session_percent = usage.map_or(0.0, |u| u.session.percentage);
+        s.codex_weekly_percent = usage.map_or(0.0, |u| u.weekly.percentage);
         s.data = Some(cached);
         s.has_poll_result = true;
         refresh_usage_texts(s);
@@ -3807,6 +3802,7 @@ fn usage_bar_fill_percentage(percent: f64, text: &str) -> f64 {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn draw_usage_bar(
     hdc: HDC,
     bar_x: i32,
@@ -4160,7 +4156,7 @@ mod tests {
     #[test]
     fn font_size_steps_down_only_when_needed() {
         for dpi in [96, 120, 144, 192] {
-            let scale = |px| ((px * dpi + 48) / 96) as i32;
+            let scale = |px| (px * dpi + 48) / 96;
             for (height, rows, selected, expected) in [
                 (46, 2, FontSize::Px16, FontSize::Px16),
                 (42, 2, FontSize::Px16, FontSize::Px14),

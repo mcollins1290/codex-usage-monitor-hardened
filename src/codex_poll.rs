@@ -247,7 +247,6 @@ impl Monitor {
     pub fn cached(&self) -> AppUsageData {
         AppUsageData {
             codex: self.service.data.clone(),
-            ..AppUsageData::default()
         }
     }
 }
