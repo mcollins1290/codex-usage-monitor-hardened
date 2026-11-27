@@ -11,7 +11,7 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 
 - Active branch: `feature/security-remediation`
 - Preserved handover: `168885d0b8616989834e83d38d5899737600776a`
-- Current local candidate: `86de82750cb9be4c3507c68a3ce9aa464da45706`
+- Current local candidate: `b8c67a64cbe32925de2cd5727fe6fed9c7f1c9ad`
 - [Windows CI run 45932899764](https://github.com/mcollins1290/codex-usage-monitor-hardened/actions/runs/45932899764): success; formatting, locked dependency tests and optimized build passed.
 - Tests: 86 passed, 0 failed, 4 ignored (two child fixtures invoked by parent tests).
 - Local release build: passed with no compiler warnings.
