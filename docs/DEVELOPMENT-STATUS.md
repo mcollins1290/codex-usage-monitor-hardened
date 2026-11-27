@@ -115,3 +115,7 @@ Approval import rejects unknown identity fields and non-file or oversized eviden
 ### Approval regression coverage
 
 Added tests for pre-granted consent rejection, explicit approval, changed executable hash between review and confirmation, the immutable launch freeze, and oversized/malformed evidence. Tests are source additions only; execution remains pending final CI.
+
+### Codex-only scheduler boundary
+
+Production initialization now uses a fixed Codex-only constructor and no longer reconfigures the provider selection at runtime. Added regression coverage for the single scheduled service. Legacy display slots and generalized scheduler tests remain. Windows CI pending.

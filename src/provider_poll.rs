@@ -109,6 +109,11 @@ pub fn launch(
 }
 
 impl Monitor {
+    /// Production constructor: legacy display slots are permanently disabled.
+    pub fn codex_only(now: Instant) -> Self {
+        Self::new([false, true, false], now)
+    }
+
     pub fn new(enabled: [bool; 3], now: Instant) -> Self {
         Self {
             services: std::array::from_fn(|id| Service {
@@ -416,6 +421,17 @@ impl Service {
 mod tests {
     use super::*;
     use std::sync::{mpsc, Mutex};
+
+    #[test]
+    fn production_monitor_schedules_only_codex() {
+        let now = Instant::now();
+        let mut monitor = Monitor::codex_only(now);
+        let jobs = monitor.plan(now);
+        assert_eq!(jobs.len(), 1);
+        assert_eq!(jobs[0].id, 1);
+        assert!(!monitor.services[0].enabled());
+        assert!(!monitor.services[2].enabled());
+    }
 
     #[test]
     fn group_selection_discards_an_in_flight_result_without_overlapping_requests() {

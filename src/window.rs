@@ -2182,14 +2182,7 @@ pub fn run() {
                 data: None,
                 poll_interval_ms: settings.poll_interval_ms,
                 adaptive_refresh: settings.adaptive_refresh,
-                monitor: provider_poll::Monitor::new(
-                    [
-                        settings.show_claude_code,
-                        settings.show_codex,
-                        settings.show_antigravity,
-                    ],
-                    Instant::now(),
-                ),
+                monitor: provider_poll::Monitor::codex_only(Instant::now()),
                 recovery_watch: Some(recovery_events::Watch::register(hwnd)),
                 recovery_debounce: recovery_events::Debounce::default(),
                 has_poll_result: false,
@@ -2751,8 +2744,6 @@ fn request_poll(hwnd: SendHwnd, force: bool) {
     {
         let mut state = lock_state();
         if let Some(s) = state.as_mut() {
-            let enabled = [false, s.show_codex, false];
-            s.monitor.configure(enabled, Instant::now());
             if force {
                 s.monitor.force(Instant::now(), true);
             }
