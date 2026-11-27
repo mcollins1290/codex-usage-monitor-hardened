@@ -11,11 +11,11 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 
 - Active branch: `feature/security-remediation`
 - Preserved handover: `168885d0b8616989834e83d38d5899737600776a`
-- Last verified code commit: `11b160bc44198d966eff0a0bb3b4821ce6c56ffd`
-- [Windows CI run 45930514524](https://github.com/mcollins1290/codex-usage-monitor-hardened/actions/runs/45930514524): success; formatting, locked dependency tests and optimized build passed.
-- Tests: 101 passed, 0 failed, 2 ignored.
-- Release build: 38 compiler warnings; cleanup outstanding.
-- New process containment code and fixture tests are committed for CI verification; the prior verified code baseline is unchanged. Documentation-only commit f660edd also passed CI.
+- Last verified code commit: `e5ef1303c7407af566782950e6cc2b698d0eb2ec`
+- [Windows CI run 45932097829](https://github.com/mcollins1290/codex-usage-monitor-hardened/actions/runs/45932097829): success; formatting, locked dependency tests and optimized build passed.
+- Tests: 105 passed, 0 failed, 3 ignored (one child fixture invoked by parent tests).
+- Release build: 37 compiler warnings; cleanup outstanding.
+- Native child containment, descendant rejection, forced shutdown and compatibility regression tests passed. New isolated version probe code is pending CI and is not wired into production or exposed as a user command.
 
 ## Completed implementation (not necessarily runtime accepted)
 
@@ -35,14 +35,14 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 | --- | --- | --- |
 | H1 | Output queue deadlock | Remediated in source; runtime tests outstanding |
 | H2 | Unbounded output allocation | Remediated in source; runtime tests outstanding |
-| H3 | Job Object assignment after process creation | Creation-time JOB_LIST and HANDLE_LIST implemented; lifecycle tests added, Windows CI outstanding |
+| H3 | Job Object assignment after process creation | Creation-time JOB_LIST and HANDLE_LIST implemented; synthetic lifecycle tests passed on Windows |
 | H4 | Missing runtime security gate | Launch freeze enforced; accepted policy still required |
 | H5 | Application identity isolation | Partial; audit remaining metadata, paths and scripts |
 | M1 | Canonical path / hash-to-launch race | Read-only file sharing lock held and hash rechecked through launch; directory alias races still require review |
-| M2 | Independent executable version verification | Open |
+| M2 | Independent executable version verification | Isolated bounded version probe and strict parser implemented; CI and approval workflow integration pending |
 | M3 | Initialization handshake | Implemented and unit tested |
 | M4 | Tests exercise production protocol | Implemented and unit tested |
-| M5 | Upgrade-friendly compatibility records | Record schema and identity binding implemented; approval workflow and CI verification outstanding |
+| M5 | Upgrade-friendly compatibility records | Record schema and identity binding tests passed; approval workflow outstanding |
 | M6 | Child environment and working directory | Partial; authenticated configuration policy unresolved |
 | M7 | Sanitized actionable error categories | Approval, executable change and authentication classifications implemented; UI review outstanding |
 | M8 | UI lock during polling | Remediated in source |

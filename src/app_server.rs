@@ -98,6 +98,7 @@ pub enum AppServerError {
     InvalidIdentity,
     ExecutableMissing,
     HashMismatch,
+    VersionMismatch,
     LaunchFailed,
     Timeout,
     OutputTooLarge,
@@ -222,7 +223,7 @@ fn wide(value: &std::ffi::OsStr) -> Result<Vec<u16>, AppServerError> {
     Ok(result)
 }
 
-fn environment_block() -> Result<Vec<u16>, AppServerError> {
+fn environment_block(isolated: Option<&Path>) -> Result<Vec<u16>, AppServerError> {
     let mut block = Vec::new();
     // Alphabetical, case-insensitive order as required by CreateProcessW.
     for name in [
@@ -235,7 +236,15 @@ fn environment_block() -> Result<Vec<u16>, AppServerError> {
         "USERPROFILE",
         "WINDIR",
     ] {
-        if let Some(value) = std::env::var_os(name) {
+        let value = match (isolated, name) {
+            (Some(root), "CODEX_HOME") => Some(root.join("codex").into_os_string()),
+            (Some(root), "APPDATA") => Some(root.join("roaming").into_os_string()),
+            (Some(root), "LOCALAPPDATA") => Some(root.join("local").into_os_string()),
+            (Some(root), "TEMP" | "TMP") => Some(root.join("temp").into_os_string()),
+            (Some(root), "USERPROFILE") => Some(root.to_path_buf().into_os_string()),
+            _ => std::env::var_os(name),
+        };
+        if let Some(value) = value {
             let mut entry = std::ffi::OsString::from(format!("{name}="));
             entry.push(value);
             block.extend(wide(&entry)?);
@@ -258,6 +267,7 @@ impl ContainedChild {
         executable: &Path,
         workdir: &Path,
         arguments: &str,
+        isolated: Option<&Path>,
     ) -> Result<(Self, File, File, File), AppServerError> {
         let job = owned(launch_error(unsafe {
             CreateJobObjectW(None, PCWSTR::null())
@@ -289,7 +299,7 @@ impl ContainedChild {
         command.push(executable);
         command.push(format!("\" {arguments}"));
         let mut command = wide(&command)?;
-        let environment = environment_block()?;
+        let environment = environment_block(isolated)?;
         let mut startup = STARTUPINFOEXW::default();
         startup.StartupInfo.cb = std::mem::size_of::<STARTUPINFOEXW>() as u32;
         startup.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
@@ -434,6 +444,77 @@ pub fn validate_identity(identity: &ApprovedExecutable) -> Result<PathBuf, AppSe
     Ok(canonical)
 }
 
+// Version output is deliberately not logged, even on failure.
+fn validate_version_output(output: &[u8], expected: &str) -> Result<(), AppServerError> {
+    if !stable_version(expected) || output.len() > 256 {
+        return Err(AppServerError::VersionMismatch);
+    }
+    let output = std::str::from_utf8(output).map_err(|_| AppServerError::VersionMismatch)?;
+    let expected = format!("codex-cli {expected}");
+    if output == expected || output == format!("{expected}\n") || output == format!("{expected}\r\n") {
+        Ok(())
+    } else {
+        Err(AppServerError::VersionMismatch)
+    }
+}
+
+// Only called with an already verified executable hash and a freshly created,
+// dedicated synthetic profile. This is not an approval mechanism: callers
+// still need independently established official release provenance.
+fn verify_version_in_profile(
+    identity: &ApprovedExecutable,
+    root: &Path,
+) -> Result<(), AppServerError> {
+    let executable = validate_identity(identity)?;
+    let mut locked = std::fs::OpenOptions::new()
+        .read(true)
+        .share_mode(1)
+        .open(&executable)
+        .map_err(|_| AppServerError::ExecutableMissing)?;
+    if !hash_reader(&mut locked)?.eq_ignore_ascii_case(&identity.sha256) {
+        return Err(AppServerError::HashMismatch);
+    }
+    for name in ["codex", "roaming", "local", "temp"] {
+        std::fs::create_dir(root.join(name)).map_err(|_| AppServerError::LaunchFailed)?;
+    }
+    let (mut child, stdin, stdout, stderr) =
+        ContainedChild::launch(&executable, root, "--version", Some(root))?;
+    drop(stdin);
+    // Read only a bounded amount on each stream, even if a child floods output.
+    let stdout_thread = std::thread::spawn(move || {
+        let mut output = Vec::new();
+        stdout.take(257).read_to_end(&mut output)?;
+        Ok::<_, std::io::Error>(output)
+    });
+    let stderr_thread = std::thread::spawn(move || {
+        let mut output = Vec::new();
+        stderr.take(257).read_to_end(&mut output)?;
+        Ok::<_, std::io::Error>(output.is_empty())
+    });
+    let shutdown = child.shutdown(true);
+    drop(locked);
+    let deadline = Instant::now() + SHUTDOWN_TIMEOUT;
+    while !stdout_thread.is_finished() || !stderr_thread.is_finished() {
+        if Instant::now() >= deadline {
+            return Err(AppServerError::Timeout);
+        }
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    let output = stdout_thread
+        .join()
+        .map_err(|_| AppServerError::LaunchFailed)?
+        .map_err(|_| AppServerError::LaunchFailed)?;
+    let stderr_empty = stderr_thread
+        .join()
+        .map_err(|_| AppServerError::LaunchFailed)?
+        .map_err(|_| AppServerError::LaunchFailed)?;
+    shutdown?;
+    if !stderr_empty {
+        return Err(AppServerError::VersionMismatch);
+    }
+    validate_version_output(&output, &identity.version)
+}
+
 fn require_startup_acceptance() -> Result<(), AppServerError> {
     Err(AppServerError::StartupNotVerified)
 }
@@ -459,7 +540,7 @@ pub fn read_rate_limits(identity: &ApprovedExecutable) -> Result<UsageData, AppS
         .join("app-server-work");
     std::fs::create_dir_all(&workdir).map_err(|_| AppServerError::LaunchFailed)?;
     let (mut guard, mut stdin, stdout, stderr) =
-        ContainedChild::launch(&executable, &workdir, "app-server --listen stdio://")?;
+        ContainedChild::launch(&executable, &workdir, "app-server --listen stdio://", None)?;
 
     drop(locked);
     let (tx, rx) = sync_channel(16);
@@ -748,6 +829,7 @@ mod tests {
             &executable,
             directory,
             "--exact app_server::tests::contained_fixture --ignored --nocapture",
+            None,
         )
         .expect("creation-time job and pipe setup must succeed")
     }
@@ -833,6 +915,33 @@ mod tests {
         assert_eq!(
             check_compatibility(&identity),
             Err(AppServerError::CompatibilityRequired)
+        );
+    }
+
+    #[test]
+    fn version_output_accepts_only_exact_stable_cli_version() {
+        for output in [
+            b"codex-cli 0.172.0".as_slice(),
+            b"codex-cli 0.172.0\n",
+            b"codex-cli 0.172.0\r\n",
+        ] {
+            assert_eq!(validate_version_output(output, "0.172.0"), Ok(()));
+        }
+        for output in [
+            b"codex-cli 0.173.0\n".as_slice(),
+            b"codex-cli 0.172.0-alpha.1\n",
+            b"codex-cli 0.172.0\nunexpected",
+            b" codex-cli 0.172.0\n",
+            b"\xff",
+        ] {
+            assert_eq!(
+                validate_version_output(output, "0.172.0"),
+                Err(AppServerError::VersionMismatch)
+            );
+        }
+        assert_eq!(
+            validate_version_output(&[b'x'; 257], "0.172.0"),
+            Err(AppServerError::VersionMismatch)
         );
     }
 
