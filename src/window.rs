@@ -146,14 +146,8 @@ const IDM_LANG_SIMPLIFIED_CHINESE: u16 = 51;
 const IDM_LANG_ITALIAN: u16 = 52;
 const IDM_QUOTA_USED: u16 = 53;
 const IDM_QUOTA_REMAINING: u16 = 54;
-const IDM_PASSIVE_MONITORING: u16 = 55;
-const IDM_UPDATES_ENABLED: u16 = 56;
-const IDM_MCP_SERVER: u16 = 35;
-const MAX_QUOTA_GROUPS: usize = 32;
 const IDM_ALERT_RESET: u16 = 84;
-const IDM_MODEL_CLAUDE_CODE: u16 = 60;
 const IDM_MODEL_CODEX: u16 = 61;
-const IDM_MODEL_ANTIGRAVITY: u16 = 62;
 const IDM_SHOW_SESSION_WINDOW: u16 = 71;
 const IDM_SHOW_WEEKLY_WINDOW: u16 = 72;
 const IDM_ALERT_OFF: u16 = 80;
@@ -3921,14 +3915,6 @@ unsafe extern "system" fn wnd_proc(
                     save_state_settings();
                     position_at_taskbar();
                 }
-                IDM_PASSIVE_MONITORING | IDM_UPDATES_ENABLED => {}
-                IDM_MCP_SERVER => {
-                    show_info_message(
-                        hwnd,
-                        "MCP disabled",
-                        "The hardened build has no local MCP server.",
-                    );
-                }
                 IDM_START_WITH_WINDOWS => {
                     let enable = startup_status() != StartupStatus::Enabled;
                     STARTUP_WRITE_FAILED.store(!set_startup_enabled(enable), Ordering::Relaxed);
@@ -4146,28 +4132,11 @@ unsafe extern "system" fn wnd_proc(
                     }
                     save_state_settings();
                 }
-                IDM_MODEL_CLAUDE_CODE | IDM_MODEL_CODEX | IDM_MODEL_ANTIGRAVITY => {
+                IDM_MODEL_CODEX => {
                     {
                         let mut state = lock_state();
                         if let Some(s) = state.as_mut() {
-                            match id {
-                                IDM_MODEL_CLAUDE_CODE => {
-                                    if s.show_codex || s.show_antigravity || !s.show_claude_code {
-                                        s.show_claude_code = !s.show_claude_code;
-                                    }
-                                }
-                                IDM_MODEL_CODEX => {
-                                    if s.show_claude_code || s.show_antigravity || !s.show_codex {
-                                        s.show_codex = !s.show_codex;
-                                    }
-                                }
-                                IDM_MODEL_ANTIGRAVITY => {
-                                    if s.show_claude_code || s.show_codex || !s.show_antigravity {
-                                        s.show_antigravity = !s.show_antigravity;
-                                    }
-                                }
-                                _ => {}
-                            }
+                            s.show_codex = true;
                             s.session_text = "...".to_string();
                             s.weekly_text = "...".to_string();
                             s.codex_session_text = "...".to_string();
@@ -4260,29 +4229,6 @@ unsafe extern "system" fn wnd_proc(
             LRESULT(0)
         }
         _ => DefWindowProcW(hwnd, msg, wparam, lparam),
-    }
-}
-
-fn select_antigravity_group(hwnd: HWND, group: Option<String>) {
-    let changed = lock_state().as_mut().is_some_and(|s| {
-        if group == s.antigravity_quota_group {
-            return false;
-        }
-        s.antigravity_quota_group = group;
-        s.monitor.reselect(2, Instant::now());
-        s.reset_observations.clear_provider(2);
-        s.notified_quota_windows
-            .retain(|key| !key.starts_with("antigravity:"));
-        s.data = Some(s.monitor.cached());
-        refresh_usage_texts(s);
-        true
-    });
-    if changed {
-        save_state_settings();
-        unsafe {
-            let _ = PostMessageW(hwnd, WM_APP_USAGE_UPDATED, WPARAM(0), LPARAM(0));
-        }
-        start_poll(SendHwnd::from_hwnd(hwnd), true);
     }
 }
 

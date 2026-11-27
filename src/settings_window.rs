@@ -113,7 +113,6 @@ static SAVE_FAILED: AtomicBool = AtomicBool::new(false);
 enum Action {
     Command(u16),
     Display(HWND),
-    Group(Option<String>),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -4871,7 +4870,6 @@ unsafe extern "system" fn settings_proc(
                         let _ = SendMessageW(widget, WM_COMMAND, WPARAM(id as usize), LPARAM(0));
                     }
                     Some(Action::Display(target)) => select_settings_display(widget, target),
-                    Some(Action::Group(group)) => select_antigravity_group(widget, group),
                     None => {}
                 }
                 with_panel(|panel| {
