@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "candidate_commit": "56c54951eebee398c2ecf4772d080bac6f539e2e",
+  "candidate_commit": "a0a5bc6835f646427f1d4ab9cb29a37a508fc7ca",
   "branch": "feature/security-remediation",
   "status_legend": [
     "PASS — VERIFIED",

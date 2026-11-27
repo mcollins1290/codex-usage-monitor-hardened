@@ -15,7 +15,7 @@ Windows or authenticated-runtime acceptance as passed.
 
 - Branch: `feature/security-remediation`
 - Starting reviewed remote HEAD: `858cd6dc61f5a67444788a3edceda9a444db3721`
-- Current local candidate: `56c54951eebee398c2ecf4772d080bac6f539e2e` (documentation update pending)
+- Current local candidate: `a0a5bc6835f646427f1d4ab9cb29a37a508fc7ca` (documentation update pending)
 - Original handover: `168885d0b8616989834e83d38d5899737600776a`
 - Windows CI remains manual-only; no CI run was triggered by this review.
 - Authenticated app-server launch remains unconditionally frozen in
