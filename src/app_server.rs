@@ -225,8 +225,20 @@ pub fn read_rate_limits(identity: &ApprovedExecutable) -> Result<UsageData, AppS
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .env_remove("CODEX_THREAD_ID")
-        .env_remove("CLAUDECODE")
-        .env_remove("CLAUDE_CODE_ENTRYPOINT");
+        .env_clear();
+    for name in [
+        "CODEX_HOME",
+        "USERPROFILE",
+        "APPDATA",
+        "LOCALAPPDATA",
+        "TEMP",
+        "TMP",
+        "PATH",
+    ] {
+        if let Some(value) = std::env::var_os(name) {
+            command.env(name, value);
+        }
+    }
 
     let mut child = command.spawn().map_err(|_| AppServerError::LaunchFailed)?;
     let _job = JobGuard::attach(&child)?;
