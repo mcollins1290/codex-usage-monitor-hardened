@@ -111,3 +111,7 @@ Manual RustSec review completed at database revision `c9f6c91a44dbad9d71742329e9
 ### Approval persistence correction
 
 Approval import rejects unknown identity fields and non-file or oversized evidence. Confirmation reports success only after settings persistence; failed approval saves restore the previous in-memory identity. Failed revocation saves keep the session revoked and explicitly warn that old disk state may remain. Production launch freeze unchanged. Final Windows CI pending.
+
+### Approval regression coverage
+
+Added tests for pre-granted consent rejection, explicit approval, changed executable hash between review and confirmation, the immutable launch freeze, and oversized/malformed evidence. Tests are source additions only; execution remains pending final CI.

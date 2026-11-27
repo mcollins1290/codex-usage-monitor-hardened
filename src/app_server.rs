@@ -957,6 +957,76 @@ mod tests {
     }
 
     #[test]
+    fn evidence_import_requires_explicit_consent_and_revalidates_hash() {
+        let path = std::env::temp_dir().join(format!("codex-evidence-{}", std::process::id()));
+        std::fs::write(&path, b"synthetic evidence fixture").unwrap();
+        let identity = ApprovedExecutable {
+            path: path.canonicalize().unwrap(),
+            sha256: sha256_file(&path).unwrap(),
+            version: CODEX_VERSION.to_string(),
+            compatibility: None,
+        };
+        let evidence = CompatibilityRecord {
+            schema: COMPATIBILITY_SCHEMA,
+            invocation_policy: INVOCATION_POLICY.to_string(),
+            release_tag: format!("rust-v{}", identity.version),
+            release_commit: "b".repeat(40),
+            observed_version: format!("codex-cli {}", identity.version),
+            observed_sha256: identity.sha256.clone(),
+            observed_path: identity.path.clone(),
+            synthetic_passed: true,
+            authenticated_passed: true,
+            explicitly_approved: false,
+        };
+        let mut preapproved = evidence.clone();
+        preapproved.explicitly_approved = true;
+        assert!(matches!(
+            inspect_evidence(EvidenceImport {
+                identity: identity.clone(),
+                evidence: preapproved,
+            }),
+            Err(AppServerError::CompatibilityRequired)
+        ));
+        let candidate = inspect_evidence(EvidenceImport {
+            identity,
+            evidence,
+        })
+        .unwrap();
+        assert_eq!(
+            check_compatibility(&candidate),
+            Err(AppServerError::CompatibilityRequired)
+        );
+        let approved = confirm_evidence(candidate.clone()).unwrap();
+        assert_eq!(check_compatibility(&approved), Ok(()));
+        assert!(matches!(
+            read_rate_limits(&approved),
+            Err(AppServerError::StartupNotVerified)
+        ));
+        std::fs::write(&path, b"changed synthetic fixture").unwrap();
+        assert!(matches!(
+            confirm_evidence(candidate),
+            Err(AppServerError::HashMismatch)
+        ));
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn evidence_import_rejects_oversized_and_unknown_fields() {
+        let path = std::env::temp_dir().join(format!("codex-evidence-size-{}", std::process::id()));
+        std::fs::write(&path, vec![b' '; 16 * 1024 + 1]).unwrap();
+        assert!(matches!(
+            inspect_evidence_file(&path),
+            Err(AppServerError::OutputTooLarge)
+        ));
+        std::fs::write(&path, br#"{"identity":{"path":"fixture","sha256":"x","version":"0.172.0","unknown":true},"evidence":{}}"#).unwrap();
+        assert!(matches!(
+            inspect_evidence_file(&path),
+            Err(AppServerError::InvalidIdentity)
+        ));
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
     fn compatibility_requires_matching_version_hash_and_completed_approval() {
         let mut identity = ApprovedExecutable {
             path: PathBuf::from(r"C:\fixture\codex.exe"),
