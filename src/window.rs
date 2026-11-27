@@ -737,6 +737,9 @@ fn normalize_settings(mut settings: SettingsFile) -> SettingsFile {
         settings.poll_interval_ms = POLL_5_MIN;
     }
     settings.adaptive_refresh = false;
+    settings.show_claude_code = false;
+    settings.show_antigravity = false;
+    settings.show_codex = true;
     if !settings.show_claude_code && !settings.show_codex && !settings.show_antigravity {
         settings.show_codex = true;
     }

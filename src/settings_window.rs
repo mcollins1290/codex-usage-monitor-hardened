@@ -500,9 +500,8 @@ fn rows(page: Page, s: &AppState) -> Vec<Row> {
             result
         }
         Page::Usage => {
-            let providers = [s.show_codex, s.show_claude_code, s.show_antigravity];
-            let count = providers.iter().filter(|enabled| **enabled).count();
-            let [claude, codex, antigravity] = &s.monitor.services;
+            let count = 1;
+            let codex = &s.monitor.services[1];
             let provider = |name: &str, id, monitored, error| {
                 let hint = match service_status(monitored, error, s.language) {
                     Some(status) => Some(Hint::Warning(status.into())),
@@ -511,36 +510,6 @@ fn rows(page: Page, s: &AppState) -> Vec<Row> {
                 };
                 limited_check(name, id, monitored, !monitored || count > 1).hint(hint)
             };
-            let mut groups = vec![None];
-            groups.extend(
-                s.antigravity_groups
-                    .iter()
-                    .filter(|name| !name.eq_ignore_ascii_case(poller::GEMINI_QUOTA_GROUP))
-                    .take(MAX_QUOTA_GROUPS)
-                    .cloned()
-                    .map(Some),
-            );
-            if let Some(group) = &s.antigravity_quota_group {
-                if !groups.iter().any(|option| option.as_ref() == Some(group)) {
-                    groups.truncate(MAX_QUOTA_GROUPS);
-                    groups.push(Some(group.clone()));
-                }
-            }
-            let selected_group = groups
-                .iter()
-                .position(|group| group == &s.antigravity_quota_group)
-                .unwrap_or(0);
-            let group_items = groups
-                .into_iter()
-                .map(|group| OptionItem {
-                    label: group
-                        .as_deref()
-                        .unwrap_or(poller::GEMINI_QUOTA_GROUP)
-                        .into(),
-                    action: Some(Action::Group(group)),
-                    swatch: None,
-                })
-                .collect();
             let one_window = info(strings.keep_one_quota_hint);
             vec![
                 section(strings.models),
@@ -550,25 +519,6 @@ fn rows(page: Page, s: &AppState) -> Vec<Row> {
                     s.show_codex,
                     codex.error,
                 ),
-                provider(
-                    strings.claude_code_model,
-                    IDM_MODEL_CLAUDE_CODE,
-                    s.show_claude_code,
-                    claude.error,
-                ),
-                provider(
-                    strings.antigravity_model,
-                    IDM_MODEL_ANTIGRAVITY,
-                    s.show_antigravity,
-                    antigravity.error,
-                ),
-                Row::Choice {
-                    label: strings.antigravity_quota_group.into(),
-                    items: group_items,
-                    selected: selected_group,
-                    enabled: s.show_antigravity,
-                    hint: info(strings.antigravity_quota_group_hint),
-                },
                 section(strings.refresh_section),
                 choice(
                     strings.update_frequency,
@@ -582,7 +532,7 @@ fn rows(page: Page, s: &AppState) -> Vec<Row> {
                         POLL_1_MIN => IDM_FREQ_1MIN,
                         POLL_5_MIN => IDM_FREQ_5MIN,
                         POLL_1_HOUR => IDM_FREQ_1HOUR,
-                        _ => IDM_FREQ_15MIN,
+                        _ => IDM_FREQ_5MIN,
                     },
                 ),
                 check(
