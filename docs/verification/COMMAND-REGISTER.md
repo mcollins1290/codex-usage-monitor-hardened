@@ -11,4 +11,4 @@
 | PowerShell JSON parse of `docs/verification/checklist-dispositions.json` | 0 | 524 item records, 524 unique identifiers |
 | `powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File verification/Verify-Fixtures.ps1` | 0 | Synthetic suite passed; official Codex was not executed |
 | PowerShell parser checks for both verification scripts | 0 | Both scripts parsed without syntax errors |
-| Ten repeated synthetic fixture runs | 0 each | 10/10 passed; elapsed milliseconds: 3069, 3095, 2956, 3097, 3091, 3018, 2885, 3093, 3095, 3055 |
+| Ten repeated synthetic fixture runs | 0 each | 10/10 passed; elapsed milliseconds: 3080, 3214, 2987, 3017, 3015, 3034, 3071, 3140, 3148, 3101 |
