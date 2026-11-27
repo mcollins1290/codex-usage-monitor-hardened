@@ -15,7 +15,7 @@ Windows or authenticated-runtime acceptance as passed.
 
 - Branch: `feature/security-remediation`
 - Starting reviewed remote HEAD: `858cd6dc61f5a67444788a3edceda9a444db3721`
-- Current local candidate: `a0a5bc6835f646427f1d4ab9cb29a37a508fc7ca` (documentation update pending)
+- Current local candidate: `0d6b0ceb524d194ed41ad95ebdf098ee6a2cf727` (documentation update pending)
 - Original handover: `168885d0b8616989834e83d38d5899737600776a`
 - Windows CI remains manual-only; no CI run was triggered by this review.
 - Authenticated app-server launch remains unconditionally frozen in
@@ -55,8 +55,9 @@ Windows or authenticated-runtime acceptance as passed.
 
 1. The production Codex-only refactor is implemented and locally verified, but
    Windows CI has not yet run against the current candidate.
-2. Generic provider-oriented appearance terminology and historical documentation
-   remain to be reconciled; they do not select or execute a secondary provider.
+2. Some generic service-oriented UI helper names and historical documentation
+   remain; source inspection confirms they do not select or execute a secondary
+   provider.
 3. `cargo deny check` reports a non-security duplicate `syn` version warning.
 4. T2–T8 startup side-effect verification and authenticated runtime acceptance
    remain external acceptance gates. The successful T1 protocol exchange does
