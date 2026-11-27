@@ -17,7 +17,7 @@ The item-level dispositions are in
 
 - Branch: `feature/security-remediation`
 - Starting reviewed remote HEAD: `858cd6dc61f5a67444788a3edceda9a444db3721`
-- Current reviewed implementation baseline: `080e6f283b8706e3c8f131356aa1bb81be9d7205`
+- Current reviewed implementation baseline: `631b888284cd83141744022d2cb94a377e4123aa`
 - Subsequent evidence-register identity updates are documentation-only commits.
 - Original handover: `168885d0b8616989834e83d38d5899737600776a`
 - Windows CI remains manual-only; no CI run was triggered by this review.
