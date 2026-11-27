@@ -1,5 +1,6 @@
 #![windows_subsystem = "windows"]
 
+mod app_server;
 mod codex_colors;
 mod diagnose;
 mod localization;
