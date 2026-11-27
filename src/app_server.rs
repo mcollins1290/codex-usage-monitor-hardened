@@ -369,4 +369,70 @@ mod tests {
         assert_eq!(data.session.percentage, 10.0);
         assert_eq!(data.weekly.percentage, 20.0);
     }
+
+    #[test]
+    fn identity_accepts_matching_absolute_file_and_rejects_changed_hash() {
+        let path = std::env::temp_dir().join(format!("codex-identity-{}", std::process::id()));
+        std::fs::write(&path, b"synthetic executable fixture").unwrap();
+        let hash = sha256_file(&path).unwrap();
+        let identity = ApprovedExecutable {
+            path: path.clone(),
+            sha256: hash,
+            version: CODEX_VERSION.to_string(),
+        };
+        assert_eq!(
+            validate_identity(&identity).unwrap(),
+            path.canonicalize().unwrap()
+        );
+
+        let mut changed = identity.clone();
+        changed.sha256.replace_range(..1, "0");
+        assert_eq!(
+            validate_identity(&changed),
+            Err(AppServerError::HashMismatch)
+        );
+        let _ = std::fs::remove_file(path);
+    }
+
+    #[test]
+    fn identity_rejects_relative_paths_and_unapproved_versions() {
+        let relative = ApprovedExecutable {
+            path: PathBuf::from("codex.exe"),
+            sha256: "0".repeat(64),
+            version: CODEX_VERSION.to_string(),
+        };
+        assert_eq!(
+            validate_identity(&relative),
+            Err(AppServerError::InvalidIdentity)
+        );
+
+        let wrong_version = ApprovedExecutable {
+            path: PathBuf::from(r"C:\codex.exe"),
+            sha256: "0".repeat(64),
+            version: "0.167.0".to_string(),
+        };
+        assert_eq!(
+            validate_identity(&wrong_version),
+            Err(AppServerError::InvalidIdentity)
+        );
+    }
+
+    #[test]
+    fn missing_windows_are_unavailable_and_wrong_duration_is_rejected() {
+        let missing: RateLimitsResult = serde_json::from_value(serde_json::json!({
+            "rateLimits": {"primary": null, "secondary": null}
+        }))
+        .unwrap();
+        let data = quota_data(missing).unwrap();
+        assert!(!data.session.has_reading());
+        assert!(!data.weekly.has_reading());
+
+        let wrong: RateLimitsResult = serde_json::from_value(serde_json::json!({
+            "rateLimits": {"primary": {"usedPercent": 10, "windowDurationMins": 60, "resetsAt": 2000000000}, "secondary": null}
+        })).unwrap();
+        assert!(matches!(
+            quota_data(wrong),
+            Err(AppServerError::InvalidQuota)
+        ));
+    }
 }
