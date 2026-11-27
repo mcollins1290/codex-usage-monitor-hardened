@@ -369,7 +369,11 @@ impl Service {
                     "Next refresh"
                 }
             };
-            text.push_str(&format!("\n{label}：{time}"));
+            if self.auth_paused {
+                text.push_str(&format!("\n{label}"));
+            } else {
+                text.push_str(&format!("\n{label}：{time}"));
+            }
         }
         if let Some(error) = self.error {
             let reason = if chinese {
@@ -398,9 +402,9 @@ impl Service {
             ));
             if self.auth_paused {
                 text.push_str(if chinese {
-                    "\n已暂停接口重试，等待登录凭据更新；也可手动刷新。"
+                    "\n已暂停接口重试。重新登录后请手动刷新。"
                 } else {
-                    "\nAPI retries paused until credentials change; manual refresh is available."
+                    "\nAPI retries paused. Sign in again and refresh manually."
                 });
             }
         }
@@ -590,7 +594,7 @@ mod tests {
         complete(&mut monitor, &job, Err(PollError::NoCredentials), now, wall);
         assert!(monitor.services[0]
             .description(wall, now, true)
-            .contains("等待手动刷新："));
+            .contains("等待手动刷新"));
     }
 
     #[test]

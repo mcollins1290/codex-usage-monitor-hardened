@@ -99,3 +99,7 @@ Continue without intermediate automatic CI; restore full CI at final verificatio
 ### Credential monitoring cleanup
 
 Removed credential snapshot types and callbacks. Production polling now uses the same explicit manual authentication retry gate as scheduler tests. The three-slot renderer/scheduler remains for now. Changes are pending final Windows CI.
+
+### Verification preparation
+
+Locked dependency inventory and final audit procedure added in `docs/DEPENDENCY-AUDIT.md`; synthetic and authenticated acceptance criteria added in `docs/RUNTIME-ACCEPTANCE.md`. Neither is a completed audit or runtime pass. Corrected paused-authentication tooltip to require manual refresh without implying credential watching or an automatic retry time.
