@@ -17,6 +17,8 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 - Release build: 41 compiler warnings; cleanup outstanding.
 - Native child containment, descendant rejection, forced shutdown, compatibility, isolated profile and negative version-probe tests passed. Schema 2 now binds evidence to the executable path as well as version/hash/policy; tests pending CI. No version probe or approval action is exposed to users yet.
 
+**Temporary CI policy (owner authorized):** Windows CI is manual-only on this development branch until final verification. Intermediate commits are unverified; restore push and pull-request triggers and require a successful full Windows CI run before acceptance, merging or installation. All checks remain intact.
+
 ## Completed implementation (not necessarily runtime accepted)
 
 - [x] Upstream security review, fork and independent review.

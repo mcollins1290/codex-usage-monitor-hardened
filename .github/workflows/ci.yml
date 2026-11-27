@@ -1,9 +1,8 @@
 name: Windows build and tests
 
 on:
-  push:
-    branches: ['**']
-  pull_request:
+  # Temporarily manual-only during development; restore automatic triggers
+  # before final acceptance and merging.
   workflow_dispatch:
 
 permissions:
