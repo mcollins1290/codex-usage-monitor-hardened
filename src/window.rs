@@ -28,7 +28,7 @@ use crate::native_interop::{
     WM_APP_USAGE_UPDATED,
 };
 use crate::poller;
-use crate::provider_icons::{self, Provider};
+use crate::provider_icons;
 use crate::quota_refresh;
 use crate::quota_text;
 use crate::quota_tooltip;
@@ -70,22 +70,11 @@ struct AppState {
     settings_theme: SettingsTheme,
     codex_identity: Option<ApprovedExecutable>,
 
-    session_percent: f64,
-    session_text: String,
-    weekly_percent: f64,
-    weekly_text: String,
     codex_session_percent: f64,
     codex_session_text: String,
     codex_weekly_percent: f64,
     codex_weekly_text: String,
-    antigravity_session_percent: f64,
-    antigravity_session_text: String,
-    antigravity_weekly_percent: f64,
-    antigravity_weekly_text: String,
-    show_claude_code: bool,
     show_codex: bool,
-    show_antigravity: bool,
-    antigravity_quota_group: Option<String>,
     show_session_window: bool,
     show_weekly_window: bool,
     alert_threshold_percent: u8,
@@ -574,12 +563,6 @@ struct SettingsFile {
     widget_visible: bool,
     #[serde(default = "default_show_codex")]
     show_codex: bool,
-    #[serde(default = "default_show_claude_code")]
-    show_claude_code: bool,
-    #[serde(default = "default_show_antigravity")]
-    show_antigravity: bool,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    antigravity_quota_group: Option<String>,
     #[serde(default = "default_show_usage_window")]
     show_session_window: bool,
     #[serde(default = "default_show_usage_window")]
@@ -610,10 +593,7 @@ impl Default for SettingsFile {
             quota_display_mode: Some(QuotaDisplayMode::Remaining),
             settings_theme: SettingsTheme::default(),
             widget_visible: true,
-            show_claude_code: false,
             show_codex: true,
-            show_antigravity: false,
-            antigravity_quota_group: None,
             show_session_window: true,
             show_weekly_window: true,
             alert_threshold_percent: 0,
@@ -641,14 +621,6 @@ fn default_show_codex() -> bool {
     true
 }
 
-fn default_show_claude_code() -> bool {
-    false
-}
-
-fn default_show_antigravity() -> bool {
-    false
-}
-
 fn default_show_usage_window() -> bool {
     true
 }
@@ -672,10 +644,7 @@ fn normalize_settings(mut settings: SettingsFile) -> SettingsFile {
         settings.poll_interval_ms = POLL_5_MIN;
     }
     settings.adaptive_refresh = false;
-    settings.show_claude_code = false;
     settings.show_codex = true;
-    settings.show_antigravity = false;
-    settings.antigravity_quota_group = None;
     if !settings.show_session_window && !settings.show_weekly_window {
         settings.show_session_window = true;
     }
@@ -704,10 +673,7 @@ fn save_state_settings() -> bool {
             quota_display_mode: Some(s.quota_display_mode),
             settings_theme: s.settings_theme,
             widget_visible: s.widget_visible,
-            show_claude_code: s.show_claude_code,
             show_codex: s.show_codex,
-            show_antigravity: s.show_antigravity,
-            antigravity_quota_group: s.antigravity_quota_group.clone(),
             show_session_window: s.show_session_window,
             show_weekly_window: s.show_weekly_window,
             alert_threshold_percent: s.alert_threshold_percent,
@@ -915,43 +881,17 @@ fn append_quota_alert(
     });
 }
 
-fn antigravity_label(state: &AppState) -> String {
-    let group = state
-        .antigravity_quota_group
-        .as_deref()
-        .unwrap_or(poller::CODEX_QUOTA_GROUP);
-    format!("Antigravity ({group})")
-}
-
 fn tray_icon_data_from_state() -> Option<tray_icon::TrayIconData> {
     let state = lock_state();
     match state.as_ref() {
         Some(s) if s.has_poll_result => {
             let mut services = Vec::new();
             let strings = s.language.strings();
-            if s.show_claude_code {
-                services.push(service_tooltip(
-                    strings.claude_code_model,
-                    &s.session_text,
-                    &s.weekly_text,
-                    s.show_session_window,
-                    s.show_weekly_window,
-                ));
-            }
             if s.show_codex {
                 services.push(service_tooltip(
                     strings.codex_model,
                     &s.codex_session_text,
                     &s.codex_weekly_text,
-                    s.show_session_window,
-                    s.show_weekly_window,
-                ));
-            }
-            if s.show_antigravity {
-                services.push(service_tooltip(
-                    &antigravity_label(s),
-                    &s.antigravity_session_text,
-                    &s.antigravity_weekly_text,
                     s.show_session_window,
                     s.show_weekly_window,
                 ));
@@ -966,10 +906,10 @@ fn tray_icon_data_from_state() -> Option<tray_icon::TrayIconData> {
         }
         Some(s) => {
             let strings = s.language.strings();
-            let tooltip = match (s.show_claude_code, s.show_codex, s.show_antigravity) {
-                (false, true, false) => strings.codex_window_title,
-                (false, false, true) => strings.antigravity_window_title,
-                _ => strings.window_title,
+            let tooltip = if s.show_codex {
+                strings.codex_window_title
+            } else {
+                strings.window_title
             };
             Some(tray_icon::TrayIconData {
                 tooltip: tooltip.to_string(),
@@ -2091,22 +2031,11 @@ pub fn run() {
                 quota_display_mode: settings.quota_display_mode.unwrap_or_default(),
                 settings_theme: settings.settings_theme,
                 codex_identity: settings.codex_executable.clone(),
-                session_percent: 0.0,
-                session_text: "--".to_string(),
-                weekly_percent: 0.0,
-                weekly_text: "--".to_string(),
                 codex_session_percent: 0.0,
                 codex_session_text: "--".to_string(),
                 codex_weekly_percent: 0.0,
                 codex_weekly_text: "--".to_string(),
-                antigravity_session_percent: 0.0,
-                antigravity_session_text: "--".to_string(),
-                antigravity_weekly_percent: 0.0,
-                antigravity_weekly_text: "--".to_string(),
-                show_claude_code: settings.show_claude_code,
                 show_codex: settings.show_codex,
-                show_antigravity: settings.show_antigravity,
-                antigravity_quota_group: settings.antigravity_quota_group,
 
                 show_session_window: settings.show_session_window,
                 show_weekly_window: settings.show_weekly_window,
@@ -2228,20 +2157,9 @@ fn update_quota_tooltips() {
             let mut left = sc(LEFT_DIVIDER_W)
                 + sc(DIVIDER_RIGHT_MARGIN)
                 + period_label_column_width(label_width, s.appearance);
-            let antigravity_name = antigravity_label(s);
-            for (id, visible, name, session) in [
-                (0, s.show_claude_code, "Claude Code", &s.session_text),
-                (1, s.show_codex, "Codex", &s.codex_session_text),
-                (
-                    2,
-                    s.show_antigravity,
-                    antigravity_name.as_str(),
-                    &s.antigravity_session_text,
-                ),
-            ] {
-                if !visible {
-                    continue;
-                }
+            if s.show_codex {
+                let name = "Codex";
+                let session = &s.codex_session_text;
                 let service = &s.monitor.service;
                 let now = SystemTime::now();
                 let description = service.description(now, Instant::now(), chinese);
@@ -2253,11 +2171,7 @@ fn update_quota_tooltips() {
                         "\nThis provider did not return quota in the latest update."
                     });
                 }
-                if let Some(usage) = service
-                    .data
-                    .as_ref()
-                    .filter(|_| id != 2 || service.error.is_none())
-                {
+                if let Some(usage) = service.data.as_ref().filter(|_| service.error.is_none()) {
                     for note in window_notes(usage, service.history.last_success, now, s.language) {
                         text.push('\n');
                         text.push_str(&note);
@@ -2286,7 +2200,6 @@ struct WidgetContent<'a> {
     appearance: Appearance,
     language: LanguageId,
     mode: QuotaDisplayMode,
-    // Provider column order: Claude Code, Codex, Antigravity.
     provider_visible: bool,
     visible_rows: [bool; 2],
     used: [[f64; 1]; 2],
@@ -2538,7 +2451,7 @@ fn paint_content(hdc: HDC, width: i32, height: i32, content: &WidgetContent<'_>)
             let size = sc(provider_icons::SIZE).min(height);
             let mut icon_x = model_left;
             if provider_visible {
-                provider_icons::draw(hdc, icon_x, (height - size) / 2, size, Provider::Codex);
+                provider_icons::draw(hdc, icon_x, (height - size) / 2, size);
             }
         }
 
@@ -2698,8 +2611,7 @@ fn do_poll(send_hwnd: SendHwnd) {
                 let Some(state) = state.as_ref() else {
                     return codex_poll::Attempt::cancelled();
                 };
-                let enabled = [false, state.show_codex, false];
-                if !enabled[job.id] || !state.monitor.job_is_current(job) {
+                if !state.show_codex || !state.monitor.job_is_current(job) {
                     return codex_poll::Attempt::cancelled();
                 }
                 state.codex_identity.clone()
@@ -2714,7 +2626,7 @@ fn do_poll(send_hwnd: SendHwnd) {
 
 fn collect_reset_alerts(
     state: &mut AppState,
-    provider: usize,
+    _provider: usize,
     usage: &crate::models::UsageData,
     now: SystemTime,
     alerts: &mut Vec<QuotaAlert>,
@@ -2723,22 +2635,13 @@ fn collect_reset_alerts(
         return false;
     }
     let strings = state.language.strings();
-    let (name, kind) = [
-        (strings.claude_code_model, tray_icon::TrayIconKind::Claude),
-        (strings.codex_model, tray_icon::TrayIconKind::Codex),
-        (
-            strings.antigravity_model,
-            tray_icon::TrayIconKind::Antigravity,
-        ),
-    ][provider];
+    let (name, kind) = (strings.codex_model, tray_icon::TrayIconKind::Codex);
     let mut changed = false;
     for (weekly, section, window) in [
         (false, &usage.session, strings.session_window),
         (true, &usage.weekly, strings.weekly_window),
     ] {
-        let (saved, reset) = state
-            .reset_observations
-            .observe(provider, weekly, section, now);
+        let (saved, reset) = state.reset_observations.observe(1, weekly, section, now);
         changed |= saved;
         if reset {
             let (title, message) = if state.language == LanguageId::SimplifiedChinese {
@@ -2823,23 +2726,11 @@ fn complete_provider_poll(
         ));
         let notice = completion.notify_auth.then(|| {
             let strings = s.language.strings();
-            match job.id {
-                0 => (
-                    tray_icon::TrayIconKind::Claude,
-                    strings.token_expired_title,
-                    strings.token_expired_body,
-                ),
-                1 => (
-                    tray_icon::TrayIconKind::Codex,
-                    strings.codex_token_expired_title,
-                    strings.codex_token_expired_body,
-                ),
-                _ => (
-                    tray_icon::TrayIconKind::Antigravity,
-                    strings.antigravity_token_expired_title,
-                    strings.antigravity_token_expired_body,
-                ),
-            }
+            (
+                tray_icon::TrayIconKind::Codex,
+                strings.codex_token_expired_title,
+                strings.codex_token_expired_body,
+            )
         });
         (alerts, notice, settings_changed)
     };
@@ -3446,8 +3337,6 @@ unsafe extern "system" fn wnd_proc(
                     {
                         let mut state = lock_state();
                         if let Some(s) = state.as_mut() {
-                            s.session_text = "...".to_string();
-                            s.weekly_text = "...".to_string();
                             s.codex_session_text = "...".to_string();
                             s.codex_weekly_text = "...".to_string();
                         }
@@ -3720,12 +3609,8 @@ unsafe extern "system" fn wnd_proc(
                         let mut state = lock_state();
                         if let Some(s) = state.as_mut() {
                             s.show_codex = true;
-                            s.session_text = "...".to_string();
-                            s.weekly_text = "...".to_string();
                             s.codex_session_text = "...".to_string();
                             s.codex_weekly_text = "...".to_string();
-                            s.antigravity_session_text = "...".to_string();
-                            s.antigravity_weekly_text = "...".to_string();
                         }
                     }
                     save_state_settings();
@@ -4303,14 +4188,10 @@ mod tests {
                 [(50.01, green), (50.0, yellow), (20.0, yellow), (19.99, red)]
             {
                 assert_eq!(remaining_bar_color(remaining, dark).to_colorref(), expected);
-                for provider in [Provider::Claude, Provider::Codex, Provider::Antigravity] {
-                    assert_eq!(
-                        appearance
-                            .bar_color(provider, 100.0 - remaining, dark)
-                            .to_colorref(),
-                        expected
-                    );
-                }
+                assert_eq!(
+                    appearance.bar_color(100.0 - remaining, dark).to_colorref(),
+                    expected
+                );
             }
         }
     }
