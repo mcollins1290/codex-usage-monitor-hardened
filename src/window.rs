@@ -24,7 +24,7 @@ use crate::localization::{self, LanguageId, Strings};
 use crate::models::{AppUsageData, QuotaDisplayMode};
 use crate::native_interop::{
     self, Color, TIMER_COUNTDOWN, TIMER_FRESHNESS, TIMER_POLL, TIMER_TASKBAR_RETRY,
-    TIMER_UPDATE_CHECK, WM_APP_TRAY, WM_APP_USAGE_UPDATED,
+    WM_APP_TRAY, WM_APP_USAGE_UPDATED,
 };
 use crate::poller;
 use crate::provider_icons::{self, Provider};
@@ -188,7 +188,6 @@ const IDM_RESET_CLOCK: u16 = 129;
 const IDM_WINDOWS_STARTUP_SETTINGS: u16 = 130;
 
 const WM_DPICHANGED_MSG: u32 = 0x02E0;
-const WM_APP_UPDATE_CHECK_COMPLETE: u32 = WM_APP + 2;
 const WM_APP_TASKBARS_CHANGED: u32 = WM_APP + 6;
 const TRAY_ICON_UPDATE_REPOSITION_SUPPRESS_MS: u64 = 750;
 
@@ -690,11 +689,7 @@ fn normalize_settings(mut settings: SettingsFile) -> SettingsFile {
     if !matches!(settings.alert_threshold_percent, 0 | 10 | 20 | 30) {
         settings.alert_threshold_percent = 0;
     }
-    settings.antigravity_quota_group = settings
-        .antigravity_quota_group
-        .as_deref()
-        .and_then(poller::quota_group_name)
-        .filter(|name| !name.eq_ignore_ascii_case(poller::GEMINI_QUOTA_GROUP));
+    settings.antigravity_quota_group = None;
     settings.notified_quota_windows.sort();
     settings.notified_quota_windows.dedup();
     settings
@@ -3369,9 +3364,6 @@ unsafe extern "system" fn wnd_proc(
                         sync_tray_icons(hwnd);
                     }
                 }
-                TIMER_UPDATE_CHECK => {
-                    let _ = KillTimer(hwnd, TIMER_UPDATE_CHECK);
-                }
                 _ => {}
             }
             LRESULT(0)
@@ -3387,7 +3379,6 @@ unsafe extern "system" fn wnd_proc(
             sync_tray_icons(hwnd);
             LRESULT(0)
         }
-        WM_APP_UPDATE_CHECK_COMPLETE => LRESULT(0),
         WM_SETCURSOR => {
             let is_dragging = {
                 let state = lock_state();

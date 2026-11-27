@@ -55,12 +55,6 @@ pub fn poll_provider(
     let identity = identity.ok_or(PollError::ApprovalRequired)?;
     app_server::read_rate_limits(identity).map_err(app_server_error)
 }
-pub fn credential_watch_snapshot(_mode: CredentialWatchMode) -> CredentialWatchSnapshot {
-    Vec::new()
-}
-pub fn quota_group_name(_name: &str) -> Option<String> {
-    None
-}
 
 pub fn format_quota_line(
     section: &UsageSection,
@@ -140,10 +134,3 @@ pub fn app_server_error(error: app_server::AppServerError) -> PollError {
     }
 }
 
-pub fn execute(
-    _job: &crate::provider_poll::Job,
-    poll: impl FnOnce() -> Result<UsageData, PollError>,
-    _credentials: impl Fn(CredentialWatchMode) -> CredentialWatchSnapshot,
-) -> crate::provider_poll::Attempt {
-    crate::provider_poll::Attempt::from_result(poll())
-}

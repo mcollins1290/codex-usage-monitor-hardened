@@ -64,7 +64,7 @@ Complete autonomously as far as available evidence and permissions permit:
 
 - Path-bound compatibility approval: schema 2 committed; final CI pending.
 - User-facing approval workflow: Settings status, bounded JSON evidence import, default-No explicit confirmation and revocation implemented. Final CI and UI acceptance outstanding; external evidence is an attestation, not proof of provenance.
-- Legacy code removal: dead updater functions, updater/privacy preference machinery and helper argument handling removed; residual multi-provider renderer/scheduler remains.
+- Legacy code removal: dead updater functions, updater/privacy preference machinery and helper argument handling removed; obsolete update timers and unused polling adapter stubs removed; residual multi-provider renderer/scheduler remains.
 - Dependency security audit: inventory and advisory assessment required; final locked build and audit required.
 - Authenticated runtime verification: synthetic tests and acceptance harness can be developed autonomously; genuine local authenticated evidence and startup safety acceptance remain required. Never substitute fabricated or CI credentials.
 
