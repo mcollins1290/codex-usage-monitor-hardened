@@ -5608,6 +5608,7 @@ mod tests {
                     quota_display_mode: QuotaDisplayMode::Remaining,
                     settings_theme: SettingsTheme::Light,
                     install_channel: InstallChannel::Portable,
+                    codex_identity: None,
                     session_percent: 25.0,
                     session_text: "75% 3h".into(),
                     weekly_percent: 40.0,
