@@ -103,3 +103,7 @@ Removed credential snapshot types and callbacks. Production polling now uses the
 ### Verification preparation
 
 Locked dependency inventory and final audit procedure added in `docs/DEPENDENCY-AUDIT.md`; synthetic and authenticated acceptance criteria added in `docs/RUNTIME-ACCEPTANCE.md`. Neither is a completed audit or runtime pass. Corrected paused-authentication tooltip to require manual refresh without implying credential watching or an automatic retry time.
+
+### Advisory review and documentation cleanup
+
+Manual RustSec review completed at database revision `c9f6c91a44dbad9d71742329e9df061279f9c4be`: four package-name matches, zero applicable advisories. Automated audit and yank checks remain pending. Removed misleading upstream download, install, policy and update instructions from active user documentation. No CI triggered.

@@ -1,6 +1,6 @@
 # Dependency security review
 
-Status: inventory complete; advisory scan pending. Do not interpret this document as a clean audit.
+Status: locked-package manual RustSec review complete; zero applicable advisories at the recorded revision. Automated cargo-audit and yanked-package checks remain pending.
 
 Baseline lockfile: 34bff340d9203807e7ad7a86e93302d82a6d7be7. 50 external package/version entries (including platform-specific and build dependencies).
 
@@ -56,6 +56,19 @@ Baseline lockfile: 34bff340d9203807e7ad7a86e93302d82a6d7be7. 50 external package
 | windows_x86_64_msvc | 0.52.6 |
 | winres | 0.1.12 |
 | zmij | 1.0.21 |
+
+## Manual advisory review — 2026-11-26
+
+RustSec advisory database revision: [c9f6c91a44dbad9d71742329e9df061279f9c4be](https://github.com/RustSec/advisory-db/tree/c9f6c91a44dbad9d71742329e9df061279f9c4be). Retrieved the complete recursive tree (2,632 entries; not truncated), intersected package directory names with the locked package names, and examined all four matching advisory records at that same revision.
+
+| Crate | Advisory | Assessment |
+| --- | --- | --- |
+| dirs 6.0.0 | [RUSTSEC-2020-0053](https://rustsec.org/advisories/RUSTSEC-2020-0053.html) | Withdrawn 2021-04-19 |
+| generic-array 0.14.7 | [RUSTSEC-2020-0146](https://rustsec.org/advisories/RUSTSEC-2020-0146.html) | Patched >=0.13.3 |
+| sha2 0.10.9 | [RUSTSEC-2021-0100](https://rustsec.org/advisories/RUSTSEC-2021-0100.html) | Patched >=0.9.8 |
+| windows 0.58.0 | [RUSTSEC-2022-0008](https://rustsec.org/advisories/RUSTSEC-2022-0008.html) | Patched >=0.32.0 |
+
+No applicable advisories identified in this snapshot. This is not an execution of cargo-audit, does not check registry yanks, and does not establish absence of unknown vulnerabilities or supply-chain compromise. Recheck the final lockfile and fresh advisory database before acceptance.
 
 ## Final verification procedure
 
