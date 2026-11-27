@@ -10,7 +10,7 @@ acceptance.
 
 - Branch: `feature/security-remediation`
 - Starting reviewed remote HEAD: `858cd6dc61f5a67444788a3edceda9a444db3721`
-- Current local candidate: `5f8ecb212bbef9c03b346c682b12f30161c63b73`
+- Current local candidate: `6b6129cf055e1ffd0f24ac1f65a1bd5dda062148`
 - Original handover: `168885d0b8616989834e83d38d5899737600776a`
 - Windows CI remains manual-only; no CI run was triggered by this review.
 - Authenticated app-server launch remains unconditionally frozen in
