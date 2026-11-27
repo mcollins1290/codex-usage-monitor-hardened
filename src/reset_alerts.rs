@@ -6,10 +6,6 @@ use crate::models::UsageSection;
 pub struct ResetObservations([Option<u64>; 6]);
 
 impl ResetObservations {
-    pub fn clear_provider(&mut self, provider: usize) {
-        self.0[provider * 2..provider * 2 + 2].fill(None);
-    }
-
     /// Returns (baseline changed, new window evidenced by the provider).
     pub fn observe(
         &mut self,
@@ -70,6 +66,5 @@ mod tests {
         assert_eq!(restored.observe(1, false, &after, at(1001)), (true, true));
         assert_eq!(restored.observe(1, false, &after, at(1002)), (false, false));
         assert_eq!(restored.observe(1, true, &after, at(1002)), (false, false));
-        restored.clear_provider(1);
     }
 }

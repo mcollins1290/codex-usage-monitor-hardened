@@ -4813,10 +4813,9 @@ mod tests {
         let now = UNIX_EPOCH + Duration::from_secs(2_000_000_000);
         let session = now + Duration::from_secs(17_999);
         let weekly = now + Duration::from_secs(604_799);
-        let mut usage = UsageData {
+        let usage = UsageData {
             session: UsageSection::reported(20.0, Some(session)),
             weekly: UsageSection::reported(40.0, Some(weekly)),
-            ..UsageData::default()
         };
         let session_time = format_precise_reset_time(Some(session)).unwrap();
         let weekly_time = format_precise_reset_time(Some(weekly)).unwrap();

@@ -880,7 +880,6 @@ fn quota_data(result: RateLimitsResult) -> Result<UsageData, AppServerError> {
     Ok(UsageData {
         session: window(snapshot.primary.as_ref(), true)?,
         weekly: window(snapshot.secondary.as_ref(), false)?,
-        ..UsageData::default()
     })
 }
 

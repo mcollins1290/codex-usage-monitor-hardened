@@ -211,7 +211,6 @@ mod tests {
         UsageData {
             session: UsageSection::reported(session, None),
             weekly: UsageSection::reported(weekly, None),
-            ..Default::default()
         }
     }
     #[test]
