@@ -601,6 +601,59 @@ fn window(window: Option<&RateLimitWindow>, session: bool) -> Result<UsageSectio
 mod tests {
     use super::*;
 
+    // The fixture uses this test executable, not Codex. It must only be run
+    // explicitly by the two parent tests below.
+    #[test]
+    #[ignore = "child-process fixture; invoked by containment tests"]
+    fn contained_fixture() {
+        let mut input = Vec::new();
+        std::io::stdin().read_to_end(&mut input).unwrap();
+        assert_eq!(input, b"fixture\n");
+        // Attempt a harmless descendant and require the job to reject it.
+        let attempted = std::process::Command::new(std::env::current_exe().unwrap())
+            .arg("--list")
+            .spawn();
+        if let Ok(mut escaped) = attempted {
+            let _ = escaped.kill();
+            let _ = escaped.wait();
+            panic!("contained child created a descendant");
+        }
+        println!("CONTAINED_FIXTURE_OK");
+    }
+
+    fn launch_fixture() -> (ContainedChild, File, File, File) {
+        let executable = std::env::current_exe().unwrap().canonicalize().unwrap();
+        let directory = executable.parent().unwrap();
+        ContainedChild::launch(
+            &executable,
+            directory,
+            "--exact app_server::tests::contained_fixture --ignored --nocapture",
+        )
+        .expect("creation-time job and pipe setup must succeed")
+    }
+
+    #[test]
+    fn contained_child_closes_stdin_and_cannot_create_descendants() {
+        let (mut child, mut stdin, stdout, stderr) = launch_fixture();
+        stdin.write_all(b"fixture\n").unwrap();
+        drop(stdin);
+        child.shutdown(true).unwrap();
+        let mut output = String::new();
+        stdout.take(8192).read_to_string(&mut output).unwrap();
+        let mut errors = String::new();
+        stderr.take(8192).read_to_string(&mut errors).unwrap();
+        assert!(output.contains("CONTAINED_FIXTURE_OK"), "{output} {errors}");
+    }
+
+    #[test]
+    fn contained_child_is_terminated_when_stdin_remains_open() {
+        let (mut child, stdin, _stdout, _stderr) = launch_fixture();
+        assert!(!child.wait(Duration::from_millis(50)).unwrap());
+        child.shutdown(false).unwrap();
+        assert!(child.wait(Duration::ZERO).unwrap());
+        drop(stdin);
+    }
+
     #[test]
     fn unverified_startup_cannot_launch_even_with_configured_identity() {
         let identity = ApprovedExecutable {

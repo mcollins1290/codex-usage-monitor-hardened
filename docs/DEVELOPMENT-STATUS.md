@@ -15,7 +15,7 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 - [Windows CI run 45930514524](https://github.com/mcollins1290/codex-usage-monitor-hardened/actions/runs/45930514524): success; formatting, locked dependency tests and optimized build passed.
 - Tests: 101 passed, 0 failed, 2 ignored.
 - Release build: 38 compiler warnings; cleanup outstanding.
-- New process containment code is committed for CI verification; the prior verified baseline is unchanged.
+- New process containment code and fixture tests are committed for CI verification; the prior verified code baseline is unchanged. Documentation-only commit f660edd also passed CI.
 
 ## Completed implementation (not necessarily runtime accepted)
 
@@ -35,7 +35,7 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 | --- | --- | --- |
 | H1 | Output queue deadlock | Remediated in source; runtime tests outstanding |
 | H2 | Unbounded output allocation | Remediated in source; runtime tests outstanding |
-| H3 | Job Object assignment after process creation | Creation-time JOB_LIST and HANDLE_LIST implemented; Windows CI and lifecycle tests outstanding |
+| H3 | Job Object assignment after process creation | Creation-time JOB_LIST and HANDLE_LIST implemented; lifecycle tests added, Windows CI outstanding |
 | H4 | Missing runtime security gate | Launch freeze enforced; accepted policy still required |
 | H5 | Application identity isolation | Partial; audit remaining metadata, paths and scripts |
 | M1 | Canonical path / hash-to-launch race | Read-only file sharing lock held and hash rechecked through launch; directory alias races still require review |
