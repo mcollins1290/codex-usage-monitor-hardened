@@ -133,7 +133,8 @@ pub fn app_server_error(error: app_server::AppServerError) -> PollError {
         }
         AppServerError::InvalidIdentity
         | AppServerError::ExecutableMissing
-        | AppServerError::HashMismatch => PollError::ExecutableChanged,
+        | AppServerError::HashMismatch
+        | AppServerError::VersionMismatch => PollError::ExecutableChanged,
         AppServerError::AuthenticationRequired => PollError::AuthRequired,
         _ => PollError::RequestFailed,
     }

@@ -24,7 +24,7 @@ const MAX_TOTAL_OUTPUT_BYTES: usize = 1024 * 1024;
 const SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(2);
 const STARTUP_TIMEOUT: Duration = Duration::from_secs(3);
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(7);
-const COMPATIBILITY_SCHEMA: u32 = 1;
+const COMPATIBILITY_SCHEMA: u32 = 2;
 const INVOCATION_POLICY: &str = "account-only-stdio-v1";
 #[cfg(test)]
 const CODEX_VERSION: &str = "0.172.0";
@@ -47,6 +47,8 @@ pub struct CompatibilityRecord {
     pub release_commit: String,
     pub observed_version: String,
     pub observed_sha256: String,
+    #[serde(default)]
+    pub observed_path: PathBuf,
     pub synthetic_passed: bool,
     pub authenticated_passed: bool,
     pub explicitly_approved: bool,
@@ -71,6 +73,7 @@ fn check_compatibility(identity: &ApprovedExecutable) -> Result<(), AppServerErr
         || !record
             .observed_sha256
             .eq_ignore_ascii_case(&identity.sha256)
+        || record.observed_path != identity.path
         || !record.synthetic_passed
         || !record.authenticated_passed
         || !record.explicitly_approved
@@ -528,6 +531,20 @@ fn collect_version_output(
     validate_version_output(&output, expected)
 }
 
+// An approval record is not transferable to another installation path.
+// The external verifier must establish release provenance and startup safety;
+// local version output alone is never sufficient to approve polling.
+fn prepare_compatibility_record(
+    identity: &ApprovedExecutable,
+    evidence: CompatibilityRecord,
+) -> Result<ApprovedExecutable, AppServerError> {
+    let mut candidate = identity.clone();
+    candidate.compatibility = Some(evidence);
+    check_compatibility(&candidate)?;
+    validate_identity(&candidate)?;
+    Ok(candidate)
+}
+
 fn require_startup_acceptance() -> Result<(), AppServerError> {
     Err(AppServerError::StartupNotVerified)
 }
@@ -888,6 +905,7 @@ mod tests {
             release_commit: "b".repeat(40),
             observed_version: "codex-cli 0.173.0".to_string(),
             observed_sha256: identity.sha256.clone(),
+            observed_path: identity.path.clone(),
             synthetic_passed: true,
             authenticated_passed: true,
             explicitly_approved: true,
@@ -914,6 +932,57 @@ mod tests {
             check_compatibility(&identity),
             Err(AppServerError::CompatibilityRequired)
         );
+    }
+
+    #[test]
+    fn compatibility_cannot_be_transferred_to_another_path_or_policy() {
+        let mut identity = ApprovedExecutable {
+            path: PathBuf::from(r"C:\fixture\codex.exe"),
+            sha256: "A".repeat(64),
+            version: CODEX_VERSION.to_string(),
+            compatibility: None,
+        };
+        let evidence = CompatibilityRecord {
+            schema: COMPATIBILITY_SCHEMA,
+            invocation_policy: INVOCATION_POLICY.to_string(),
+            release_tag: format!("rust-v{}", identity.version),
+            release_commit: "b".repeat(40),
+            observed_version: format!("codex-cli {}", identity.version),
+            observed_sha256: identity.sha256.clone(),
+            observed_path: identity.path.clone(),
+            synthetic_passed: true,
+            authenticated_passed: true,
+            explicitly_approved: true,
+        };
+        identity.compatibility = Some(evidence.clone());
+        assert_eq!(check_compatibility(&identity), Ok(()));
+        identity.path = PathBuf::from(r"C:\other\codex.exe");
+        assert_eq!(
+            check_compatibility(&identity),
+            Err(AppServerError::CompatibilityRequired)
+        );
+        identity.path = evidence.observed_path.clone();
+        let record = identity.compatibility.as_mut().unwrap();
+        record.schema = 1;
+        assert_eq!(
+            check_compatibility(&identity),
+            Err(AppServerError::CompatibilityRequired)
+        );
+        let record = identity.compatibility.as_mut().unwrap();
+        record.schema = COMPATIBILITY_SCHEMA;
+        record.invocation_policy = "different-policy".to_string();
+        assert_eq!(
+            check_compatibility(&identity),
+            Err(AppServerError::CompatibilityRequired)
+        );
+        let mut relative = identity.clone();
+        relative.path = PathBuf::from("codex.exe");
+        let mut relative_evidence = evidence;
+        relative_evidence.observed_path = relative.path.clone();
+        assert!(matches!(
+            prepare_compatibility_record(&relative, relative_evidence),
+            Err(AppServerError::InvalidIdentity)
+        ));
     }
 
     #[test]
