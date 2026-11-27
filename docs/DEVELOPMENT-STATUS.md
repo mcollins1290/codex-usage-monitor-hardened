@@ -107,3 +107,7 @@ Locked dependency inventory and final audit procedure added in `docs/DEPENDENCY-
 ### Advisory review and documentation cleanup
 
 Manual RustSec review completed at database revision `c9f6c91a44dbad9d71742329e9df061279f9c4be`: four package-name matches, zero applicable advisories. Automated audit and yank checks remain pending. Removed misleading upstream download, install, policy and update instructions from active user documentation. No CI triggered.
+
+### Approval persistence correction
+
+Approval import rejects unknown identity fields and non-file or oversized evidence. Confirmation reports success only after settings persistence; failed approval saves restore the previous in-memory identity. Failed revocation saves keep the session revoked and explicitly warn that old disk state may remain. Production launch freeze unchanged. Final Windows CI pending.

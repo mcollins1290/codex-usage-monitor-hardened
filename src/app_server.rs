@@ -30,6 +30,7 @@ const INVOCATION_POLICY: &str = "account-only-stdio-v1";
 const CODEX_VERSION: &str = "0.172.0";
 
 #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ApprovedExecutable {
     pub path: PathBuf,
     pub sha256: String,
@@ -567,10 +568,16 @@ struct EvidenceImport {
 }
 
 pub fn inspect_evidence_file(path: &Path) -> Result<ApprovedExecutable, AppServerError> {
+    let file = File::open(path).map_err(|_| AppServerError::InvalidIdentity)?;
+    let metadata = file.metadata().map_err(|_| AppServerError::InvalidIdentity)?;
+    if !metadata.is_file() {
+        return Err(AppServerError::InvalidIdentity);
+    }
+    if metadata.len() > 16 * 1024 {
+        return Err(AppServerError::OutputTooLarge);
+    }
     let mut bytes = Vec::new();
-    File::open(path)
-        .map_err(|_| AppServerError::InvalidIdentity)?
-        .take(16 * 1024 + 1)
+    file.take(16 * 1024 + 1)
         .read_to_end(&mut bytes)
         .map_err(|_| AppServerError::InvalidIdentity)?;
     if bytes.len() > 16 * 1024 {

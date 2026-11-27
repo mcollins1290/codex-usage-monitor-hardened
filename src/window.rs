@@ -701,7 +701,7 @@ fn save_settings(settings: &SettingsFile) {
     }
 }
 
-fn save_state_settings() {
+fn save_state_settings() -> bool {
     let result = settings_store::save(&settings_path(), || {
         let state = lock_state();
         state.as_ref().map(|s| SettingsFile {
@@ -731,10 +731,12 @@ fn save_state_settings() {
             codex_executable: s.codex_identity.clone(),
         })
     });
-    settings_window::note_save_result(result.is_ok());
+    let saved = result.is_ok();
+    settings_window::note_save_result(saved);
     if let Err(error) = result {
         diagnose::log_error("unable to save settings", error);
     }
+    saved
 }
 
 fn format_precise_reset_time(resets_at: Option<SystemTime>) -> Option<String> {
@@ -1439,11 +1441,21 @@ fn import_compatibility_evidence(hwnd: HWND) {
     }
     match crate::app_server::confirm_evidence(candidate) {
         Ok(identity) => {
-            if let Some(state) = lock_state().as_mut() {
-                state.codex_identity = Some(identity);
+            let previous = {
+                let mut state = lock_state();
+                let Some(state) = state.as_mut() else {
+                    return;
+                };
+                state.codex_identity.replace(identity)
+            };
+            if save_state_settings() {
+                show_info_message(hwnd, "Compatibility evidence recorded", "Live polling is still disabled pending runtime security acceptance.");
+            } else {
+                if let Some(state) = lock_state().as_mut() {
+                    state.codex_identity = previous;
+                }
+                show_error_message(hwnd, "Approval not saved", "Settings could not be saved. The previous in-memory approval was restored; live polling remains disabled.");
             }
-            save_state_settings();
-            show_info_message(hwnd, "Compatibility evidence recorded", "Live polling is still disabled pending runtime security acceptance.");
         }
         Err(_) => show_error_message(hwnd, "Evidence rejected", "The executable identity could not be revalidated. No approval was recorded."),
     }
@@ -1453,8 +1465,12 @@ fn revoke_compatibility_evidence(hwnd: HWND) {
     if let Some(state) = lock_state().as_mut() {
         state.codex_identity = None;
     }
-    save_state_settings();
-    show_info_message(hwnd, "Approval revoked", "The recorded executable approval has been cleared. Live polling remains disabled.");
+    if save_state_settings() {
+        show_info_message(hwnd, "Approval revoked", "The recorded executable approval has been cleared. Live polling remains disabled.");
+    } else {
+        // Never restore approval after an explicit revocation request.
+        show_error_message(hwnd, "Revocation not saved", "Approval is cleared for this session, but the previous settings may remain on disk. Retry revocation before restarting. Live polling remains disabled.");
+    }
 }
 
 fn language_command(language: LanguageId) -> u16 {
