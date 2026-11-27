@@ -21,8 +21,15 @@ The harness validates the executable identity, creates a disposable synthetic
 profile, sends only the fixed T1 protocol sequence, bounds shutdown, and emits
 structured sanitized results. It is intentionally not a production launcher,
 does not handle credentials, and does not implement T2–T8 fixture observation;
-those scenarios remain explicitly unimplemented until their observation and
-containment requirements are added and independently reviewed.
+those scenarios remain subject to official-runtime execution and independent
+review; the synthetic fixture and observation controls are implemented below.
+
+The synthetic fixture suite is `verification/Verify-Fixtures.ps1`. It runs
+without the official executable and covers positive process/filesystem/network
+observation, T2–T6 fixture execution, normal and premature exits, timeout
+termination and cleanup. Ten consecutive self-test repetitions passed; measured
+elapsed times were approximately 3.1–3.3 seconds per run. Official Codex
+execution remains a separate acceptance stage.
 
 ## Synthetic phase (no real account)
 

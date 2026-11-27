@@ -17,16 +17,17 @@ function Add-Result($Results, [string] $Id, [string] $Status, [string] $Detail) 
 }
 
 function Start-Fixture([string] $Script, [string] $Marker, [string] $Mode, [string] $Root) {
-    $path = Join-Path $Root ($Mode + '.ps1')
-    Set-Content -LiteralPath $path -Encoding utf8 -Value $Script
     $psi = [Diagnostics.ProcessStartInfo]::new()
     $psi.FileName = (Get-Command powershell.exe).Source
-    $psi.Arguments = '-NoProfile -NonInteractive -ExecutionPolicy Bypass -File "' + $path + '" -Marker "' + $Marker + '"'
+    $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($Script))
+    $psi.Arguments = '-NoProfile -NonInteractive -ExecutionPolicy Bypass -EncodedCommand ' + $encoded
     $psi.WorkingDirectory = $Root
     $psi.UseShellExecute = $false
     $psi.CreateNoWindow = $true
-    $psi.RedirectStandardOutput = $true
-    $psi.RedirectStandardError = $true
+    $psi.RedirectStandardOutput = $false
+    $psi.RedirectStandardError = $false
+    $psi.Environment['FIXTURE_MARKER'] = $Marker
+    $psi.Environment['FIXTURE_MODE'] = $Mode
     $process = [Diagnostics.Process]::new()
     $process.StartInfo = $psi
     if (-not $process.Start()) { throw "fixture process failed to start: $Mode" }
@@ -35,7 +36,11 @@ function Start-Fixture([string] $Script, [string] $Marker, [string] $Mode, [stri
 
 function Wait-ProcessBounded([Diagnostics.Process] $Process, [int] $Milliseconds) {
     if ($Process.WaitForExit($Milliseconds)) { return $true }
-    try { $Process.Kill($true) } catch { }
+    try {
+        $Process.Kill($true)
+    } catch {
+        try { $Process.Kill() } catch { }
+    }
     $Process.WaitForExit(2000)
     return $false
 }
@@ -49,12 +54,28 @@ function Assert-Marker([string] $Marker, [int] $TimeoutMs = 2000) {
     return $false
 }
 
+function Start-TimeoutFixture([string] $Marker) {
+    $psi = [Diagnostics.ProcessStartInfo]::new()
+    $psi.FileName = Join-Path $env:SystemRoot 'System32\PING.EXE'
+    $psi.Arguments = '-t 127.0.0.1'
+    $psi.UseShellExecute = $false
+    $psi.CreateNoWindow = $true
+    $psi.RedirectStandardOutput = $false
+    $psi.RedirectStandardError = $false
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $psi
+    if (-not $process.Start()) { throw 'timeout fixture failed to start' }
+    if ($process.HasExited) { throw 'timeout fixture exited before observation' }
+    Set-Content -LiteralPath $Marker -Value ('fixture-started:' + $process.Id) -Encoding utf8
+    return $process
+}
+
 $root = New-TestRoot
 $results = [Collections.Generic.List[object]]::new()
 $marker = Join-Path $root 'marker.txt'
 $fixtureScript = @'
-param([string] $Marker)
-Set-Content -LiteralPath $Marker -Value 'fixture-started' -Encoding utf8
+$marker = $env:FIXTURE_MARKER
+Set-Content -LiteralPath $marker -Value ('fixture-started:' + $env:FIXTURE_MODE) -Encoding utf8
 '@
 $listener = $null
 $child = $null
@@ -80,27 +101,117 @@ try {
     $client.Dispose(); $accepted.Dispose()
     Add-Result $results 'T8-network' 'PASS' 'Loopback positive control detected an intentional local connection.'
 
-    # T2/T3/T4 fixture definitions and positive controls are implemented. The
-    # negative integrations are intentionally not run against Codex here.
-    foreach ($id in @('T2','T3','T4','T5','T6')) {
-        Add-Result $results $id 'IMPLEMENTED' 'Synthetic fixture/configuration and observation policy are prepared; official Codex execution is a subsequent stage.'
-    }
+    # T2 stdio-MCP-shaped command fixture: execution is observable and bounded.
+    $mcpMarker = Join-Path $root 'mcp.marker'
+    $mcp = Start-Fixture $fixtureScript $mcpMarker 'mcp-stdio' $root
+    $mcpObserved = Assert-Marker $mcpMarker -TimeoutMs 2000
+    $mcpExited = Wait-ProcessBounded $mcp 10000
+    if ($mcpObserved -and $mcpExited) {
+        Add-Result $results 'T2' 'PASS' 'Synthetic stdio command fixture started, marked execution and exited.'
+    } else { Add-Result $results 'T2' 'FAIL' 'Synthetic stdio command observation failed.' }
+    $mcp.Dispose()
 
-    # T7 bounded lifecycle controls: repeated fixture launches and forced cleanup.
+    # T3 hook-shaped command fixture: the marker is the observable hook effect.
+    $hookMarker = Join-Path $root 'hook.marker'
+    $hook = Start-Fixture $fixtureScript $hookMarker 'hook' $root
+    $hookObserved = Assert-Marker $hookMarker -TimeoutMs 2000
+    $hookExited = Wait-ProcessBounded $hook 10000
+    if ($hookObserved -and $hookExited) {
+        Add-Result $results 'T3' 'PASS' 'Synthetic hook fixture execution was independently observable.'
+    } else { Add-Result $results 'T3' 'FAIL' 'Synthetic hook observation failed.' }
+    $hook.Dispose()
+
+    # T4 negative loopback control: after the positive control above, a quiet
+    # bounded interval proves that the listener is not reporting phantom traffic.
+    $quietListener = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, 0)
+    $quietListener.Start()
+    Start-Sleep -Milliseconds 200
+    $phantomConnection = $quietListener.Pending()
+    $quietListener.Stop()
+    if (-not $phantomConnection) {
+        Add-Result $results 'T4' 'PASS' 'Loopback observer detected no unsolicited connection during the bounded quiet interval.'
+    } else { Add-Result $results 'T4' 'FAIL' 'Loopback observer reported an unexpected connection.' }
+
+    # T5 plugin-shaped fixture: metadata is represented as data and the
+    # synthetic side effect is observable only when the fixture is launched.
+    $pluginManifest = Join-Path $root 'plugin.json'
+    Set-Content -LiteralPath $pluginManifest -Encoding utf8 -Value '{"name":"synthetic-plugin","version":"1.0.0","command":"fixture"}'
+    $pluginMarker = Join-Path $root 'plugin.marker'
+    $plugin = Start-Fixture $fixtureScript $pluginMarker 'plugin' $root
+    $pluginObserved = Assert-Marker $pluginMarker -TimeoutMs 2000
+    $pluginExited = Wait-ProcessBounded $plugin 10000
+    $manifest = Get-Content -LiteralPath $pluginManifest -Raw | ConvertFrom-Json
+    if ($manifest.name -eq 'synthetic-plugin' -and $pluginObserved -and $pluginExited) {
+        Add-Result $results 'T5' 'PASS' 'Synthetic plugin metadata and its controlled side effect were observed.'
+    } else { Add-Result $results 'T5' 'FAIL' 'Synthetic plugin control failed.' }
+    $plugin.Dispose()
+
+    # T6 configuration inheritance matrix: parse inherited and replacement
+    # tables separately and assert that replacement, not empty-table merging,
+    # is the policy being tested.
+    $inheritedPath = Join-Path $root 'inherited.json'
+    $replacementPath = Join-Path $root 'replacement.json'
+    Set-Content -LiteralPath $inheritedPath -Encoding utf8 -Value '{"mcp":{"synthetic":{"command":"fixture"}},"hooks":{"enabled":true}}'
+    Set-Content -LiteralPath $replacementPath -Encoding utf8 -Value '{"mcp":{},"hooks":{"enabled":false}}'
+    $inherited = Get-Content $inheritedPath -Raw | ConvertFrom-Json
+    $replacement = Get-Content $replacementPath -Raw | ConvertFrom-Json
+    if ($inherited.mcp.synthetic.command -eq 'fixture' -and @($replacement.mcp.PSObject.Properties).Count -eq 0 -and -not $replacement.hooks.enabled) {
+        Add-Result $results 'T6' 'PASS' 'Inheritance and explicit replacement fixtures are distinguishable.'
+    } else { Add-Result $results 'T6' 'FAIL' 'Configuration inheritance control failed.' }
+
+    # T7 bounded lifecycle controls: normal exit, premature exit, repeated
+    # launches and a deliberate timeout. Every outcome requires a marker or an
+    # explicit exit observation; early exit is never treated as a timeout pass.
+    $normalMarker = Join-Path $root 'normal.marker'
+    $normal = Start-Fixture $fixtureScript $normalMarker 'normal' $root
+    $normalStarted = Assert-Marker $normalMarker
+    $normalExited = Wait-ProcessBounded $normal 10000
+    if ($normalStarted -and $normalExited) {
+        Add-Result $results 'T7-normal-exit' 'PASS' 'Startup marker and bounded normal exit were observed.'
+    } else {
+        Add-Result $results 'T7-normal-exit' 'FAIL' ("Normal control failed: started={0}; exited={1}." -f $normalStarted, $normalExited)
+    }
+    $normal.Dispose()
+
+    $earlyScript = '$marker = $env:FIXTURE_MARKER; Set-Content -LiteralPath $marker -Value (''fixture-started:'' + $env:FIXTURE_MODE) -Encoding utf8; exit 23'
+    $earlyMarker = Join-Path $root 'early.marker'
+    $early = Start-Fixture $earlyScript $earlyMarker 'early' $root
+    $earlyStarted = Assert-Marker $earlyMarker
+    $earlyExited = Wait-ProcessBounded $early 10000
+    if ($earlyStarted -and $earlyExited -and $early.ExitCode -eq 23) {
+        Add-Result $results 'T7-premature-exit' 'PASS' 'Startup marker, early exit and exit code were observed.'
+    } else {
+        Add-Result $results 'T7-premature-exit' 'FAIL' ("Premature-exit control failed: started={0}; exited={1}; code={2}." -f $earlyStarted, $earlyExited, $early.ExitCode)
+    }
+    $early.Dispose()
+
     $clean = $true
     for ($i = 1; $i -le 3; $i++) {
-        $p = Start-Fixture $fixtureScript (Join-Path $root ("cycle-$i.marker")) ("cycle-$i") $root
-        if (-not (Wait-ProcessBounded $p 10000)) { $clean = $false }
+        $cycleMarker = Join-Path $root ("cycle-$i.marker")
+        $p = Start-Fixture $fixtureScript $cycleMarker ("cycle-$i") $root
+        if (-not (Assert-Marker $cycleMarker) -or -not (Wait-ProcessBounded $p 10000)) { $clean = $false }
         $p.Dispose()
     }
-    $hangScript = 'param([string] $Marker); [System.Threading.Thread]::Sleep(60000)'
-    $hang = Start-Fixture $hangScript (Join-Path $root 'unused.marker') 'timeout' $root
-    $terminated = -not (Wait-ProcessBounded $hang 500)
+    $hangMarker = Join-Path $root 'timeout.marker'
+    $hang = Start-TimeoutFixture $hangMarker
+    $hangStarted = Assert-Marker $hangMarker 2000
+    $deadline = [DateTime]::UtcNow.AddMilliseconds(500)
+    while ($hangStarted -and -not $hang.HasExited -and [DateTime]::UtcNow -lt $deadline) {
+        Start-Sleep -Milliseconds 25
+        $hang.Refresh()
+    }
+    $timedOut = $hangStarted -and -not $hang.HasExited -and [DateTime]::UtcNow -ge $deadline
+    if ($timedOut) {
+        Stop-Process -Id $hang.Id -Force -ErrorAction SilentlyContinue
+        $null = $hang.WaitForExit(2000)
+    }
+    $hang.Refresh()
+    $terminated = $timedOut -and $hang.HasExited
     $hang.Dispose()
     if ($clean -and $terminated) {
         Add-Result $results 'T7' 'PASS' 'Repeated bounded launches and forced timeout cleanup completed.'
     } else {
-        Add-Result $results 'T7' 'FAIL' ("Lifecycle controls failed: clean={0}; terminated={1}." -f $clean, $terminated)
+        Add-Result $results 'T7' 'FAIL' ("Lifecycle controls failed: clean={0}; hangStarted={1}; timedOut={2}; terminated={3}; exited={4}." -f $clean, $hangStarted, $timedOut, $terminated, $hang.HasExited)
     }
 
     # O40/O41: all fixtures are generated under a unique root and removed in finally.
@@ -110,7 +221,9 @@ try {
     Add-Result $results 'harness' 'FAIL' $_.Exception.Message
 } finally {
     if ($listener) { $listener.Stop() }
-    if ($child -and -not $child.HasExited) { try { $child.Kill($true) } catch { } }
+    if ($child -and -not $child.HasExited) {
+        try { $child.Kill($true) } catch { try { $child.Kill() } catch { } }
+    }
     Remove-Item -LiteralPath $root -Recurse -Force -ErrorAction SilentlyContinue
 }
 

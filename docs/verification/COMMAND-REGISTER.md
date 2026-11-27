@@ -9,3 +9,5 @@
 | `cargo audit --json` | 0 | 0 vulnerabilities; advisory DB `c5279d0b0c9e8b70df666eb6d1edbabcfd1176bd` |
 | `cargo deny check` | 0 | Advisories, bans, licenses and sources passed; duplicate `syn` warning |
 | PowerShell JSON parse of `docs/verification/checklist-dispositions.json` | 0 | 524 item records, 524 unique identifiers |
+| `powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File verification/Verify-Fixtures.ps1` | 0 | Synthetic suite passed; official Codex was not executed |
+| Ten repeated synthetic fixture runs | 0 each | 10/10 passed; elapsed milliseconds: 3185, 3306, 3212, 3224, 3249, 3173, 3146, 3253, 3188, 3207 |

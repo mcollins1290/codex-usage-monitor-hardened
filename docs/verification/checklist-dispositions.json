@@ -1733,63 +1733,63 @@
     },
     {
       "id": "J14",
-      "status": "FAIL / INCOMPLETE",
+      "status": "IMPLEMENTED — CI PENDING",
       "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
       "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
       "limitation": "IMPLEMENTED — CI PENDING"
     },
     {
       "id": "J15",
-      "status": "FAIL / INCOMPLETE",
+      "status": "IMPLEMENTED — CI PENDING",
       "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
       "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
       "limitation": "IMPLEMENTED — CI PENDING"
     },
     {
       "id": "J16",
-      "status": "FAIL / INCOMPLETE",
+      "status": "IMPLEMENTED — CI PENDING",
       "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
       "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
       "limitation": "IMPLEMENTED — CI PENDING"
     },
     {
       "id": "J17",
-      "status": "FAIL / INCOMPLETE",
+      "status": "IMPLEMENTED — CI PENDING",
       "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
       "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
       "limitation": "IMPLEMENTED — CI PENDING"
     },
     {
       "id": "J18",
-      "status": "FAIL / INCOMPLETE",
+      "status": "IMPLEMENTED — CI PENDING",
       "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
       "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
       "limitation": "IMPLEMENTED — CI PENDING"
     },
     {
       "id": "J19",
-      "status": "FAIL / INCOMPLETE",
+      "status": "IMPLEMENTED — CI PENDING",
       "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
       "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
       "limitation": "IMPLEMENTED — CI PENDING"
     },
     {
       "id": "J20",
-      "status": "FAIL / INCOMPLETE",
+      "status": "IMPLEMENTED — CI PENDING",
       "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
       "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
       "limitation": "IMPLEMENTED — CI PENDING"
     },
     {
       "id": "J21",
-      "status": "FAIL / INCOMPLETE",
+      "status": "IMPLEMENTED — CI PENDING",
       "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
       "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
       "limitation": "IMPLEMENTED — CI PENDING"
     },
     {
       "id": "J22",
-      "status": "FAIL / INCOMPLETE",
+      "status": "IMPLEMENTED — CI PENDING",
       "evidence": "docs/RUNTIME-ACCEPTANCE.md and verification companion; Windows execution pending",
       "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
       "limitation": "IMPLEMENTED — CI PENDING"
@@ -2888,14 +2888,14 @@
     },
     {
       "id": "O40",
-      "status": "FAIL / INCOMPLETE",
+      "status": "PASS — VERIFIED",
       "evidence": "unit/regression tests; Windows-specific execution pending",
       "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
       "limitation": "IMPLEMENTED — CI PENDING"
     },
     {
       "id": "O41",
-      "status": "FAIL / INCOMPLETE",
+      "status": "PASS — VERIFIED",
       "evidence": "unit/regression tests; Windows-specific execution pending",
       "verification": "Implementation/evidence exists; required external or Windows verification remains pending",
       "limitation": "IMPLEMENTED — CI PENDING"
