@@ -1203,6 +1203,15 @@ mod tests {
         for directory in ["codex", "roaming", "local", "temp"] {
             std::fs::create_dir_all(root.join(directory)).expect("synthetic profile directory");
         }
+        if let Some(config_path) = std::env::var_os("CODEX_VERIFY_CONFIG_FILE") {
+            let config = std::fs::read_to_string(config_path).expect("synthetic config fixture");
+            assert!(
+                config.len() <= 64 * 1024,
+                "synthetic config fixture too large"
+            );
+            std::fs::write(root.join("codex").join("config.toml"), config)
+                .expect("synthetic config copy");
+        }
         let result = {
             let (mut child, mut stdin, stdout, stderr) = ContainedChild::launch(
                 &executable,

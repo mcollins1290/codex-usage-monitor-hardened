@@ -40,6 +40,23 @@ the sanitized unauthenticated response, and verifies reader completion and
 profile cleanup. It does not approve an executable or create a compatibility
 record.
 
+For later T2–T6 runs, set `CODEX_VERIFY_CONFIG_FILE` to a separately created
+fixture file. The test-only runner copies that bounded file into the synthetic
+`CODEX_HOME` before launch; it never reads the user's normal configuration.
+The 0.172.0 source uses `[mcp_servers.<name>]` with either `command`/`args` for
+stdio or `url` for streamable HTTP, and requires `environment_id`; these types
+are defined in `codex-rs/config/src/mcp_types.rs` (`McpServerConfig` and
+`McpServerTransportConfig`) at source commit `3d86e43b075adeba2193ec5c22ac92f55afd82e6`.
+Hooks use top-level event tables such as `[hooks]` with `SessionStart` or
+`PreToolUse` matcher arrays and tagged `type = "command"` handlers, as defined
+in `codex-rs/config/src/hook_config.rs` and `codex-rs/protocol/src/hooks.rs`.
+Plugins are represented by `[plugins._default]` and exact plugin keys in
+`config.toml`, while installed plugin metadata lives under the synthetic
+`CODEX_HOME` plugin cache; the version-matched CLI tests in
+`codex-rs/cli/tests/plugin_cli.rs` define the manifest layout. These references
+are preparation evidence, not proof that app-server activates an integration
+during an account-only exchange.
+
 On the approved local CLI 0.172.0 executable, this T1 exchange completed with
 the expected authentication-required result and clean bounded shutdown. This
 is not evidence that configured MCP, hooks, plugins, or other startup
