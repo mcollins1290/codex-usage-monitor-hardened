@@ -101,6 +101,7 @@ pub enum AppServerError {
     CompatibilityRequired,
     AuthenticationRequired,
     InvalidIdentity,
+    IdentityPathNotCanonical,
     ExecutableMissing,
     HashMismatch,
     #[allow(dead_code)]
@@ -441,7 +442,7 @@ pub fn validate_identity(identity: &ApprovedExecutable) -> Result<PathBuf, AppSe
         std::fs::canonicalize(&identity.path).map_err(|_| AppServerError::ExecutableMissing)?;
     // Approval must persist the canonical path, not a mutable alias.
     if canonical != identity.path || !canonical.is_file() {
-        return Err(AppServerError::InvalidIdentity);
+        return Err(AppServerError::IdentityPathNotCanonical);
     }
     let actual = sha256_file(&canonical)?;
     if !actual.eq_ignore_ascii_case(&identity.sha256) {
@@ -596,6 +597,30 @@ pub fn inspect_evidence_file(path: &Path) -> Result<ApprovedExecutable, AppServe
     let import: EvidenceImport =
         serde_json::from_slice(&bytes).map_err(|_| AppServerError::InvalidIdentity)?;
     inspect_evidence(import)
+}
+
+pub fn evidence_import_error_message(error: AppServerError) -> &'static str {
+    match error {
+        AppServerError::IdentityPathNotCanonical => {
+            "Evidence rejected: the executable path is not the exact Windows canonical path. Recreate evidence from the resolved executable target."
+        }
+        AppServerError::HashMismatch => {
+            "Evidence rejected: the executable hash does not match the approved fingerprint."
+        }
+        AppServerError::CompatibilityRequired => {
+            "Evidence rejected: schema, version, release, invocation policy, runtime evidence, or consent fields do not match the required values."
+        }
+        AppServerError::InvalidIdentity => {
+            "Evidence rejected: the evidence format or executable identity is invalid."
+        }
+        AppServerError::ExecutableMissing => {
+            "Evidence rejected: the referenced executable could not be found."
+        }
+        AppServerError::OutputTooLarge => {
+            "Evidence rejected: the evidence file exceeds the allowed size."
+        }
+        _ => "Evidence rejected: the evidence could not be validated.",
+    }
 }
 
 fn inspect_evidence(import: EvidenceImport) -> Result<ApprovedExecutable, AppServerError> {
@@ -1899,6 +1924,31 @@ mod tests {
             validate_identity(&wrong_version),
             Err(AppServerError::InvalidIdentity)
         );
+    }
+
+    #[test]
+    fn identity_rejects_noncanonical_windows_alias_with_specific_error() {
+        let path =
+            std::env::temp_dir().join(format!("codex-evidence-canonical-{}", std::process::id()));
+        std::fs::write(&path, b"synthetic executable identity").unwrap();
+        let canonical = std::fs::canonicalize(&path).unwrap();
+        if canonical != path {
+            let identity = ApprovedExecutable {
+                path: path.clone(),
+                sha256: sha256_file(&path).unwrap(),
+                version: CODEX_VERSION.to_owned(),
+                compatibility: None,
+            };
+            assert_eq!(
+                validate_identity(&identity),
+                Err(AppServerError::IdentityPathNotCanonical)
+            );
+            assert!(
+                evidence_import_error_message(AppServerError::IdentityPathNotCanonical)
+                    .contains("canonical")
+            );
+        }
+        std::fs::remove_file(path).unwrap();
     }
 
     #[test]

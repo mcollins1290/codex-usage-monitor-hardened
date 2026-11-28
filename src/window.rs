@@ -1298,8 +1298,12 @@ fn import_compatibility_evidence(hwnd: HWND) {
     let path = PathBuf::from(std::ffi::OsString::from_wide(&buffer[..end]));
     let candidate = match crate::app_server::inspect_evidence_file(&path) {
         Ok(candidate) => candidate,
-        Err(_) => {
-            show_error_message(hwnd, "Evidence rejected", "The evidence is incomplete, invalid or does not match the executable. No approval was recorded.");
+        Err(error) => {
+            show_error_message(
+                hwnd,
+                "Evidence rejected",
+                crate::app_server::evidence_import_error_message(error),
+            );
             return;
         }
     };

@@ -99,6 +99,7 @@ pub fn app_server_error(error: app_server::AppServerError) -> PollError {
     match error {
         AppServerError::CompatibilityRequired => PollError::ApprovalRequired,
         AppServerError::InvalidIdentity
+        | AppServerError::IdentityPathNotCanonical
         | AppServerError::ExecutableMissing
         | AppServerError::HashMismatch
         | AppServerError::VersionMismatch => PollError::ExecutableChanged,
