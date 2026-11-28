@@ -63,6 +63,29 @@ is not evidence that configured MCP, hooks, plugins, or other startup
 integrations are absent; T2–T6 require version-specific configuration fixtures
 and observer coverage and remain separate acceptance cases.
 
+## Unauthenticated official-runtime batch results
+
+The authorized batch used the pinned 0.172.0 identity and stayed below the
+20-invocation limit. T1 passed. A recognized-looking stdio MCP fixture and a
+required-stdio control both completed the fixed protocol without a marker; an
+invalid-config control also completed it. Because the observed behavior did
+not demonstrate that Codex recognized the fixture configuration, these T2
+results are `INCONCLUSIVE`, not proof of suppression. A loopback HTTP MCP
+fixture likewise produced no connection, but its recognition was not
+established, so T4 is `INCONCLUSIVE`. T3 and T5 were not activated because
+doing so safely would require a turn or a version-specific plugin activation
+path not demonstrated by this batch; T6 remains `INCONCLUSIVE` because the
+loader's effective precedence was not observable through the fixed account-only
+exchange. T7 repeated the fixed exchange with identity revalidation and
+bounded cleanup; all completed repetitions passed. T8 process/filesystem and
+loopback positive controls passed independently.
+
+Observed official-runtime network scope was limited to the loopback listener;
+the available observers do not establish comprehensive external-network or
+filesystem access absence. No prohibited activity, authentication, inference,
+thread, turn, or credential access was observed. The production launch freeze
+remains active, so these results do not authorize monitor polling.
+
 The synthetic fixture suite is `verification/Verify-Fixtures.ps1`. It runs
 without the official executable and covers positive process/filesystem/network
 observation, T2–T6 fixture execution, normal and premature exits, timeout
