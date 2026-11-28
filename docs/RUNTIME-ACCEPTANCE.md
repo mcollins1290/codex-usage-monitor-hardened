@@ -21,6 +21,31 @@ against the official Codex executable;
 those scenarios remain subject to official-runtime execution and independent
 review; the synthetic fixture and observation controls are implemented below.
 
+An explicitly selected external executable can be tested through the ignored
+Rust test-only entry point (the production launch freeze is not consulted or
+modified by this development-only path):
+
+```powershell
+$env:CODEX_VERIFY_EXECUTABLE = 'C:\path\to\approved\codex.exe'
+$env:CODEX_VERIFY_SHA256 = '<64-hex SHA-256>'
+$env:CODEX_VERIFY_VERSION = '<stable semver>'
+cargo test --locked app_server::tests::externally_selected_codex_unauthenticated_exchange -- --ignored --nocapture
+Remove-Item Env:CODEX_VERIFY_EXECUTABLE,Env:CODEX_VERIFY_SHA256,Env:CODEX_VERIFY_VERSION
+```
+
+The entry point validates the canonical path and hash, creates a disposable
+profile, uses the production creation-time Job Object and bounded readers,
+sends only `initialize`, `initialized`, and `account/rateLimits/read`, expects
+the sanitized unauthenticated response, and verifies reader completion and
+profile cleanup. It does not approve an executable or create a compatibility
+record.
+
+On the approved local CLI 0.172.0 executable, this T1 exchange completed with
+the expected authentication-required result and clean bounded shutdown. This
+is not evidence that configured MCP, hooks, plugins, or other startup
+integrations are absent; T2–T6 require version-specific configuration fixtures
+and observer coverage and remain separate acceptance cases.
+
 The synthetic fixture suite is `verification/Verify-Fixtures.ps1`. It runs
 without the official executable and covers positive process/filesystem/network
 observation, T2–T6 fixture execution, normal and premature exits, timeout

@@ -1156,6 +1156,96 @@ mod tests {
         }
     }
 
+    /// Explicitly invoked, test-only external verification entry point.
+    ///
+    /// This is intentionally not reachable from the production binary and does
+    /// not consult compatibility approval or the production launch function.
+    /// The caller must supply the executable path, expected hash, and expected
+    /// stable version; no discovery or implicit trust is performed.
+    #[test]
+    #[ignore = "requires explicit external executable authorization"]
+    fn externally_selected_codex_unauthenticated_exchange() {
+        let executable = std::env::var_os("CODEX_VERIFY_EXECUTABLE")
+            .expect("CODEX_VERIFY_EXECUTABLE must be explicitly supplied");
+        let expected_hash = std::env::var("CODEX_VERIFY_SHA256")
+            .expect("CODEX_VERIFY_SHA256 must be explicitly supplied");
+        let expected_version = std::env::var("CODEX_VERIFY_VERSION")
+            .expect("CODEX_VERIFY_VERSION must be explicitly supplied");
+        assert!(
+            stable_version(&expected_version),
+            "unstable version supplied"
+        );
+        let selected_path = std::fs::canonicalize(PathBuf::from(executable))
+            .expect("selected executable canonical path");
+        let identity = ApprovedExecutable {
+            path: selected_path,
+            sha256: expected_hash,
+            version: expected_version,
+            compatibility: None,
+        };
+        let executable = validate_identity(&identity).expect("selected executable identity");
+        let actual_hash = sha256_file(&executable).expect("selected executable hash");
+        assert_eq!(
+            actual_hash.to_ascii_lowercase(),
+            identity.sha256.to_ascii_lowercase(),
+            "selected executable changed before launch"
+        );
+
+        let root = std::env::temp_dir().join(format!(
+            "codex-external-verification-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("system clock")
+                .as_nanos()
+        ));
+        std::fs::create_dir_all(&root).expect("verification root");
+        for directory in ["codex", "roaming", "local", "temp"] {
+            std::fs::create_dir_all(root.join(directory)).expect("synthetic profile directory");
+        }
+        let result = {
+            let (mut child, mut stdin, stdout, stderr) = ContainedChild::launch(
+                &executable,
+                &root,
+                "app-server --listen stdio://",
+                Some(&root),
+            )
+            .expect("contained app-server launch");
+            let (tx, rx) = sync_channel(16);
+            let output_limit = Arc::new(AtomicBool::new(false));
+            let stdout_thread = std::thread::spawn({
+                let limit = Arc::clone(&output_limit);
+                move || read_stdout(stdout, tx, limit)
+            });
+            let stderr_limit = Arc::clone(&output_limit);
+            let stderr_thread = std::thread::spawn(move || drain_stderr(stderr, stderr_limit));
+            let exchange_result = exchange(&mut stdin, |id, deadline| {
+                receive_response(&rx, &output_limit, id, deadline)
+            });
+            drop(stdin);
+            drop(rx);
+            let shutdown_result = child.shutdown(exchange_result.is_ok());
+            let readers_result = finish_readers([stdout_thread, stderr_thread]);
+            (exchange_result, shutdown_result, readers_result)
+        };
+        let cleanup_result = std::fs::remove_dir_all(&root);
+        assert!(!root.exists(), "verification root was not removed");
+        cleanup_result.expect("verification root cleanup");
+        let (exchange_result, shutdown_result, readers_result) = result;
+        if !matches!(exchange_result, Err(AppServerError::AuthenticationRequired)) {
+            panic!(
+                "expected the sanitized unauthenticated rate-limit response; category={:?}",
+                exchange_result.err()
+            );
+        }
+        shutdown_result.expect("bounded app-server shutdown");
+        readers_result.expect("stdout/stderr reader completion");
+        println!(
+            "EXTERNAL_CODEX_VERIFICATION_OK version={} hash={}",
+            identity.version, identity.sha256
+        );
+    }
+
     // The fixture uses this test executable, not Codex. It must only be run
     // explicitly by the two parent tests below.
     #[test]

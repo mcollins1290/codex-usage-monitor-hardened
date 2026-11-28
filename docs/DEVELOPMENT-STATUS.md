@@ -54,7 +54,7 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 ## App-server evidence
 
 - CLI 0.166.0: earlier local authenticated quota feasibility succeeded; executable subsequently replaced.
-- CLI 0.172.0: local synthetic verifier report confirms initialize, initialized and account/rateLimits/read; expected authentication-required error (-32600); clean exit in 508 ms. This was reported by local Codex, not independently reproduced in CI.
+- CLI 0.172.0: the explicitly selected local executable passed the development-only Rust external T1 entry point in a fresh synthetic profile; initialize, initialized and account/rateLimits/read completed with the expected sanitized authentication-required result, bounded shutdown, reader completion and profile cleanup. This does not establish absence of MCP, hook or plugin startup activity.
 - Startup integration side effects, authenticated behavior on 0.172.0 and full T2–T8 synthetic tests remain unverified. Do not infer safety from protocol success alone.
 - Never publish local executable paths, personal configuration, account data, credentials or private logs.
 
