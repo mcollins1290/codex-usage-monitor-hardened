@@ -1,7 +1,7 @@
 # Development status
 
 **Last updated:** 2026-11-27 (US Eastern)  
-**Decision:** GO for development; NO GO for installation or authenticated polling.
+**Decision:** GO for development and authenticated polling; final installation remains pending Windows CI and owner desktop acceptance.
 
 ## Objective
 
@@ -23,7 +23,7 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 
 - [x] Upstream security review, fork and independent review.
 - [x] Remove active direct OAuth/HTTP quota path, inference fallback, updater and MCP listener.
-- [x] Enforce unconditional authenticated app-server launch freeze.
+- [x] Replace the temporary authenticated launch freeze with the reviewed fail-closed compatibility gate.
 - [x] Isolate primary settings, startup registry key, window classes, mutex and executable name.
 - [x] Remove upstream settings/startup migration and inherited installer/uninstaller.
 - [x] Wait for initialization response before sending quota request.
@@ -38,7 +38,7 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 | H1 | Output queue deadlock | Remediated in source; runtime tests outstanding |
 | H2 | Unbounded output allocation | Remediated in source; runtime tests outstanding |
 | H3 | Job Object assignment after process creation | Creation-time JOB_LIST and HANDLE_LIST implemented; synthetic lifecycle tests passed on Windows |
-| H4 | Missing runtime security gate | Launch freeze enforced; accepted policy still required |
+| H4 | Missing runtime security gate | Reviewed invocation and authenticated acceptance recorded; compatibility gate required |
 | H5 | Application identity isolation | Partial; audit remaining metadata, paths and scripts |
 | M1 | Canonical path / hash-to-launch race | Read-only file sharing lock held and hash rechecked through launch; directory alias races still require review |
 | M2 | Independent executable version verification | Isolated profile, strict parser and negative probe tests passed in CI; real Codex positive control and approval workflow integration pending |
@@ -84,7 +84,7 @@ Continue without intermediate automatic CI; restore full CI at final verificatio
 ## Acceptance and operating boundaries
 
 - Every candidate must pass formatting, locked tests and Windows release compilation.
-- Production launch remains blocked until startup policy and runtime verification are accepted.
+- Production launch is enabled only for a fully approved identity matching the reviewed invocation policy and completed runtime evidence.
 - No automatic approval of new executable versions or hashes.
 - No merge to main, release publication, repository security-setting changes or local installation without explicit approval.
 - GitHub commits and CI are the durable development evidence. Update this document at each substantive milestone, recording verified results separately from pending work.
@@ -111,7 +111,7 @@ Manual RustSec review completed at database revision `c9f6c91a44dbad9d71742329e9
 
 ### Approval persistence correction
 
-Approval import rejects unknown identity fields and non-file or oversized evidence. Confirmation reports success only after settings persistence; failed approval saves restore the previous in-memory identity. Failed revocation saves keep the session revoked and explicitly warn that old disk state may remain. Production launch freeze unchanged. Final Windows CI pending.
+Approval import rejects unknown identity fields and non-file or oversized evidence. Confirmation reports success only after settings persistence; failed approval saves restore the previous in-memory identity. Failed revocation saves keep the session revoked and explicitly warn that old disk state may remain. Authenticated production-path acceptance passed for the pinned 0.172.0 executable; final Windows CI remains pending.
 
 ### Approval regression coverage
 

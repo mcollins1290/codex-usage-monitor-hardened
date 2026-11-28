@@ -1,12 +1,11 @@
 # Runtime acceptance checklist
 
-Production app-server launch remains frozen. This checklist does not authorize an authenticated launch or replace independent evidence.
+Production app-server launch is enabled only through the completed fail-closed compatibility gate. This checklist records independent evidence and does not bypass that gate.
 
 The reviewed invocation policy candidate is fixed in `src/app_server.rs` as
 `app-server --listen stdio:// --disable plugins -c "mcp_servers={}"`.
 The explicit empty-table override replaces configured MCP servers, and the
-official `Plugins` feature is disabled. The production freeze remains active
-until authenticated acceptance is recorded.
+official `Plugins` feature is disabled.
 
 ## Reusable harness
 
@@ -64,11 +63,11 @@ Plugins are represented by `[plugins._default]` and exact plugin keys in
 are preparation evidence, not proof that app-server activates an integration
 during an account-only exchange.
 
-On the approved local CLI 0.172.0 executable, this T1 exchange completed with
-the expected authentication-required result and clean bounded shutdown. This
-is not evidence that configured MCP, hooks, plugins, or other startup
-integrations are absent; T2–T6 require version-specific configuration fixtures
-and observer coverage and remain separate acceptance cases.
+On the approved local CLI 0.172.0 executable, the exact reviewed invocation
+completed authenticated quota retrieval with clean bounded shutdown. The
+sanitized observation was 89.000% remaining for the five-hour window and
+48.000% remaining for the weekly window; both reset timestamps were returned,
+and the genuine config.toml hash was unchanged.
 
 ## Unauthenticated official-runtime batch results
 
@@ -89,9 +88,18 @@ loopback positive controls passed independently.
 
 Observed official-runtime network scope was limited to the loopback listener;
 the available observers do not establish comprehensive external-network or
-filesystem access absence. No prohibited activity, authentication, inference,
-thread, turn, or credential access was observed. The production launch freeze
-remains active, so these results do not authorize monitor polling.
+filesystem access absence. No prohibited activity, inference, thread, turn, or
+credential access was observed. The compatibility record authorizes polling
+only for this exact identity and invocation policy; changed, moved, incomplete,
+or revoked identities remain blocked.
+
+## Authenticated official-runtime acceptance
+
+The approved 0.172.0 executable was run once through the production
+`read_rate_limits` path using the reviewed invocation. The process returned
+both Codex quota windows, completed bounded cleanup, and left the genuine
+`config.toml` content hash unchanged. No authentication token, raw response,
+account identifier, thread, turn, or inference request was accessed or logged.
 
 The synthetic fixture suite is `verification/Verify-Fixtures.ps1`. It runs
 without the official executable and covers positive process/filesystem/network

@@ -31,10 +31,10 @@
       "status": "PASS — VERIFIED",
       "source": [
         "src/app_server.rs",
-        "src/app_server.rs::require_startup_acceptance",
+        "src/app_server.rs::check_compatibility",
         "src/app_server.rs::tests::unverified_startup_cannot_launch_even_with_configured_identity"
       ],
-      "result": "The fixed protocol implementation and unconditional production launch freeze are covered by source inspection and regression tests."
+      "result": "The fixed protocol implementation and fail-closed compatibility launch gate are covered by source inspection and regression tests."
     },
     "local_verification": {
       "status": "PASS — VERIFIED",
@@ -56,7 +56,7 @@
     "startup_security": {
       "status": "EXTERNAL ACCEPTANCE PENDING",
       "source": "docs/RUNTIME-ACCEPTANCE.md; docs/hardened-architecture.md",
-      "result": "Authenticated startup-side-effect verification has not been performed and the production launch freeze remains enforced."
+      "result": "Authenticated production-path acceptance passed for the pinned executable; the reviewed suppression policy and remaining observation limits are recorded in docs/RUNTIME-ACCEPTANCE.md."
     },
     "windows_acceptance": {
       "status": "IMPLEMENTED — CI PENDING",

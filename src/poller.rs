@@ -97,9 +97,7 @@ fn format_countdown_from_secs(total_secs: u64, strings: Strings) -> String {
 pub fn app_server_error(error: app_server::AppServerError) -> PollError {
     use app_server::AppServerError;
     match error {
-        AppServerError::StartupNotVerified | AppServerError::CompatibilityRequired => {
-            PollError::ApprovalRequired
-        }
+        AppServerError::CompatibilityRequired => PollError::ApprovalRequired,
         AppServerError::InvalidIdentity
         | AppServerError::ExecutableMissing
         | AppServerError::HashMismatch

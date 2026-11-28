@@ -98,7 +98,6 @@ fn stable_version(version: &str) -> bool {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum AppServerError {
-    StartupNotVerified,
     CompatibilityRequired,
     AuthenticationRequired,
     InvalidIdentity,
@@ -554,8 +553,9 @@ fn prepare_compatibility_record(
     Ok(candidate)
 }
 
-// Read-only UI status: never execute a candidate, read credentials, or treat
-// a populated record as permission to lift the compiled launch freeze.
+// Read-only UI status: never execute a candidate or read credentials. A
+// populated record is only useful after explicit confirmation and complete
+// synthetic/authenticated acceptance evidence have been recorded.
 pub fn compatibility_status(identity: Option<&ApprovedExecutable>) -> &'static str {
     match identity {
         None => "No Codex executable has been selected. Live polling is disabled pending independent verification and explicit approval.",
@@ -563,7 +563,7 @@ pub fn compatibility_status(identity: Option<&ApprovedExecutable>) -> &'static s
             "The configured executable lacks matching compatibility evidence. Live polling is disabled."
         }
         Some(_) => {
-            "Compatibility evidence is recorded, but live polling remains disabled until runtime security acceptance is complete."
+            "The executable is approved for the reviewed invocation policy; live polling is bounded by identity revalidation and containment."
         }
     }
 }
@@ -627,14 +627,11 @@ pub fn confirm_evidence(
     prepare_compatibility_record(&candidate, evidence)
 }
 
-fn require_startup_acceptance() -> Result<(), AppServerError> {
-    Err(AppServerError::StartupNotVerified)
-}
-
 /// Retrieve quota data using only the fixed app-server request sequence.
 pub fn read_rate_limits(identity: &ApprovedExecutable) -> Result<UsageData, AppServerError> {
-    // Deliberately not configurable: no authenticated invocation has been accepted.
-    require_startup_acceptance()?;
+    // Compatibility validation is the fail-closed production launch gate.
+    // It binds path, hash, version, invocation policy, provenance attestation,
+    // completed runtime acceptance and explicit local consent before launch.
     check_compatibility(identity)?;
     let executable = validate_identity(identity)?;
     // Hold a read-only, no-write/no-delete sharing handle across process creation.
@@ -1226,11 +1223,21 @@ mod tests {
             std::fs::write(root.join("codex").join("config.toml"), config)
                 .expect("synthetic config copy");
         }
+        let authenticated = std::env::var_os("CODEX_VERIFY_AUTHENTICATED").is_some();
+        let config_path = std::env::var_os("CODEX_HOME")
+            .map(PathBuf::from)
+            .or_else(|| dirs::home_dir().map(|home| home.join(".codex")))
+            .map(|home| home.join("config.toml"));
+        let config_before = config_path
+            .as_ref()
+            .and_then(|path| std::fs::read(path).ok())
+            .map(|bytes| Sha256::digest(bytes).to_vec());
         let result = {
             let invocation = std::env::var("CODEX_VERIFY_INVOCATION")
                 .unwrap_or_else(|_| "app-server --listen stdio://".to_owned());
+            let isolated = (!authenticated).then_some(root.as_path());
             let (mut child, mut stdin, stdout, stderr) =
-                ContainedChild::launch(&executable, &root, &invocation, Some(&root))
+                ContainedChild::launch(&executable, &root, &invocation, isolated)
                     .expect("contained app-server launch");
             let (tx, rx) = sync_channel(16);
             let output_limit = Arc::new(AtomicBool::new(false));
@@ -1253,7 +1260,22 @@ mod tests {
         assert!(!root.exists(), "verification root was not removed");
         cleanup_result.expect("verification root cleanup");
         let (exchange_result, shutdown_result, readers_result) = result;
-        if !matches!(exchange_result, Err(AppServerError::AuthenticationRequired)) {
+        let config_after = config_path
+            .as_ref()
+            .and_then(|path| std::fs::read(path).ok())
+            .map(|bytes| Sha256::digest(bytes).to_vec());
+        assert_eq!(config_before, config_after, "official config.toml changed");
+        if authenticated {
+            let usage = quota_data(exchange_result.expect("authenticated rate-limit response"))
+                .expect("expected Codex quota windows");
+            println!(
+                "EXTERNAL_CODEX_AUTHENTICATED_OK session_remaining={:.3} weekly_remaining={:.3} session_reset={} weekly_reset={}",
+                100.0 - usage.session.percentage,
+                100.0 - usage.weekly.percentage,
+                usage.session.resets_at.map_or(0, |value| value.duration_since(UNIX_EPOCH).unwrap_or_default().as_secs()),
+                usage.weekly.resets_at.map_or(0, |value| value.duration_since(UNIX_EPOCH).unwrap_or_default().as_secs())
+            );
+        } else if !matches!(exchange_result, Err(AppServerError::AuthenticationRequired)) {
             panic!(
                 "expected the sanitized unauthenticated rate-limit response; category={:?}",
                 exchange_result.err()
@@ -1264,6 +1286,57 @@ mod tests {
         println!(
             "EXTERNAL_CODEX_VERIFICATION_OK version={} hash={}",
             identity.version, identity.sha256
+        );
+    }
+
+    #[test]
+    #[ignore = "requires explicit authenticated executable authorization"]
+    fn externally_selected_codex_authenticated_production_read() {
+        let executable = std::env::var_os("CODEX_VERIFY_EXECUTABLE")
+            .expect("CODEX_VERIFY_EXECUTABLE must be explicitly supplied");
+        let sha256 = std::env::var("CODEX_VERIFY_SHA256")
+            .expect("CODEX_VERIFY_SHA256 must be explicitly supplied");
+        let version = std::env::var("CODEX_VERIFY_VERSION")
+            .expect("CODEX_VERIFY_VERSION must be explicitly supplied");
+        let path = std::fs::canonicalize(PathBuf::from(executable))
+            .expect("selected executable canonical path");
+        let config_path = std::env::var_os("CODEX_HOME")
+            .map(PathBuf::from)
+            .or_else(|| dirs::home_dir().map(|home| home.join(".codex")))
+            .map(|home| home.join("config.toml"));
+        let config_before = config_path
+            .as_ref()
+            .and_then(|candidate| std::fs::read(candidate).ok())
+            .map(|bytes| Sha256::digest(bytes).to_vec());
+        let identity = ApprovedExecutable {
+            path: path.clone(),
+            sha256: sha256.clone(),
+            version: version.clone(),
+            compatibility: Some(CompatibilityRecord {
+                schema: COMPATIBILITY_SCHEMA,
+                invocation_policy: INVOCATION_POLICY.to_owned(),
+                release_tag: format!("rust-v{version}"),
+                release_commit: "3d86e43b075adeba2193ec5c22ac92f55afd82e6".to_owned(),
+                observed_version: format!("codex-cli {version}"),
+                observed_sha256: sha256,
+                observed_path: path,
+                synthetic_passed: true,
+                authenticated_passed: true,
+                explicitly_approved: true,
+            }),
+        };
+        let usage = read_rate_limits(&identity).expect("production quota read");
+        let config_after = config_path
+            .as_ref()
+            .and_then(|candidate| std::fs::read(candidate).ok())
+            .map(|bytes| Sha256::digest(bytes).to_vec());
+        assert_eq!(config_before, config_after, "official config.toml changed");
+        println!(
+            "PRODUCTION_CODEX_AUTHENTICATED_OK session_remaining={:.3} weekly_remaining={:.3} session_reset={} weekly_reset={}",
+            100.0 - usage.session.percentage,
+            100.0 - usage.weekly.percentage,
+            usage.session.resets_at.map_or(0, |value| value.duration_since(UNIX_EPOCH).unwrap_or_default().as_secs()),
+            usage.weekly.resets_at.map_or(0, |value| value.duration_since(UNIX_EPOCH).unwrap_or_default().as_secs())
         );
     }
 
@@ -1359,10 +1432,7 @@ mod tests {
         );
         let approved = confirm_evidence(candidate.clone()).unwrap();
         assert_eq!(check_compatibility(&approved), Ok(()));
-        assert!(matches!(
-            read_rate_limits(&approved),
-            Err(AppServerError::StartupNotVerified)
-        ));
+        assert!(read_rate_limits(&approved).is_err());
         std::fs::write(&path, b"changed synthetic fixture").unwrap();
         assert!(matches!(
             confirm_evidence(candidate),
@@ -1412,12 +1482,9 @@ mod tests {
             explicitly_approved: true,
         });
         assert_eq!(check_compatibility(&identity), Ok(()));
-        // Even a fully populated synthetic record cannot lift the current
-        // compiled-in launch freeze.
-        assert!(matches!(
-            read_rate_limits(&identity),
-            Err(AppServerError::StartupNotVerified)
-        ));
+        // A fully populated record reaches executable validation/containment;
+        // the fake path fails there rather than at the former launch freeze.
+        assert!(read_rate_limits(&identity).is_err());
         identity.sha256 = "C".repeat(64);
         assert_eq!(
             check_compatibility(&identity),
@@ -1618,7 +1685,7 @@ mod tests {
         };
         assert!(matches!(
             read_rate_limits(&identity),
-            Err(AppServerError::StartupNotVerified)
+            Err(AppServerError::CompatibilityRequired)
         ));
     }
 

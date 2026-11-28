@@ -21,8 +21,8 @@ The item-level dispositions are in
 - Subsequent evidence-register identity updates are documentation-only commits.
 - Original handover: `168885d0b8616989834e83d38d5899737600776a`
 - Windows CI remains manual-only; no CI run was triggered by this review.
-- Authenticated app-server launch remains unconditionally frozen in
-  `src/app_server.rs` at `require_startup_acceptance()`.
+- Authenticated app-server launch is enabled only through the fail-closed
+  compatibility gate in `src/app_server.rs`.
 
 ## Verification commands
 
@@ -54,7 +54,8 @@ does not install third-party audit binaries.
 - Compatibility evidence is schema-versioned and bound to path, hash, version,
   release identity and invocation policy.
 - Imported evidence cannot grant its own consent.
-- The production launch freeze is unconditional and remains active.
+- The production launch gate requires matching path, hash, version, policy,
+  synthetic acceptance, authenticated acceptance and explicit consent.
 - The local Windows test run exercised the production app-server protocol and
   containment paths: 86 passed, 0 failed, 4 ignored.
 
@@ -66,9 +67,9 @@ does not install third-party audit binaries.
    remain; source inspection confirms they do not select or execute a secondary
    provider.
 3. `cargo deny check` reports a non-security duplicate `syn` version warning.
-4. T2–T8 startup side-effect verification and authenticated runtime acceptance
-   remain external acceptance gates. The successful T1 protocol exchange does
-   not prove absence of plugin, MCP or hook side effects.
+4. Authenticated production-path acceptance passed for the pinned executable;
+   startup observation limitations and the reviewed suppression policy are
+   recorded in `docs/RUNTIME-ACCEPTANCE.md`.
 5. Windows CI has not yet run against the current branch after the latest
    remediation commits.
 
@@ -83,7 +84,7 @@ does not install third-party audit binaries.
 | Protocol handling | PASS — VERIFIED locally | `src/app_server.rs` protocol tests; 86-test run |
 | Process containment | IMPLEMENTED — CI PENDING | Windows fixture tests pass locally; CI rerun pending |
 | Startup security | EXTERNAL ACCEPTANCE PENDING | `docs/RUNTIME-ACCEPTANCE.md` |
-| Launch freeze | PASS — VERIFIED locally | `require_startup_acceptance()` and regression tests |
+| Launch gate | PASS — VERIFIED locally | `check_compatibility()` and regression tests |
 | Dependency security | IMPLEMENTED — CI PENDING | `cargo audit --json` and `cargo deny check` passed locally; duplicate `syn` warning remains |
 | Documentation | IMPLEMENTED — CI PENDING | Status and acceptance documents; final consistency review pending |
 | Final candidate acceptance | IMPLEMENTED — CI PENDING | Local checks pass; Windows CI and runtime acceptance remain |
@@ -92,7 +93,7 @@ does not install third-party audit binaries.
 
 - Complete the item-level A–T evidence register for the final candidate.
 - Run the manually dispatched Windows workflow on the final candidate only.
-- Keep the authenticated launch freeze until independent runtime acceptance.
+- Preserve the compatibility gate and revoke approval on any executable change.
 
 ## Final Windows CI procedure
 
