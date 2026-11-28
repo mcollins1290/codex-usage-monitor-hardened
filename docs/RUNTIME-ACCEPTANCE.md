@@ -2,6 +2,12 @@
 
 Production app-server launch remains frozen. This checklist does not authorize an authenticated launch or replace independent evidence.
 
+The reviewed invocation policy candidate is fixed in `src/app_server.rs` as
+`app-server --listen stdio:// --disable plugins -c "mcp_servers={}"`.
+The explicit empty-table override replaces configured MCP servers, and the
+official `Plugins` feature is disabled. The production freeze remains active
+until authenticated acceptance is recorded.
+
 ## Reusable harness
 
 The committed `verification/Verify-AppServer.ps1` file is a reporting shim; it
@@ -29,8 +35,9 @@ modified by this development-only path):
 $env:CODEX_VERIFY_EXECUTABLE = 'C:\path\to\approved\codex.exe'
 $env:CODEX_VERIFY_SHA256 = '<64-hex SHA-256>'
 $env:CODEX_VERIFY_VERSION = '<stable semver>'
+$env:CODEX_VERIFY_INVOCATION = 'app-server --listen stdio:// --disable plugins -c "mcp_servers={}"'
 cargo test --locked app_server::tests::externally_selected_codex_unauthenticated_exchange -- --ignored --nocapture
-Remove-Item Env:CODEX_VERIFY_EXECUTABLE,Env:CODEX_VERIFY_SHA256,Env:CODEX_VERIFY_VERSION
+Remove-Item Env:CODEX_VERIFY_EXECUTABLE,Env:CODEX_VERIFY_SHA256,Env:CODEX_VERIFY_VERSION,Env:CODEX_VERIFY_INVOCATION
 ```
 
 The entry point validates the canonical path and hash, creates a disposable

@@ -25,7 +25,9 @@ const SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(2);
 const STARTUP_TIMEOUT: Duration = Duration::from_secs(3);
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(7);
 const COMPATIBILITY_SCHEMA: u32 = 2;
-const INVOCATION_POLICY: &str = "account-only-stdio-v1";
+const INVOCATION_POLICY: &str = "account-only-stdio-v2-disable-plugins-clear-mcp";
+const APP_SERVER_INVOCATION: &str =
+    "app-server --listen stdio:// --disable plugins -c \"mcp_servers={}\"";
 #[cfg(test)]
 const CODEX_VERSION: &str = "0.172.0";
 
@@ -650,7 +652,7 @@ pub fn read_rate_limits(identity: &ApprovedExecutable) -> Result<UsageData, AppS
         .join("app-server-work");
     std::fs::create_dir_all(&workdir).map_err(|_| AppServerError::LaunchFailed)?;
     let (mut guard, mut stdin, stdout, stderr) =
-        ContainedChild::launch(&executable, &workdir, "app-server --listen stdio://", None)?;
+        ContainedChild::launch(&executable, &workdir, APP_SERVER_INVOCATION, None)?;
 
     drop(locked);
     let (tx, rx) = sync_channel(16);
@@ -910,6 +912,18 @@ fn window(window: Option<&RateLimitWindow>, session: bool) -> Result<UsageSectio
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn production_invocation_is_fixed_to_quota_only_policy() {
+        assert_eq!(
+            APP_SERVER_INVOCATION,
+            "app-server --listen stdio:// --disable plugins -c \"mcp_servers={}\""
+        );
+        assert_eq!(
+            INVOCATION_POLICY,
+            "account-only-stdio-v2-disable-plugins-clear-mcp"
+        );
+    }
 
     fn synthetic_arg(name: &str) -> Option<String> {
         std::env::args().skip_while(|arg| arg != name).nth(1)
@@ -1213,13 +1227,11 @@ mod tests {
                 .expect("synthetic config copy");
         }
         let result = {
-            let (mut child, mut stdin, stdout, stderr) = ContainedChild::launch(
-                &executable,
-                &root,
-                "app-server --listen stdio://",
-                Some(&root),
-            )
-            .expect("contained app-server launch");
+            let invocation = std::env::var("CODEX_VERIFY_INVOCATION")
+                .unwrap_or_else(|_| "app-server --listen stdio://".to_owned());
+            let (mut child, mut stdin, stdout, stderr) =
+                ContainedChild::launch(&executable, &root, &invocation, Some(&root))
+                    .expect("contained app-server launch");
             let (tx, rx) = sync_channel(16);
             let output_limit = Arc::new(AtomicBool::new(false));
             let stdout_thread = std::thread::spawn({

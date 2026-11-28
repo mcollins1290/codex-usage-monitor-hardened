@@ -55,7 +55,7 @@ Deliver a lightweight Windows taskbar monitor showing Codex subscription five-ho
 
 - CLI 0.166.0: earlier local authenticated quota feasibility succeeded; executable subsequently replaced.
 - CLI 0.172.0: the explicitly selected local executable passed the development-only Rust external T1 entry point in a fresh synthetic profile; initialize, initialized and account/rateLimits/read completed with the expected sanitized authentication-required result, bounded shutdown, reader completion and profile cleanup. This does not establish absence of MCP, hook or plugin startup activity.
-- Startup integration side effects, authenticated behavior on 0.172.0 and full T2–T8 synthetic tests remain unverified. Do not infer safety from protocol success alone.
+- Startup integration side effects, authenticated behavior on 0.172.0 and full T2–T8 synthetic tests remain unverified. The reviewed invocation candidate now explicitly disables the official `plugins` feature and replaces `mcp_servers` with an empty table; this passed the bounded unauthenticated external exchange, but does not substitute for authenticated acceptance or prove unsupported integrations are recognized.
 - Authorized unauthenticated official-runtime batch: T1 passed; T2 and T4 remained inconclusive because configuration recognition was not demonstrated; T3, T5 and T6 remain unexecuted/inconclusive; repeated T7 lifecycle checks and T8 observer positive controls passed. No authenticated or inference activity occurred.
 - Never publish local executable paths, personal configuration, account data, credentials or private logs.
 
