@@ -5,6 +5,7 @@
 | `cargo fmt --all -- --check` | 0 | Formatting passed |
 | `cargo test --locked` | 0 | 93 passed, 0 failed, 5 ignored |
 | `cargo test --locked app_server::tests::shared_runner` | 0 | 2 passed, 0 failed; synthetic stand-in correlation matrix |
+| `cargo test --locked app_server::tests::externally_selected_codex_unauthenticated_exchange -- --ignored --nocapture` | 0 | Explicitly selected CLI 0.172.0 passed T1 with the expected sanitized authentication-required result; hash/path/version supplied out-of-band and not retained here |
 | Ten consecutive shared Rust correlation runs | 0 each | 10/10 passed; elapsed milliseconds: 11916, 10259, 10243, 10231, 10234, 10231, 10226, 10231, 10225, 10207 |
 | `cargo clippy --locked --all-targets` | 0 | No warnings |
 | `cargo build --release --locked` | 0 | Optimized release build passed |
